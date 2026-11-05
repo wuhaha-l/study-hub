@@ -74,13 +74,17 @@
 
 ```
 study-hub/
-├── miniprogram/          小程序
-├── cloudfunctions/studyHub/  云函数（适配器 + 数据层）
-├── test/                 44 个离线测试
-├── localserver/          本地代理（用于内网平台的真机联调）
-├── docs/                 架构详解 · 部署手册
-├── preview*.html         界面静态预览（浏览器直接打开）
-└── gen-*.py              预览样式生成脚本（把 wxss 的 rpx 折半成 px）
+├── miniprogram/              小程序：9 个页面 + utils（主题 / 同步 / 登录态判定）
+├── cloudfunctions/studyHub/  云函数：6 个平台适配器 + 数据层
+├── test/                     44 个离线测试套件（stub 小程序运行时，无需真机）
+├── localserver/              本地代理，用于内网平台的真机联调
+├── docs/
+│   ├── ARCHITECTURE.md       架构与数据流详解
+│   ├── DEPLOY.md             部署手册
+│   ├── prototypes/           各轮 UI 方案的静态预览页（浏览器直接打开）
+│   └── images/               展示截图
+├── tools/                    预览页与样式生成脚本（把 wxss 的 rpx 折半成 px）
+└── project.config.json       微信开发者工具项目配置
 ```
 
 ## 本地运行
