@@ -1,0 +1,468 @@
+.page {
+  min-height: 100vh;
+  padding-bottom: 60rpx;
+  position: relative;
+}
+
+/* ================= 顶部 ================= */
+.head {
+  position: relative;
+  padding-bottom: 20rpx;
+  background: linear-gradient(168deg, #EEEDFF 0%, #F7F4FF 60%, #F4F5F9 100%);
+}
+
+.theme-dark .head {
+  background: linear-gradient(168deg, #1E1B33 0%, #191A26 60%, #101116 100%);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+}
+
+.nav-back {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-back-ico {
+  font-size: 52rpx;
+  line-height: 1;
+  color: var(--text);
+  margin-top: -6rpx;
+}
+
+.nav-title {
+  flex: 1;
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-left: 8rpx;
+  letter-spacing: 0.5rpx;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  margin-right: 190rpx; /* 避开右上角胶囊 */
+}
+
+.view-btn {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-dark .view-btn {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.view-ico {
+  font-size: 30rpx;
+  color: var(--brand);
+  line-height: 1;
+}
+
+.sub-row {
+  padding: 4rpx 32rpx 18rpx;
+}
+
+.sub-txt {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* 搜索 */
+.search {
+  margin: 0 32rpx;
+  height: 76rpx;
+  border-radius: 20rpx;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  padding: 0 22rpx;
+}
+
+.search-ico {
+  font-size: 26rpx;
+  margin-right: 12rpx;
+  opacity: 0.75;
+}
+
+.search-ipt {
+  flex: 1;
+  font-size: 27rpx;
+  color: var(--text);
+}
+
+.ph {
+  color: var(--text-3);
+}
+
+.search-clear {
+  width: 44rpx;
+  height: 44rpx;
+  line-height: 44rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+/* ================= 便签配色 ================= */
+.note-c-plain,
+.row-c-plain {
+  background: var(--card);
+}
+
+.note-c-yellow,
+.row-c-yellow {
+  background: #FFF7D6;
+}
+
+.note-c-pink,
+.row-c-pink {
+  background: #FDEAF0;
+}
+
+.note-c-blue,
+.row-c-blue {
+  background: #E8F1FE;
+}
+
+.note-c-green,
+.row-c-green {
+  background: #E4F7EE;
+}
+
+.note-c-purple,
+.row-c-purple {
+  background: #F1ECFE;
+}
+
+.theme-dark .note-c-yellow,
+.theme-dark .row-c-yellow {
+  background: #3B3524;
+}
+
+.theme-dark .note-c-pink,
+.theme-dark .row-c-pink {
+  background: #3B2831;
+}
+
+.theme-dark .note-c-blue,
+.theme-dark .row-c-blue {
+  background: #22303F;
+}
+
+.theme-dark .note-c-green,
+.theme-dark .row-c-green {
+  background: #1E3329;
+}
+
+.theme-dark .note-c-purple,
+.theme-dark .row-c-purple {
+  background: #2C2740;
+}
+
+/* ================= 宫格 ================= */
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 24rpx 32rpx 0;
+}
+
+.note-c {
+  position: relative;
+  width: 333rpx;
+  height: 300rpx;
+  margin-bottom: 20rpx;
+  padding: 24rpx 22rpx 18rpx;
+  border-radius: 24rpx;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.note-c:nth-child(odd) {
+  margin-right: 20rpx;
+}
+
+.grid-fill {
+  width: 333rpx;
+}
+
+.note-hover {
+  opacity: 0.78;
+  transform: scale(0.985);
+}
+
+.pin-flag {
+  position: absolute;
+  top: 16rpx;
+  right: 18rpx;
+  font-size: 20rpx;
+  opacity: 0.85;
+}
+
+.note-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  /* 标题最多两行 */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  padding-right: 24rpx;
+}
+
+/* 摘要要单独包一层：
+   .note-c 是 flex 容器，flex 子元素的 display 会被浏览器算成 block，
+   -webkit-box / line-clamp 就失效了（摘要会顶出卡片再被裁成半行）。
+   包一层普通 block 之后 clamp 才真的生效。 */
+.note-body-wrap {
+  flex: 1;
+  overflow: hidden;
+  margin-top: 10rpx;
+}
+
+.note-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 24rpx;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.note-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+}
+
+.note-time {
+  font-size: 20rpx;
+  color: var(--text-3);
+}
+
+.note-chars {
+  font-size: 20rpx;
+  color: var(--text-3);
+  opacity: 0.9;
+}
+
+/* ================= 列表 ================= */
+.list {
+  padding: 24rpx 32rpx 0;
+}
+
+.row-c {
+  position: relative;
+  display: flex;
+  margin-bottom: 18rpx;
+  padding: 24rpx 24rpx 20rpx 26rpx;
+  border-radius: 24rpx;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.row-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 8rpx;
+  background: var(--brand-2);
+  opacity: 0.55;
+}
+
+.row-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.row-top {
+  display: flex;
+  align-items: flex-start;
+}
+
+.pin-mini {
+  font-size: 20rpx;
+  margin-right: 8rpx;
+  line-height: 1.6;
+}
+
+.row-title {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.row-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 8rpx;
+  font-size: 25rpx;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+
+.row-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14rpx;
+}
+
+/* ================= 悬浮新建 ================= */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 70rpx;
+  width: 108rpx;
+  height: 108rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  box-shadow: 0 10rpx 30rpx rgba(99, 102, 241, 0.36);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.fab-hover {
+  transform: scale(0.94);
+}
+
+.fab-ico {
+  font-size: 56rpx;
+  color: #FFFFFF;
+  line-height: 1;
+  margin-top: -4rpx;
+}
+
+.safe-bottom {
+  height: 140rpx;
+}
+
+/* ================= 空状态按钮 ================= */
+.empty-btn {
+  display: inline-block;
+  margin-top: 32rpx;
+  padding: 0 48rpx;
+  height: 78rpx;
+  line-height: 78rpx;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+/* ================= 长按菜单 ================= */
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--mask);
+  z-index: 40;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 20rpx 0 calc(20rpx + env(safe-area-inset-bottom));
+  z-index: 41;
+  animation: rise 0.22s ease-out;
+}
+
+@keyframes rise {
+  from { transform: translateY(40rpx); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sheet-bar {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 4rpx;
+  background: var(--line);
+  margin: 0 auto 20rpx;
+}
+
+.sheet-title {
+  padding: 0 40rpx 18rpx;
+  font-size: 26rpx;
+  color: var(--text-3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sheet-item {
+  display: flex;
+  align-items: center;
+  height: 104rpx;
+  padding: 0 40rpx;
+}
+
+.sheet-item:active {
+  background: var(--card-2);
+}
+
+.sheet-ico {
+  width: 48rpx;
+  font-size: 30rpx;
+}
+
+.sheet-txt {
+  font-size: 30rpx;
+  color: var(--text);
+}
+
+.sheet-txt.is-danger {
+  color: var(--danger);
+}
+
+.sheet-cancel {
+  margin-top: 12rpx;
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+  font-size: 30rpx;
+  color: var(--text-2);
+  border-top: 1rpx solid var(--line);
+}
+
+.hov {
+  opacity: 0.6;
+}

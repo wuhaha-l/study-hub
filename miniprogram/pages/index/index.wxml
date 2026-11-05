@@ -1,0 +1,384 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+  <!-- 背景渐变挂在 .page 自己身上。不要在这里再放一个 position: fixed 的
+       整屏背景层：z-index: 0 的定位层会盖住所有未定位的内容（课程卡、分组、
+       任务卡全中招），真机上表现为筛选行以下一片空白。 -->
+
+  <!-- ===== 顶部：小标栏 + 结论标题 + 2×2 磁贴 ===== -->
+  <view class="head" style="padding-top:{{statusBarHeight}}px;">
+    <view class="nav" style="height:{{navBarHeight}}px;">
+      <text class="nav-brand">郑好有你</text>
+      <view class="nav-acts">
+        <view class="nav-acc {{isGuest ? 'is-guest' : ''}}" bindtap="onAccTap" hover-class="tap-dim">
+          <text class="nav-acc-ico">{{isGuest ? '👤' : '⚙'}}</text>
+          <text class="nav-acc-txt">{{isGuest ? roleLabel : '登录设置'}}</text>
+        </view>
+        <view class="rbtn" bindtap="onThemeToggle" hover-class="tap-dim">
+          <text class="rbtn-ico">{{theme === 'dark' ? '☀️' : '🌙'}}</text>
+        </view>
+        <view class="rbtn {{syncing ? 'spin' : ''}}" wx:if="{{!isGuest}}" bindtap="onSyncTap" hover-class="tap-dim">
+          <text class="rbtn-ico">⟳</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="hello">
+      <view class="hello-hi">{{greeting}} · {{todayLabel}}</view>
+      <view class="hello-big" wx:if="{{stats.todo > 0}}">还有 <text class="hello-n">{{stats.todo}}</text> 件事要交</view>
+      <view class="hello-big" wx:else>今天都清完了</view>
+      <view class="hello-sub">{{headSub}}</view>
+    </view>
+
+    <!-- 磁贴：两行两列，四个都是「一眼看完」的数字，后两个可以直接点进去 -->
+    <!-- 用两行 flex 而不是 flex-wrap + calc 宽度：calc 里的 rpx 在部分基础库上会被
+         当成非法值整条丢掉，磁贴就退化成一行一个，这里不能再靠 calc 撑两列 -->
+    <view class="tiles">
+      <view class="tile-row">
+        <view class="tile">
+          <view class="tile-k"><view class="tile-dot" style="background:#FF3B30"></view>待完成</view>
+          <view class="tile-v">{{stats.todo}}<text class="tile-u">件</text></view>
+          <view class="tile-s" wx:if="{{stats.expired > 0}}"><text class="tile-red">{{stats.expired}} 项已过期</text></view>
+          <view class="tile-s" wx:else>{{stats.week}} 项 7 天内截止</view>
+        </view>
+
+        <view class="tile tile-ring">
+          <view class="tile-k"><view class="tile-dot" style="background:#34C759"></view>完成率</view>
+          <view class="tile-v">{{stats.rate}}<text class="tile-u">%</text></view>
+          <view class="tile-s">已完成 {{stats.done}} 项</view>
+          <view class="ring" style="background: conic-gradient(#0A84FF {{stats.rate}}%, rgba(120,120,128,0.16) {{stats.rate}}%);">
+            <view class="ring-hole">{{stats.rate}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="tile-row">
+        <view class="tile" bindtap="goTomato" hover-class="tile-hover">
+          <view class="tile-k"><view class="tile-dot" style="background:#AF52DE"></view>专注</view>
+          <view class="tile-v">{{tomatoMin}}<text class="tile-u">分钟</text></view>
+          <view class="tile-s">{{tomatoRunning ? '正在专注中…' : (tomatoToday > 0 ? '今天 ' + tomatoToday + ' 个番茄' : '开一个番茄钟')}}</view>
+        </view>
+
+        <view class="tile" bindtap="goNotes" hover-class="tile-hover">
+          <view class="tile-k"><view class="tile-dot" style="background:#FF9500"></view>记事本</view>
+          <view class="tile-v">{{noteCount}}<text class="tile-u">条</text></view>
+          <view class="tile-s">{{noteCount > 0 ? '最近记过 ' + noteCount + ' 条' : '随手记点东西'}}</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 平台：三格胶囊，点一下就进绑定 / 管理 -->
+    <view class="plats" wx:if="{{!isGuest}}">
+      <view
+        class="plat {{item.bound ? '' : 'off'}} {{item.status === 'invalid' ? 'bad' : ''}}"
+        wx:for="{{platforms}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onPlatformTap"
+        hover-class="tile-hover"
+      >
+        <view class="plat-i" style="background:{{item.color}}">{{item.initial}}</view>
+        <text class="plat-n">{{item.name}}</text>
+        <text class="plat-c">{{!item.bound ? '绑定' : (item.status === 'invalid' ? '失效' : item.count)}}</text>
+      </view>
+    </view>
+    <view class="guest-bar" wx:else>
+      <text class="guest-bar-title">访客模式</text>
+      <text class="guest-bar-body">课表导入、学习通 / 希冀 / U校园 绑定和任务同步都关掉了。要这些功能，得用本校学号登录。</text>
+    </view>
+
+    <!-- 需要重新登录的提醒。放在同步条上方：
+         否则用户点完「同步全部」，发现条数没动，才反应过来是根本没抓成。 -->
+    <view class="relogin" wx:if="{{reloginShow && !isGuest}}" bindtap="goRelogin" hover-class="relogin-hover">
+      <view class="relogin-top">
+        <text class="relogin-ico">🔑</text>
+        <text class="relogin-t">{{relogin.title}}</text>
+        <text class="relogin-go">{{relogin.items.length === 1 ? '去登录 ›' : '逐个处理 ›'}}</text>
+      </view>
+      <view class="relogin-list">
+        <view class="relogin-i" wx:for="{{relogin.items}}" wx:key="key">
+          <view class="relogin-dot" style="background:{{item.color}}"></view>
+          <text class="relogin-name">{{item.name}}</text>
+          <text class="relogin-why">{{item.reasonText}}</text>
+        </view>
+      </view>
+      <view class="relogin-foot">
+        <text class="relogin-tip">不登录的话，这个平台的任务会停在上次抓到的样子</text>
+        <text class="relogin-later" catchtap="onReloginLater">今天稍后</text>
+      </view>
+    </view>
+
+    <!-- 全量同步：三平台一次点完，是这一屏唯一的主动作 -->
+    <view class="sync-all {{syncing ? 'is-on' : ''}}" wx:if="{{!isGuest}}" bindtap="onSyncTap" hover-class="sync-hover">
+      <text class="sync-all-ico {{syncing ? 'spin' : ''}}">⟳</text>
+      <text class="sync-all-t">{{syncing ? (syncText || '正在同步所有课程和任务…') : '同步全部课程和任务'}}</text>
+    </view>
+    <view class="guest-strip" wx:else>
+      <text class="guest-strip-ico">👤</text>
+      <text class="guest-strip-txt">{{guestName}} · 访客账号，只能用记事本、专注和手动课表</text>
+    </view>
+  </view>
+
+  <!-- ===== 云函数版本过旧（兜底拦截后仍要提醒部署） ===== -->
+  <view class="ver-warn" wx:if="{{verWarn}}">
+    <text class="ver-warn-ico">⚠️</text>
+    <text class="ver-warn-txt">{{verWarn}}</text>
+  </view>
+
+  <!-- ===== 学期筛选（有往期任务时才出现） ===== -->
+  <block wx:if="{{semesterChips.length}}">
+    <scroll-view class="chips chips-sem" scroll-x enhanced show-scrollbar="{{false}}">
+      <view
+        class="chip chip-sem {{semesterFilter === item.key ? 'is-on' : ''}}"
+        wx:for="{{semesterChips}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onSemesterFilter"
+      >
+        <text class="chip-name">{{item.name}}</text>
+        <text class="chip-num" wx:if="{{item.count > 0}}">{{item.count}}</text>
+      </view>
+    </scroll-view>
+    <view class="sem-hint" wx:if="{{semesterText && semesterFilter === 'current'}}">{{semesterText}}</view>
+  </block>
+
+  <!-- ===== 平台筛选 + 新任务 ===== -->
+  <view class="seg-row">
+    <scroll-view class="seg" scroll-x enhanced show-scrollbar="{{false}}">
+      <view
+        class="seg-i {{filter === item.key ? 'is-on' : ''}}"
+        wx:for="{{filters}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="onFilter"
+      >
+        <text class="seg-n">{{item.name}}</text>
+        <text class="seg-c" wx:if="{{item.count > 0}}">{{item.count}}</text>
+      </view>
+    </scroll-view>
+    <view class="add-fab" bindtap="onAddTask" hover-class="tile-hover">
+      <text class="add-fab-ico">＋</text>
+      <text class="add-fab-txt">新任务</text>
+    </view>
+  </view>
+
+  <!-- ===== 课程筛选 ===== -->
+  <scroll-view
+    class="chips chips-sub"
+    scroll-x
+    enhanced
+    show-scrollbar="{{false}}"
+    wx:if="{{courseChips.length}}"
+  >
+    <view
+      class="chip chip-course {{courseFilter === item.key ? 'is-on' : ''}}"
+      wx:for="{{courseChips}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onCourseFilter"
+    >
+      <text class="chip-name">{{item.name}}</text>
+      <text class="chip-num" wx:if="{{item.count > 0}}">{{item.count}}</text>
+    </view>
+  </scroll-view>
+
+  <!-- ===== 提示 ===== -->
+  <view class="notice" wx:if="{{error || syncWarn}}">
+    <text class="notice-ico">!</text>
+    <text class="notice-text">{{error || syncWarn}}</text>
+  </view>
+
+  <!-- ===== 加载 ===== -->
+  <view class="skeleton" wx:if="{{loading}}">
+    <view class="sk-block" wx:for="{{[1,2,3]}}" wx:key="*this"></view>
+  </view>
+
+  <!-- ===== 未绑定引导 =====
+       这里原来写的是 wx:if / wx:elif / wx:elif / wx:else 一条链，链中间夹了注释。
+       WXML 的 wx:elif、wx:else 必须紧跟同级节点，中间插进注释后整条链会静默失效：
+       loading 为假时四段全不渲染，于是「今日课程 + 任务列表」整块消失，
+       页面上只剩筛选胶囊和一大片空白（真机截图踩过）。
+       改成三个互斥的独立 wx:if，不再依赖链式上下文。 -->
+  <view class="card empty-guide" wx:if="{{!loading && !hasAccount && isGuest}}">
+    <text class="empty-emoji">👋</text>
+    <view class="empty-title">访客模式，已经可以用了</view>
+    <view class="empty-desc">记事本、番茄钟、手动加课表、手动建待办都能用。想汇总各平台作业，就需要本校学号登录。</view>
+    <view class="guide-btn" bindtap="goSchedule">去加课表</view>
+  </view>
+
+  <view class="card empty-guide" wx:if="{{!loading && !hasAccount && !isGuest}}">
+    <text class="empty-emoji">📚</text>
+    <view class="empty-title">还没有绑定任何平台</view>
+    <view class="empty-desc">绑定学习通、希冀或 U校园 的账号后，这里会自动汇总所有未完成的任务点、作业和考试。</view>
+    <view class="guide-btn" bindtap="goAccounts">去绑定账号</view>
+  </view>
+
+  <!-- ===== 任务分组 ===== -->
+  <block wx:if="{{!loading && hasAccount}}">
+
+    <!-- 今日课程 -->
+    <view class="today-card" bindtap="goSchedule" hover-class="task-hover">
+      <view class="today-head">
+        <view class="today-head-left">
+          <text class="today-title">今天 · {{todayDay}}</text>
+          <text class="today-week" wx:if="{{todayWeek}}">{{todayWeek}}</text>
+        </view>
+        <text class="today-more">{{hasTimetable ? '课表 ›' : '导入课表 ›'}}</text>
+      </view>
+      <block wx:if="{{todayClasses.length}}">
+        <view class="today-row" wx:for="{{todayClasses}}" wx:key="id" wx:for-item="c">
+          <text class="today-period {{c.now ? 'is-now' : ''}}">{{c.period}}</text>
+          <text class="today-name">{{c.name}}</text>
+          <text class="today-place" wx:if="{{c.place}}">{{c.place}}</text>
+        </view>
+        <view class="today-state" wx:if="{{todayState}}">{{todayState}}</view>
+      </block>
+      <view class="today-empty" wx:elif="{{!hasTimetable}}">还没导入课表，点这里加</view>
+      <view class="today-empty" wx:else>今天没有课{{weekCount ? '（本周共 ' + weekCount + ' 节）' : ''}}，点开看课表</view>
+    </view>
+
+    <block wx:for="{{groups}}" wx:key="key" wx:for-item="g">
+      <view class="group-head">
+        <view class="group-left">
+          <text class="group-title gt-{{g.tone}}">{{g.title}}</text>
+          <text class="group-count">{{g.count}}</text>
+        </view>
+        <text
+          class="group-more"
+          wx:if="{{g.collapsible}}"
+          data-key="{{g.key}}"
+          bindtap="toggleGroup"
+        >
+          {{g.moreText}}
+        </text>
+      </view>
+
+      <view
+        class="task {{it.status === 'done' ? 'is-done' : ''}} {{it.dlLevel === 'expired' ? 'is-hot' : ''}}"
+        wx:for="{{g.items}}"
+        wx:key="id"
+        wx:for-item="it"
+        data-id="{{it.id}}"
+        bindtap="onTaskTap"
+        bindlongpress="onTaskLongPress"
+        hover-class="task-hover"
+      >
+        <view class="task-ct">
+          <view class="task-dot" style="background:{{it.pColor}}"></view>
+          <text class="task-pf">{{it.pName}}</text>
+          <text class="task-cs">{{it.courseName}}</text>
+          <text class="task-sem" wx:if="{{it.isPast}}">{{it.semShort}}</text>
+          <text class="task-when w-{{it.dlLevel}}">{{it.dlText}}</text>
+        </view>
+        <view class="task-title {{it.required ? 'is-required' : ''}} {{it.optional ? 'is-optional' : ''}}">{{it.title}}<text class="req-badge" wx:if="{{it.required}}">必做</text><text class="opt-badge" wx:elif="{{it.optional}}">选做</text></view>
+        <view class="task-meta">
+          <text>{{it.typeIcon}} {{it.typeLabel}}</text>
+          <text wx:if="{{it.progressText}}"> · 进度 {{it.progressText}}</text>
+        </view>
+      </view>
+    </block>
+
+    <!-- 全空 -->
+    <view class="card empty-guide" wx:if="{{groups.length === 0}}">
+      <text class="empty-emoji">🎉</text>
+      <view class="empty-title">这个范围没有待办</view>
+      <view class="empty-desc">下拉可以重新同步一次，或者切换到其他平台看看。</view>
+    </view>
+
+    <!-- 每日提醒 -->
+    <view class="remind" wx:if="{{remindEnabled}}">
+      <view class="remind-body">
+        <text class="remind-title">每日提醒</text>
+        <text class="remind-desc">{{remindText}}</text>
+      </view>
+      <view class="remind-btn" bindtap="onSubscribe" hover-class="tap-dim">{{remindRemaining > 0 ? '续订' : '开启'}}</view>
+    </view>
+
+    <view class="footer-note">上次同步 · {{lastSyncText}}{{srvVer ? ' · 服务 ' + srvVer : ''}}</view>
+    <view class="footer-tip" wx:if="{{mergeNote}}">{{mergeNote}}</view>
+    <view class="footer-tip">长按任意任务可以标记完成、复制链接</view>
+  </block>
+
+  <!--
+    退出登录必须放在上面所有分支之外。
+    以前它写在「任务分组」那个 block 里，结果访客（没建过待办 → hasAccount 为 false）
+    看到的是空态引导卡，整个 block 都不渲染，页面上根本没有退出入口。
+  -->
+  <view class="logout-row" wx:if="{{!loading}}">
+    <view class="logout-link" bindtap="onLogout" hover-class="task-hover">
+      {{isGuest ? '退出访客身份' : '退出登录'}}
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- ===== 长按任务菜单 ===== -->
+  <view class="tmask" wx:if="{{menu}}" bindtap="closeMenu"></view>
+  <view class="tmenu" wx:if="{{menu}}" catchtap="noop">
+    <view class="tmenu-bar"></view>
+    <view class="tmenu-head">
+      <text class="tmenu-name">{{menu.title}}</text>
+      <text class="tmenu-sub">{{menu.platform}} · {{menu.course}} · {{menu.done ? '已完成' : '待完成'}}</text>
+    </view>
+
+    <view class="tmenu-item {{menu.done ? '' : 'is-primary'}}" bindtap="onMenuDone" hover-class="tap-dim">
+      <text class="tmenu-ico">{{menu.done ? '↩' : '✓'}}</text>
+      <text class="tmenu-txt">{{menu.done ? '恢复为待完成' : '标记为已完成'}}</text>
+      <text class="tmenu-hint">{{menu.done ? '' : '会移到「已完成」'}}</text>
+    </view>
+
+    <view class="tmenu-item" bindtap="onMenuDetail" hover-class="tap-dim">
+      <text class="tmenu-ico">›</text>
+      <text class="tmenu-txt">查看详情</text>
+    </view>
+
+    <view class="tmenu-item" wx:if="{{menu.url}}" bindtap="onMenuCopy" hover-class="tap-dim">
+      <text class="tmenu-ico">⧉</text>
+      <text class="tmenu-txt">复制任务链接</text>
+    </view>
+
+    <view class="tmenu-item" wx:if="{{menu.custom}}" bindtap="onMenuDelete" hover-class="tap-dim">
+      <text class="tmenu-ico">🗑</text>
+      <text class="tmenu-txt is-danger">删除任务</text>
+      <text class="tmenu-hint">自己建的任务才能删</text>
+    </view>
+
+    <view class="tmenu-cancel" bindtap="closeMenu" hover-class="tap-dim">取消</view>
+  </view>
+
+  <!-- ===== 新建任务弹层 ===== -->
+  <view class="tmask" wx:if="{{addShow}}" bindtap="closeAddSheet"></view>
+  <view class="asheet" wx:if="{{addShow}}" catchtap="noop">
+    <view class="asheet-bar"></view>
+    <view class="asheet-title">新任务</view>
+
+    <input class="aipt" placeholder="要做什么？比如：交物理实验报告" placeholder-class="aipt-ph" value="{{addTitle}}" bindinput="onAddTitle" />
+    <input class="aipt" placeholder="课程名（可不填）" placeholder-class="aipt-ph" value="{{addCourse}}" bindinput="onAddCourse" />
+
+    <view class="arow">
+      <picker mode="date" value="{{addDate}}" bindchange="onAddDate">
+        <view class="apick">📅 截止 {{addDate || '选日期'}}</view>
+      </picker>
+      <picker mode="time" value="{{addTime}}" bindchange="onAddTime">
+        <view class="apick">🕘 {{addTime}}</view>
+      </picker>
+    </view>
+
+    <picker mode="selector" range="{{remindOptions}}" value="{{addRemindIndex}}" bindchange="onAddRemind">
+      <view class="apick">⏰ 提醒：{{remindOptions[addRemindIndex]}}</view>
+    </picker>
+
+    <view class="arow" wx:if="{{addRemindIndex === 3}}">
+      <picker mode="date" value="{{addRemindDate}}" bindchange="onAddRemindDate">
+        <view class="apick">提醒日 {{addRemindDate}}</view>
+      </picker>
+      <picker mode="time" value="{{addRemindTime}}" bindchange="onAddRemindTime">
+        <view class="apick">{{addRemindTime}}</view>
+      </picker>
+    </view>
+
+    <view class="abtns">
+      <view class="abtn abtn-ghost" bindtap="closeAddSheet" hover-class="tap-dim">取消</view>
+      <view class="abtn abtn-primary" bindtap="onSaveTask" hover-class="tap-dim">{{addBusy ? '保存中…' : '保存'}}</view>
+    </view>
+    <view class="ahint">提醒是微信订阅消息，每条消耗一次额度；额度在首页「每日提醒」里点开启/续订攒（一次点击 = 一条）</view>
+  </view>
+</view>

@@ -1,0 +1,516 @@
+/* ================= 课表（网格视图） ================= */
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding: 0 16rpx;
+  box-sizing: border-box;
+}
+
+/* ---------- 顶部 ---------- */
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 28rpx 8rpx 16rpx;
+}
+.head-left {
+  display: flex;
+  align-items: baseline;
+}
+.head-title {
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5rpx;
+}
+.head-sub {
+  margin-left: 14rpx;
+  font-size: 22rpx;
+  color: var(--text-2);
+}
+.head-set {
+  font-size: 26rpx;
+  color: var(--brand);
+  padding: 8rpx 20rpx;
+  background: var(--brand-soft);
+  border-radius: 999rpx;
+}
+
+/* ---------- 周次条 ---------- */
+.weekbar {
+  display: flex;
+  align-items: center;
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 12rpx 12rpx;
+  margin: 0 8rpx 16rpx;
+  box-shadow: var(--shadow);
+}
+.wk-btn {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 56rpx;
+  text-align: center;
+  font-size: 38rpx;
+  color: var(--brand);
+  border-radius: 14rpx;
+  background: var(--brand-soft);
+}
+.wk-pick {
+  flex: 1;
+}
+.wk-mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.wk-no {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+.wk-date {
+  font-size: 20rpx;
+  color: var(--text-3);
+  margin-top: 2rpx;
+}
+.wk-now {
+  font-size: 22rpx;
+  color: var(--brand);
+  padding: 10rpx 16rpx;
+  margin-left: 8rpx;
+  background: var(--brand-soft);
+  border-radius: 12rpx;
+}
+
+/* ---------- 网格 ---------- */
+.grid {
+  display: flex;
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 8rpx 6rpx 12rpx;
+  box-shadow: var(--shadow);
+  font-size: 17rpx;
+  color: var(--text-3);
+  margin-top: 1rpx;
+}
+.col {
+  flex: 1;
+  min-width: 0;
+}
+.col-time {
+  flex: none;
+  width: 46rpx;
+}
+.col-head {
+  height: 64rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12rpx;
+  margin-bottom: 6rpx;
+}
+.col-head.is-today {
+  background: var(--brand-2);
+}
+.ch-d {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.ch-date {
+  font-size: 17rpx;
+  color: var(--text-3);
+  margin-top: 1rpx;
+}
+.col-head.is-today .ch-d,
+.col-head.is-today .ch-date {
+  color: #fff;
+}
+.col-head.is-today .ch-date {
+  opacity: 0.8;
+}
+
+.col-body {
+  position: relative;
+}
+.cell {
+  border-bottom: 1rpx solid var(--line);
+  box-sizing: border-box;
+}
+.cell-no {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 6rpx;
+}
+.cno {
+  font-size: 18rpx;
+  color: var(--text-3);
+  opacity: 0.75;
+}
+/* 现在正在上的那一节，左侧数字点亮 */
+.cell-no.is-now .cno {
+  color: var(--brand);
+  font-weight: 700;
+}
+
+/* 课程块（颜色来自 utils/schedule.js 的调色板，深浅色各一套） */
+.blk {
+  position: absolute;
+  left: 2rpx;
+  right: 2rpx;
+  border-radius: 10rpx;
+  border-left: 5rpx solid #6C63E8;
+  padding: 6rpx 5rpx;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.blk-hover {
+  opacity: 0.72;
+}
+.blk-name {
+  font-size: 18rpx;
+  line-height: 1.22;
+  font-weight: 600;
+  word-break: break-all;
+}
+.blk-place {
+  font-size: 16rpx;
+  line-height: 1.2;
+  opacity: 0.72;
+  margin-top: 3rpx;
+  word-break: break-all;
+}
+
+/* ---------- 本周无课 ---------- */
+.no-week {
+  margin: 14rpx 8rpx 0;
+  padding: 22rpx 24rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ---------- 空态 ---------- */
+.empty {
+  background: var(--card);
+  border-radius: 20rpx;
+  padding: 60rpx 40rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.empty-emoji {
+  font-size: 64rpx;
+}
+.empty-title {
+  margin-top: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+.empty-desc {
+  margin-top: 12rpx;
+  font-size: 24rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ---------- 操作 ---------- */
+.tools {
+  display: flex;
+  margin: 20rpx 8rpx 0;
+}
+.tool {
+  flex: 1;
+  height: 88rpx;
+  background: var(--card);
+  border-radius: 18rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+}
+.tool + .tool {
+  margin-left: 16rpx;
+}
+.tool-ico {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+.tool-txt {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.foot {
+  margin: 22rpx 8rpx 0;
+  font-size: 21rpx;
+  color: var(--text-3);
+  text-align: center;
+}
+.safe-bottom {
+  height: calc(32rpx + env(safe-area-inset-bottom));
+}
+
+/* ================= 面板 ================= */
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--mask);
+  z-index: 90;
+}
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 91;
+  background: var(--card);
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 14rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));
+  max-height: 82vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+.sheet-bar {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: var(--line);
+  margin: 0 auto 20rpx;
+}
+.sheet-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+.sheet-desc {
+  margin-top: 10rpx;
+  font-size: 23rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+.sample {
+  margin-top: 16rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 16rpx 18rpx;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+.ta {
+  width: 100%;
+  min-height: 180rpx;
+  margin-top: 16rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 18rpx;
+  font-size: 25rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+.ta-ph {
+  color: var(--text-3);
+  font-size: 25rpx;
+}
+.ipt {
+  width: 100%;
+  height: 84rpx;
+  margin-top: 14rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+.ipt-flex {
+  flex: 1;
+  width: auto;
+  margin-top: 0;
+}
+.form-row {
+  display: flex;
+  margin-top: 14rpx;
+}
+.form-row .pick + .pick {
+  margin-left: 14rpx;
+}
+.pick {
+  flex: 1;
+}
+.pick-narrow {
+  flex: none;
+  width: 220rpx;
+  margin-left: 14rpx;
+}
+.pick-in {
+  height: 84rpx;
+  line-height: 84rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+}
+
+/* 详情 */
+.dt-head {
+  padding: 4rpx 0 8rpx;
+}
+.dt-name {
+  font-size: 38rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+.dt-meta {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+.dt-place {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: var(--brand);
+}
+
+/* 按钮 */
+.sheet-btns {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 28rpx;
+}
+.sbtn {
+  flex: 1;
+  min-width: 200rpx;
+  height: 92rpx;
+  line-height: 92rpx;
+  text-align: center;
+  border-radius: 18rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+.sbtn + .sbtn {
+  margin-left: 16rpx;
+}
+.sbtn-ghost {
+  background: var(--ghost-bg);
+  color: var(--ghost-fg);
+}
+.sbtn-primary {
+  background: var(--brand-2);
+  color: #fff;
+}
+.sbtn-danger {
+  background: var(--err-bg);
+  color: var(--danger);
+}
+
+/* 设置项 */
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 4rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.set-left {
+  display: flex;
+  flex-direction: column;
+}
+.set-name {
+  font-size: 27rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+.set-val {
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-top: 6rpx;
+}
+.set-arrow {
+  font-size: 30rpx;
+  color: var(--text-3);
+}
+
+/* ===== 教务导入 ===== */
+.jw-steps {
+  margin-top: 20rpx;
+}
+.jw-step {
+  display: flex;
+  align-items: flex-start;
+  padding: 14rpx 0;
+}
+.jw-n {
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-size: 22rpx;
+  font-weight: 600;
+  flex: 0 0 auto;
+  margin-right: 16rpx;
+  margin-top: 2rpx;
+}
+.jw-txt {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.jw-t {
+  font-size: 26rpx;
+  color: var(--text);
+  font-weight: 600;
+}
+.jw-d {
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.55;
+  margin-top: 4rpx;
+}
+.jw-live {
+  margin-top: 16rpx;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 16rpx 18rpx;
+  font-size: 23rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+  white-space: pre-line;
+  word-break: break-all;
+}
+.jw-live.ok {
+  color: var(--ok);
+  background: var(--ok-bg);
+}
+.jw-live.err {
+  color: var(--danger);
+  background: var(--err-bg);
+}
+.jw-alt {
+  margin-top: 18rpx;
+  text-align: center;
+  font-size: 23rpx;
+  color: var(--brand);
+}

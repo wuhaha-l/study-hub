@@ -1,0 +1,1139 @@
+.page {
+  min-height: 100vh;
+  padding: 24rpx 0 40rpx;
+}
+
+/* 头部 */
+.head {
+  padding: 16rpx 40rpx 24rpx;
+}
+
+.head-title {
+  display: block;
+  font-size: 42rpx;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5rpx;
+  margin-bottom: 12rpx;
+}
+
+.head-desc {
+  font-size: 25rpx;
+  color: var(--text-2);
+  line-height: 1.62;
+}
+
+/* 安全提示 */
+.warn {
+  display: flex;
+  gap: 14rpx;
+  margin: 8rpx 32rpx 32rpx;
+  padding: 24rpx;
+  background: #FFFBEB;
+  border-radius: 20rpx;
+  border: 1rpx solid #FDE9B8;
+}
+
+.warn-ico {
+  font-size: 28rpx;
+  line-height: 1.4;
+}
+
+.warn-body {
+  flex: 1;
+}
+
+.warn-title {
+  display: block;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #92400E;
+  margin-bottom: 8rpx;
+}
+
+.warn-text {
+  font-size: 23rpx;
+  color: #A16207;
+  line-height: 1.62;
+}
+
+/* 平台卡 */
+.plat {
+  margin: 0 32rpx 20rpx;
+  background: var(--card);
+  border-radius: 28rpx;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.plat-top {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 32rpx;
+}
+
+.row-hover {
+  background: var(--card-2);
+}
+
+.plat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.plat-name {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6rpx;
+}
+
+.plat-desc {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-3);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.state-badge {
+  font-size: 21rpx;
+  color: var(--text-3);
+  background: var(--ghost-bg);
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  flex-shrink: 0;
+}
+
+.state-badge.on {
+  color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.chev {
+  font-size: 40rpx;
+  color: var(--text-3);
+  line-height: 1;
+  transform: rotate(90deg);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: 8rpx;
+}
+
+.chev.up {
+  transform: rotate(-90deg);
+}
+
+/* 已绑定概要 */
+.bound {
+  padding: 0 32rpx 28rpx;
+  border-top: 1rpx solid var(--line);
+  padding-top: 24rpx;
+}
+
+.bound-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 6rpx;
+}
+
+.bound-user {
+  font-size: 26rpx;
+  color: var(--text-2);
+  font-weight: 500;
+}
+
+.bound-mode {
+  font-size: 20rpx;
+  color: var(--brand);
+  background: var(--brand-soft);
+  padding: 3rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.bound-status {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-3);
+  margin-bottom: 20rpx;
+}
+
+.bound-status.bad {
+  color: var(--danger);
+}
+
+/* 旧模式账号（本地代理 / 内网直连）的说明块：必须显眼，否则用户一直以为同步过的 */
+.legacy {
+  margin: -6rpx 0 20rpx;
+  padding: 18rpx 20rpx;
+  border-radius: 16rpx;
+  background: rgba(255, 149, 0, 0.1);
+  border: 1rpx solid rgba(255, 149, 0, 0.28);
+}
+
+.legacy-title {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #B25B00;
+  margin-bottom: 6rpx;
+}
+
+.legacy-body {
+  display: block;
+  font-size: 21rpx;
+  line-height: 1.6;
+  color: var(--text-2);
+}
+
+.legacy-btn {
+  display: inline-block;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  color: var(--brand);
+}
+
+.theme-dark .legacy {
+  background: rgba(255, 159, 10, 0.14);
+  border-color: rgba(255, 159, 10, 0.34);
+}
+
+.theme-dark .legacy-title {
+  color: #FFB340;
+}
+
+.bound-ops {
+  display: flex;
+  gap: 32rpx;
+}
+
+.op {
+  font-size: 25rpx;
+  color: var(--brand);
+  font-weight: 500;
+}
+
+.op.danger {
+  color: var(--danger);
+}
+
+/* 「重新登录」比普通操作更要紧，用橙色 + 加粗，别混在一排蓝字里 */
+.op.warn {
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* ================= 需要重新登录 · 汇总卡 =================
+   这是账号页的第一块内容：用户点进来最想知道的就是「哪个坏了、点哪修」。
+   逐个平台一行，点一行直接摊开它自己的登录表单。 */
+.relogin {
+  margin: 0 32rpx 24rpx;
+  padding: 26rpx 26rpx 8rpx;
+  border-radius: 24rpx;
+  background: #FFF7ED;
+  border: 1rpx solid #FDE0BC;
+}
+
+.relogin-head {
+  display: flex;
+  align-items: center;
+}
+
+.relogin-ico {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+}
+
+.relogin-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 29rpx;
+  font-weight: 700;
+  color: #9A3412;
+}
+
+.relogin-all {
+  flex: none;
+  font-size: 24rpx;
+  color: #B45309;
+}
+
+.relogin-sub {
+  display: block;
+  margin-top: 10rpx;
+  font-size: 23rpx;
+  color: #A16207;
+  line-height: 1.6;
+}
+
+.relogin-row {
+  display: flex;
+  align-items: center;
+  margin-top: 18rpx;
+  padding: 20rpx 0;
+  border-top: 1rpx solid rgba(180, 83, 9, 0.14);
+}
+
+.relogin-row .dot {
+  width: 14rpx;
+  height: 14rpx;
+  margin-right: 14rpx;
+}
+
+.relogin-row-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.relogin-row-line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.relogin-name {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.relogin-reason {
+  font-size: 23rpx;
+  color: #B45309;
+  margin-left: 12rpx;
+}
+
+.relogin-detail {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.relogin-btn {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 25rpx;
+  font-weight: 600;
+  color: #B45309;
+}
+
+/* 表单顶上的「上次没登上」提示 */
+.form-relogin {
+  display: flex;
+  gap: 10rpx;
+  padding: 16rpx 18rpx;
+  margin-bottom: 22rpx;
+  background: #FFF7ED;
+  border: 1rpx solid #FDE0BC;
+  border-radius: 14rpx;
+}
+
+.form-relogin-ico {
+  font-size: 24rpx;
+  line-height: 1.5;
+}
+
+.form-relogin-txt {
+  flex: 1;
+  font-size: 23rpx;
+  color: #A16207;
+  line-height: 1.55;
+}
+
+/* 表单 */
+.form {
+  padding: 8rpx 32rpx 32rpx;
+  border-top: 1rpx solid var(--line);
+  padding-top: 28rpx;
+}
+
+.seg {
+  display: flex;
+  background: var(--ghost-bg);
+  border-radius: 16rpx;
+  padding: 6rpx;
+  margin-bottom: 28rpx;
+}
+
+.seg-item {
+  flex: 1;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--text-2);
+  border-radius: 12rpx;
+}
+
+.seg-item.on {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.field.column {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14rpx;
+}
+
+.field-label {
+  font-size: 26rpx;
+  color: var(--text-2);
+  width: 190rpx;
+  flex-shrink: 0;
+}
+
+.field-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text);
+  text-align: right;
+}
+
+.field-textarea {
+  width: 100%;
+  min-height: 150rpx;
+  font-size: 24rpx;
+  color: var(--text);
+  line-height: 1.6;
+  background: var(--card-2);
+  border-radius: 16rpx;
+  padding: 20rpx;
+  word-break: break-all;
+}
+
+.ph {
+  color: var(--text-3);
+}
+
+.form-tip {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+  padding: 16rpx 0 0;
+}
+
+/* 希冀内网部署引导条：公网头歌那张卡对校内自建账号一定登不上，直接在表单里给出出口 */
+.edu-jump {
+  margin: 20rpx 0 4rpx;
+  padding: 20rpx 22rpx;
+  border-radius: 16rpx;
+  background: var(--brand-soft);
+  border: 1rpx solid var(--line);
+}
+
+.edu-jump-t {
+  display: block;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--brand);
+  line-height: 1.5;
+}
+
+.edu-jump-b {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+  padding-top: 8rpx;
+}
+
+.form-link {
+  display: inline-block;
+  font-size: 22rpx;
+  color: var(--brand);
+  padding-top: 12rpx;
+}
+
+.form-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 32rpx;
+}
+
+.form-actions .btn-ghost {
+  flex: 1;
+  height: 84rpx;
+  line-height: 84rpx;
+  font-size: 28rpx;
+}
+
+.form-actions .btn-primary {
+  flex: 2;
+  height: 84rpx;
+  line-height: 84rpx;
+  font-size: 28rpx;
+}
+
+/* 扫码登录 */
+.qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12rpx 0 8rpx;
+}
+
+.qr-box {
+  position: relative;
+  width: 380rpx;
+  height: 380rpx;
+  background: var(--card);
+  border: 1rpx solid var(--line);
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.qr-img {
+  width: 340rpx;
+  height: 340rpx;
+}
+
+.qr-veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.94);
+}
+
+.qr-veil-text {
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+
+.qr-veil-text.bad {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.qr-state {
+  font-size: 27rpx;
+  color: var(--text-2);
+  font-weight: 600;
+  margin-top: 28rpx;
+}
+
+.qr-state.active {
+  color: var(--ok);
+}
+
+.qr-hint {
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.62;
+  margin-top: 14rpx;
+  text-align: center;
+  padding: 0 16rpx;
+}
+
+.qr-refresh {
+  margin-top: 28rpx;
+  width: 320rpx;
+  height: 76rpx;
+  line-height: 76rpx;
+  font-size: 26rpx;
+}
+
+/* 希冀 · 校园内网直连 */
+.intra {
+  margin: 28rpx 32rpx 0;
+  padding: 32rpx;
+  background: var(--card);
+  border-radius: 24rpx;
+  box-shadow: var(--shadow);
+}
+
+.intra-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.intra-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.intra-badge {
+  font-size: 19rpx;
+  color: #B4761A;
+  background: #FDF3E2;
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+}
+
+.intra-desc {
+  display: block;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.66;
+  margin: 14rpx 0 24rpx;
+}
+
+.intra-tip {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+  margin-top: 12rpx;
+}
+
+/* 「开发调试在哪开」的入口：夹在说明和按钮之间，平时不占地方 */
+.dbg-link {
+  display: block;
+  padding-top: 8rpx;
+  margin-bottom: 4rpx;
+}
+
+/* 构建号：小一号、更淡，只用来核对「手机上是不是这一版」 */
+.edu-build {
+  display: block;
+  margin-top: 4rpx;
+  font-size: 19rpx;
+  color: var(--text-3);
+  opacity: 0.75;
+}
+
+/* 云端登录态一行：左边状态，右边「清除」 */
+.jw-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ok-bg);
+  border-radius: 14rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 18rpx;
+}
+
+.jw-account-txt {
+  font-size: 22rpx;
+  color: var(--ok);
+}
+
+.jw-adv {
+  margin-top: 18rpx;
+}
+
+.jw-adv-body {
+  margin-top: 10rpx;
+}
+
+.intra-actions {
+  display: flex;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.intra-actions button {
+  flex: 1;
+  height: 78rpx;
+  line-height: 78rpx;
+  font-size: 25rpx;
+  padding: 0;
+}
+
+.intra-result {
+  margin-top: 24rpx;
+  padding: 22rpx;
+  background: var(--card-2);
+  border-radius: 16rpx;
+}
+
+.intra-result-title {
+  display: block;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--text-2);
+  margin-bottom: 10rpx;
+}
+
+.intra-result-body {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-2);
+  line-height: 1.72;
+  word-break: break-all;
+  white-space: pre-wrap;
+}
+
+/* 页脚 */
+.foot-note {
+  padding: 24rpx 40rpx;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.65;
+}
+
+.safe-bottom {
+  height: env(safe-area-inset-bottom);
+}
+
+/* 学习通本地代理 */
+.proxy-badge {
+  color: #2A5FD0;
+  background: #EAF1FF;
+}
+
+.proxy-live {
+  margin-left: auto;
+  font-size: 20rpx;
+  color: var(--text-3);
+  padding: 4rpx 12rpx;
+  border-radius: 8rpx;
+  background: var(--ghost-bg);
+}
+
+.proxy-live.on {
+  color: var(--ok);
+  background: var(--ok-bg);
+}
+
+.proxy-qr {
+  margin-top: 26rpx;
+  padding: 26rpx;
+  background: var(--card-2);
+  border-radius: 18rpx;
+  text-align: center;
+}
+
+.proxy-qr-img {
+  width: 260rpx;
+  height: 260rpx;
+  background: #FFFFFF;
+  border-radius: 12rpx;
+}
+
+.proxy-qr-state {
+  display: block;
+  margin: 16rpx 0 0;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+.proxy-qr-state.warn {
+  color: #B4761A;
+}
+
+.proxy-qr-state.err {
+  color: var(--danger);
+}
+
+/* ===== 教务系统卡片 ===== */
+.field.column .field-input {
+  text-align: left;
+  width: 100%;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 18rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.pick-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: var(--card-2);
+  border-radius: 14rpx;
+  padding: 18rpx 20rpx;
+  box-sizing: border-box;
+}
+
+.pick-txt {
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.pick-arrow {
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.cap-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.cap-img {
+  width: 200rpx;
+  height: 76rpx;
+  border-radius: 12rpx;
+  background: #fff;
+  border: 1rpx solid var(--line);
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.cap-input {
+  flex: 1;
+}
+
+/* ===== 课表导入：两种方式切换 ===== */
+.mode-tabs {
+  display: flex;
+  background: var(--ghost-bg);
+  border-radius: 14rpx;
+  padding: 6rpx;
+  margin: 4rpx 0 20rpx;
+}
+
+.mode-tab {
+  flex: 1;
+  text-align: center;
+  font-size: 25rpx;
+  color: var(--text-2);
+  padding: 14rpx 0;
+  border-radius: 10rpx;
+  transition: all .16s;
+}
+
+.mode-tab.on {
+  background: var(--card);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: var(--shadow);
+}
+
+/* ================= 深色模式覆盖 ================= */
+.theme-dark .relogin,
+.theme-dark .form-relogin {
+  background: #33260F;
+  border-color: #4E3A18;
+}
+.theme-dark .relogin-title,
+.theme-dark .relogin-all,
+.theme-dark .relogin-btn {
+  color: #F0C583;
+}
+.theme-dark .relogin-reason,
+.theme-dark .form-relogin-txt {
+  color: #E0B263;
+}
+.theme-dark .relogin-sub {
+  color: #C9A05A;
+}
+.theme-dark .relogin-row {
+  border-top-color: rgba(240, 197, 131, 0.16);
+}
+.theme-dark .warn {
+  background: #38290E;
+  border-color: #57421A;
+}
+.theme-dark .warn-title {
+  color: #F0C583;
+}
+.theme-dark .warn-text {
+  color: #D9A94E;
+}
+.theme-dark .intra-badge {
+  color: #F0C583;
+  background: #38290E;
+}
+.theme-dark .proxy-badge {
+  color: #8CC2F5;
+  background: #1E2C44;
+}
+.theme-dark .proxy-qr-state.warn {
+  color: #F0C583;
+}
+.theme-dark .qr-veil {
+  background: rgba(28, 30, 40, 0.94);
+}
+
+/* ================= 访客阻断卡 ================= */
+.guest-block {
+  margin: 0 32rpx;
+  padding: 44rpx 32rpx 36rpx;
+  border-radius: 26rpx;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guest-block-emoji {
+  font-size: 64rpx;
+  line-height: 1;
+  margin-bottom: 18rpx;
+}
+
+.guest-block-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 14rpx;
+}
+
+.guest-block-body {
+  font-size: 25rpx;
+  color: var(--text-3);
+  line-height: 1.7;
+  text-align: center;
+}
+
+.guest-block-btn {
+  margin-top: 32rpx;
+  width: 100%;
+  height: 92rpx;
+  line-height: 92rpx;
+  text-align: center;
+  border-radius: 22rpx;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 29rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 22rpx rgba(99, 102, 241, 0.26);
+}
+
+/* ---------------- 希冀登录：验证码一行 ---------------- */
+
+/* 标题行：左边「验证码」，右边一句可点的提示（原来只靠 placeholder，没人知道图能点） */
+.edu-cap-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  width: 100%;
+}
+
+.edu-cap-head .field-label {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.edu-cap-tip {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 21rpx;
+  color: var(--brand);
+}
+
+/* 输入框和图片框同高并排。输入框必须自己长成一个「框」：
+   以前它借用 .field-input，结果继承了 text-align:right、又没有底色和边框，
+   输进去的字符贴在图片边上，看着就像没地方输入（真机上就是这么被误会的）。 */
+.edu-cap-row {
+  display: flex;
+  align-items: stretch;
+  gap: 16rpx;
+  width: 100%;
+  height: 88rpx;
+}
+
+.edu-cap-input-wrap {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 0 22rpx;
+  border-radius: 14rpx;
+  background: var(--card-2);
+  border: 1rpx solid var(--line);
+}
+
+.edu-cap-input {
+  flex: 1;
+  min-width: 0;
+  height: 88rpx;
+  font-size: 32rpx;
+  letter-spacing: 8rpx;
+  text-align: left;
+  color: var(--text);
+}
+
+.edu-cap-count {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+.edu-cap-box {
+  width: 200rpx;
+  flex-shrink: 0;
+  border-radius: 14rpx;
+  background: var(--card-2);
+  border: 1rpx solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.edu-cap-img {
+  width: 100%;
+  height: 100%;
+}
+
+.edu-cap-txt {
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+
+/* 登录态一行：左边状态文字，右边「退出登录」 */
+.edu-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+
+.edu-state-txt {
+  flex: 1;
+  font-size: 22rpx;
+  color: var(--text-2);
+  line-height: 1.6;
+}
+
+/* 四个按钮排两行，别挤成一堆 */
+.edu-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.edu-actions button {
+  width: calc(50% - 8rpx);
+  flex: none;
+  height: 78rpx;
+  line-height: 78rpx;
+  font-size: 25rpx;
+  padding: 0;
+}
+
+/* ================= 折叠卡（希冀直连 / 课表导入） ================= */
+/* 两块表单都很长（输入框 + 说明 + 结果），收起后整页短一大截，
+   头部保留「标题 + 已登录/未登录」，一眼知道状态。 */
+.intra.fold {
+  padding: 0;
+  overflow: hidden;
+}
+
+.fold-head {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 28rpx 30rpx;
+}
+
+.fold-hover {
+  background: var(--ghost-bg);
+}
+
+.fold-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.fold-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.fold-ico {
+  font-size: 30rpx;
+  line-height: 1;
+}
+
+.fold-title {
+  font-size: 29rpx;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.3rpx;
+}
+
+.fold-title-row .intra-badge {
+  flex-shrink: 0;
+}
+
+.fold-sum {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.fold-right {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+}
+
+.fold-state {
+  font-size: 20rpx;
+  color: var(--text-3);
+  background: var(--ghost-bg);
+  padding: 5rpx 14rpx;
+  border-radius: 999rpx;
+}
+
+.fold-state.is-on {
+  color: #12885C;
+  background: #E6F7EF;
+}
+
+.theme-dark .fold-state.is-on {
+  color: #6FE0AE;
+  background: #1B3328;
+}
+
+.fold-chev {
+  display: inline-block;
+  font-size: 34rpx;
+  line-height: 1;
+  color: var(--text-3);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.fold-chev.up {
+  transform: rotate(-90deg);
+}
+
+.fold-body {
+  padding: 0 30rpx 32rpx;
+  animation: fold-in 0.18s ease-out;
+}
+
+@keyframes fold-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "studyhub-localserver",
+  "version": "1.0.0",
+  "private": true,
+  "description": "课业看板本地代理：学习通 / U校园 扫码登录",
+  "main": "server.js",
+  "dependencies": {
+    "qrcode": "^1.5.3",
+    "ws": "^8.18.0"
+  }
+}

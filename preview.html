@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>课业看板 · 小程序界面预览</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #EBECF2;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(139, 92, 246, 0.10), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(99, 102, 241, 0.09), transparent 40%);
+    min-height: 100vh;
+    padding: 48px 24px 64px;
+    color: #16161D;
+  }
+
+  .page-head { text-align: center; margin-bottom: 40px; }
+
+  .page-head h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #1B1B27;
+    margin-bottom: 8px;
+  }
+
+  .page-head p { font-size: 13px; color: #8A8D9E; letter-spacing: 0.2px; }
+
+  .badge-row { display: flex; justify-content: center; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+
+  .badge {
+    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: #fff;
+    color: #5C5F73;
+    box-shadow: 0 2px 8px rgba(24, 28, 56, 0.06);
+  }
+
+  .stage {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 56px;
+    flex-wrap: wrap;
+  }
+
+  .frame-wrap { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+
+  .phone {
+    width: 375px;
+    height: 812px;
+    background: #0E0E14;
+    border-radius: 46px;
+    padding: 11px;
+    box-shadow:
+      0 30px 60px -20px rgba(24, 28, 56, 0.32),
+      0 0 0 1px rgba(0, 0, 0, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .screen {
+    width: 100%;
+    height: 100%;
+    background: #F4F5F9;
+    border-radius: 36px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .statusbar {
+    height: 44px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 24px 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1B1B27;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+
+  .statusbar .icons { display: flex; gap: 5px; align-items: center; }
+  .statusbar .bar { width: 16px; height: 10px; border: 1.2px solid #1B1B27; border-radius: 3px; position: relative; }
+  .statusbar .bar::after { content: ''; position: absolute; inset: 1.5px; background: #1B1B27; border-radius: 1px; width: 9px; }
+  .statusbar .dots { display: flex; gap: 2px; align-items: flex-end; }
+  .statusbar .dots i { display: block; width: 2.5px; background: #1B1B27; border-radius: 1px; }
+  .statusbar .dots i:nth-child(1) { height: 4px; }
+  .statusbar .dots i:nth-child(2) { height: 6px; }
+  .statusbar .dots i:nth-child(3) { height: 8px; }
+  .statusbar .dots i:nth-child(4) { height: 10px; }
+
+  .navbar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+
+  .navbar .title { font-size: 17px; font-weight: 700; letter-spacing: 0.2px; }
+
+  .caption {
+    font-size: 12px;
+    color: #6E7180;
+    letter-spacing: 0.3px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 7px 16px;
+    border-radius: 20px;
+  }
+
+  /* ============ 首页 ============ */
+  .home { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+  .home::-webkit-scrollbar { width: 0; }
+
+  .hero {
+    padding: 0 16px 66px;
+    background: linear-gradient(168deg, #EEEDFF 0%, #F6F2FF 42%, #F4F5F9 100%);
+    position: relative;
+    overflow: hidden;
+    margin-top: -44px;
+    padding-top: 44px;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -70px;
+    width: 210px; height: 210px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.22), transparent 70%);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 90px; left: -80px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.16), transparent 70%);
+  }
+
+  .hero-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 44px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-top .brand { font-size: 17px; font-weight: 700; color: #1B1B27; flex-shrink: 0; white-space: nowrap; }
+
+  .sync-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.75);
+    box-shadow: 0 2px 12px rgba(80, 70, 160, 0.12);
+    display: flex; align-items: center; justify-content: center;
+    margin-right: 96px;
+    color: #5B5BD6;
+    font-size: 17px;
+  }
+
+  .hero-body { position: relative; z-index: 2; padding-top: 14px; }
+
+  .hero-line { display: flex; align-items: baseline; gap: 8px; margin-bottom: 5px; }
+  .greet { font-size: 14px; color: #6E6B8A; font-weight: 500; }
+  .date { font-size: 12px; color: #9A97B5; }
+
+  .count-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
+  .count-num {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    color: #4C45D6;
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
+  }
+  .count-unit { font-size: 14px; color: #6E7180; font-weight: 500; }
+
+  .pills { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    height: 24px;
+    display: flex; align-items: center;
+    padding: 0 9px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 11px;
+    color: #5C5F73;
+    font-weight: 500;
+  }
+  .pill.danger { background: #FFEDEC; color: #D6453B; }
+  .pill.danger::before {
+    content: '';
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #E8453C; margin-right: 5px;
+  }
+
+  .plat-row { display: flex; gap: 8px; padding: 0 16px; margin-top: -48px; position: relative; z-index: 3; }
+
+  .plat {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 11px 10px 10px;
+    box-shadow: 0 6px 24px rgba(24, 28, 56, 0.07);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .plat .head { display: flex; align-items: center; gap: 4px; margin-bottom: 6px; }
+
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot.cx { background: #E8453C; }
+  .dot.ed { background: #2B7FFF; }
+  .dot.up { background: #11B981; }
+
+  .plat .name { font-size: 12px; font-weight: 600; color: #41445A; }
+  .plat .num { font-size: 24px; font-weight: 700; line-height: 1.1; letter-spacing: -0.5px; color: #1B1B27; }
+  .plat .st { font-size: 10px; color: #A0A3B1; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .plat.unbound { background: #FBFBFD; box-shadow: 0 2px 10px rgba(24, 28, 56, 0.04); }
+  .plat.unbound .num { color: #C9CBD6; }
+  .plat .flag {
+    position: absolute; top: 0; right: 0;
+    background: #FFEDEC; color: #D6453B;
+    font-size: 9px; padding: 2px 6px;
+    border-bottom-left-radius: 7px;
+  }
+
+  .chips { display: flex; gap: 7px; padding: 16px 16px 4px; overflow-x: auto; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip {
+    height: 32px;
+    display: flex; align-items: center;
+    padding: 0 12px;
+    border-radius: 16px;
+    background: #fff;
+    font-size: 13px;
+    color: #5C5F73;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(24, 28, 56, 0.04);
+    flex-shrink: 0;
+  }
+  .chip.on { background: #4C45D6; color: #fff; font-weight: 600; box-shadow: 0 6px 18px rgba(76, 69, 214, 0.28); }
+  .chip .n { margin-left: 4px; font-size: 11px; opacity: 0.72; }
+
+  /* 学期筛选行 */
+  .chips.sem { padding: 14px 16px 0; }
+  .chip.sem { background: #fff; box-shadow: 0 2px 8px rgba(24, 28, 56, 0.06); }
+  .chip.sem.on { background: #1B1D2A; color: #fff; font-weight: 600; box-shadow: none; }
+  .sem-hint { padding: 8px 20px 0; font-size: 11px; color: #9A9DAF; }
+  .tag.sem { background: #F0F1F5; color: #7A7D90; margin-left: 6px; }
+
+  .group-head { display: flex; align-items: center; gap: 6px; padding: 18px 20px 8px; }
+  .group-head .gd { width: 5px; height: 5px; border-radius: 50%; }
+  .gd.danger { background: #E8453C; }
+  .gd.urgent { background: #F59E0B; }
+  .gd.normal { background: #6366F1; }
+  .group-head .gt { font-size: 13px; font-weight: 600; color: #41445A; }
+  .group-head .gc { font-size: 11px; color: #A0A3B1; }
+
+  .task {
+    display: flex;
+    margin: 0 16px 8px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 14px rgba(24, 28, 56, 0.045);
+  }
+
+  .task .bar { width: 3px; flex-shrink: 0; }
+  .task .body { flex: 1; padding: 12px 13px 11px; min-width: 0; }
+
+  .task .top { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+
+  .tag {
+    font-size: 10px;
+    line-height: 18px;
+    padding: 0 7px;
+    border-radius: 5px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .tag.cx { background: #FDEEED; color: #C93A32; }
+  .tag.ed { background: #E9F1FF; color: #1E63CC; }
+  .tag.up { background: #E6F8F1; color: #0B8E63; }
+
+  .task .course { font-size: 11px; color: #9A9DAD; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .task .title {
+    font-size: 14.5px;
+    font-weight: 500;
+    line-height: 1.42;
+    color: #1B1B27;
+    margin-bottom: 7px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .task .foot { display: flex; align-items: center; font-size: 11px; color: #A0A3B1; }
+
+  .dl { margin-left: auto; font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+  .dl.expired { color: #D6453B; background: #FDEEED; }
+  .dl.urgent { color: #C2410C; background: #FFF1E6; }
+  .dl.soon { color: #1E63CC; background: #EAF2FF; }
+  .dl.normal { color: #6E7180; background: #F2F3F8; }
+
+  .fade-bottom {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 42px;
+    background: linear-gradient(transparent, #F4F5F9);
+    pointer-events: none;
+  }
+
+  .remind {
+    display: flex; align-items: center; gap: 10px;
+    margin: 20px 16px 26px;
+    padding: 13px 14px;
+    background: linear-gradient(135deg, #F3F2FF 0%, #FBF7FF 100%);
+    border-radius: 12px;
+    border: 1px solid #E6E3FF;
+  }
+  .remind .rb { flex: 1; min-width: 0; }
+  .remind .rt { display: block; font-size: 13px; font-weight: 600; color: #3F3AAF; margin-bottom: 3px; }
+  .remind .rd { display: block; font-size: 10.5px; color: #8A86B8; line-height: 1.5; }
+  .remind .rbtn {
+    flex-shrink: 0;
+    height: 30px; line-height: 30px;
+    padding: 0 14px;
+    border-radius: 15px;
+    background: #4C45D6;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    box-shadow: 0 6px 16px rgba(76, 69, 214, 0.24);
+  }
+
+  /* ============ 账号页 ============ */
+  .acct { flex: 1; overflow-y: auto; padding: 4px 0 32px; }
+  .acct::-webkit-scrollbar { width: 0; }
+
+  .acct-head { padding: 8px 20px 12px; }
+  .acct-head h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
+  .acct-head p { font-size: 12.5px; color: #8A8D9E; line-height: 1.6; }
+
+  .warn {
+    display: flex; gap: 7px;
+    margin: 4px 16px 16px;
+    padding: 12px;
+    background: #FFFBEB;
+    border-radius: 10px;
+    border: 1px solid #FDE9B8;
+  }
+  .warn .ico { font-size: 13px; line-height: 1.4; color: #B45309; }
+  .warn .tt { font-size: 12.5px; font-weight: 600; color: #92400E; margin-bottom: 4px; }
+  .warn .tx { font-size: 11.5px; color: #A16207; line-height: 1.6; }
+
+  .acard {
+    margin: 0 16px 10px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 20px rgba(24, 28, 56, 0.05);
+    overflow: hidden;
+  }
+
+  .acard .top { display: flex; align-items: center; gap: 8px; padding: 16px; }
+  .acard .info { flex: 1; min-width: 0; }
+  .acard .nm { display: block; font-size: 15px; font-weight: 600; margin-bottom: 3px; }
+  .acard .ds { display: block; font-size: 11px; color: #A0A3B1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .state {
+    font-size: 10.5px; padding: 3px 8px; border-radius: 10px;
+    background: #F2F3F8; color: #9A9DAD; flex-shrink: 0;
+  }
+  .state.on { background: #E6F8F1; color: #0B8E63; }
+
+  .chev { color: #C9CBD6; font-size: 20px; transform: rotate(90deg); line-height: 1; flex-shrink: 0; }
+
+  .bound { padding: 0 16px 14px; border-top: 1px solid #F2F3F8; padding-top: 12px; }
+  .bound-row { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+  .bound-user { font-size: 13px; color: #41445A; font-weight: 500; }
+  .mode { font-size: 10px; color: #7C7FE0; background: #EEEDFF; padding: 1.5px 6px; border-radius: 4px; }
+  .bound-st { font-size: 11px; color: #A0A3B1; margin-bottom: 10px; }
+  .bound-st.bad { color: #D6453B; }
+  .ops { display: flex; gap: 16px; }
+  .op { font-size: 12.5px; color: #4C45D6; font-weight: 500; }
+  .op.danger { color: #D6453B; }
+
+  .note { padding: 12px 20px; font-size: 10.5px; color: #B4B6C4; line-height: 1.65; }
+
+  @media (max-width: 880px) {
+    body { padding: 28px 12px 40px; }
+    .stage { gap: 32px; }
+    .phone { transform: scale(0.86); transform-origin: top center; margin-bottom: -110px; }
+  }
+
+  /* ============ 登录：身份切换 / 访客 ============ */
+  .login-wrap {
+    flex: 1; overflow-y: auto; padding: 22px 20px 20px;
+    background: #F4F5F9;
+  }
+  .login-hero { display: flex; flex-direction: column; align-items: center; padding: 6px 0 14px; }
+  .login-hero .lg { font-size: 42px; line-height: 1; }
+  .login-hero .tt { margin-top: 9px; font-size: 22px; font-weight: 700; color: #16161D; }
+  .login-hero .ss { margin-top: 6px; font-size: 13px; color: #6E7180; }
+
+  .tabs { display: flex; padding: 3px; border-radius: 9px; background: #EBECF2; margin-bottom: 12px; }
+  .tabs span { flex: 1; height: 38px; line-height: 38px; text-align: center; border-radius: 7px; font-size: 14px; color: #6E7180; }
+  .tabs span.on { background: #fff; color: #4C45D6; font-weight: 600; box-shadow: 0 2px 7px rgba(90,108,243,.14); }
+
+  .lcard { background: #fff; border-radius: 12px; padding: 15px 16px 17px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .lcard .mode-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+  .lcard .mode-title { font-size: 15px; font-weight: 600; }
+  .lcard .mode-link { font-size: 12.5px; color: #4C45D6; }
+
+  .lfield { margin-bottom: 12px; }
+  .lfield .lb { display: block; font-size: 13px; color: #6E7180; margin-bottom: 6px; }
+  .lfield .ipt {
+    height: 46px; border-radius: 7px; background: #F6F7FA;
+    display: flex; align-items: center; padding: 0 12px;
+    font-size: 15px; color: #16161D;
+  }
+  .lfield .ipt.ph { color: #B4B6C4; }
+  .lbtn {
+    height: 44px; border-radius: 7px; display: flex; align-items: center; justify-content: center;
+    background: #5A6CF3; color: #fff; font-size: 15px; font-weight: 600; margin-top: 2px;
+    box-shadow: 0 5px 14px rgba(90,108,243,.24);
+  }
+
+  .guest-tip { margin-top: 16px; padding: 13px 14px; border-radius: 10px; background: #fff; box-shadow: 0 2px 10px rgba(24,28,56,.04); }
+  .guest-tip .t { display: block; font-size: 12.5px; font-weight: 600; color: #5C5F73; margin-bottom: 5px; }
+  .guest-tip .b { display: block; font-size: 11.5px; color: #A0A3B1; line-height: 1.7; }
+  .guest-tip .b + .b { margin-top: 4px; }
+
+  /* 首页：访客态 */
+  .nav-acc {
+    height: 29px; display: flex; align-items: center; padding: 0 9px;
+    border-radius: 999px; background: rgba(255,255,255,.8);
+    box-shadow: 0 1px 6px rgba(80,70,160,.12);
+    font-size: 11px; color: #7A7D8C; font-weight: 500; margin-right: 8px;
+  }
+  .nav-acc .ic { margin-right: 3px; font-size: 12px; }
+  .hero-actions { display: flex; align-items: center; flex-shrink: 0; }
+
+  .hero-guest {
+    margin-top: 10px; display: flex; align-items: center; height: 38px; padding: 0 12px;
+    border-radius: 19px; background: rgba(255,255,255,.78);
+    box-shadow: 0 2px 8px rgba(27,29,42,.06);
+  }
+  .hero-guest .ic { font-size: 13px; margin-right: 5px; }
+  .hero-guest .tx { flex: 1; font-size: 11.5px; color: #6E7180; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .logout { display: flex; justify-content: center; padding: 12px 0 24px; }
+  .logout span {
+    display: flex; align-items: center; justify-content: center;
+    width: 210px; height: 42px; border-radius: 21px;
+    background: #fff; border: 1px solid #F0C8C4;
+    color: #E5484D; font-size: 14px; font-weight: 500;
+  }
+
+  .guest-bar {
+    margin: -48px 16px 0; position: relative; z-index: 3;
+    padding: 11px 13px 12px; border-radius: 11px; background: #fff;
+    box-shadow: 0 6px 24px rgba(24,28,56,.07);
+  }
+  .guest-bar .t { display: block; font-size: 13.5px; font-weight: 600; color: #16161D; margin-bottom: 4px; }
+  .guest-bar .b { display: block; font-size: 11px; color: #A0A3B1; line-height: 1.65; }
+
+  .tool-row { display: flex; gap: 8px; padding: 14px 16px 0; }
+  .tool-card { flex: 1; background: #fff; border-radius: 12px; padding: 11px 12px 10px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .tool-card .top { display: flex; align-items: center; margin-bottom: 6px; }
+  .tool-card .bd { width: 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+  .tool-card .bd.n { background: #FFF4D6; }
+  .tool-card .bd.f { background: #EDE9FE; }
+  .tool-card .ar { margin-left: auto; font-size: 14px; color: #C4C6D2; }
+  .tool-card .nm { display: block; font-size: 13.5px; font-weight: 600; color: #16161D; }
+  .tool-card .sb { display: block; margin-top: 2px; font-size: 10.5px; color: #A0A3B1; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>课业看板</h1>
+  <p>微信小程序界面预览 · 以下为模拟数据，用于确认布局与信息层级</p>
+  <div class="badge-row">
+    <span class="badge">学习通</span>
+    <span class="badge">希冀平台</span>
+    <span class="badge">U校园</span>
+    <span class="badge">按截止时间聚合</span>
+  </div>
+</div>
+
+<div class="stage">
+
+  <!-- ============ 首页 ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="screen">
+        <div class="home">
+          <div class="hero">
+            <div class="hero-top">
+              <span class="brand">课业看板</span>
+              <div class="sync-btn">⟳</div>
+            </div>
+            <div class="hero-body">
+              <div class="hero-line">
+                <span class="greet">下午好</span>
+                <span class="date">10月23日 星期五</span>
+              </div>
+              <div class="count-row">
+                <span class="count-num">9</span>
+                <span class="count-unit">项待完成</span>
+              </div>
+              <div class="pills">
+                <span class="pill danger">1 项已过期</span>
+                <span class="pill">5 项 7 天内截止</span>
+                <span class="pill">完成率 36%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="plat-row">
+            <div class="plat">
+              <div class="head"><i class="dot cx"></i><span class="name">学习通</span></div>
+              <div class="num">4</div>
+              <div class="st">12 分钟前</div>
+            </div>
+            <div class="plat">
+              <div class="head"><i class="dot ed"></i><span class="name">希冀</span></div>
+              <div class="num">3</div>
+              <div class="st">12 分钟前</div>
+            </div>
+            <div class="plat">
+              <div class="head"><i class="dot up"></i><span class="name">U校园</span></div>
+              <div class="num">2</div>
+              <div class="st">登录已失效</div>
+              <span class="flag">失效</span>
+            </div>
+          </div>
+
+          <div class="chips sem">
+            <div class="chip sem on">2026 秋 本学期<span class="n">9</span></div>
+            <div class="chip sem">全部学期<span class="n">51</span></div>
+          </div>
+          <div class="sem-hint">另有 46 项往期任务，点「全部学期」可查看</div>
+
+          <div class="chips">
+            <div class="chip on">全部<span class="n">9</span></div>
+            <div class="chip">学习通<span class="n">4</span></div>
+            <div class="chip">希冀<span class="n">3</span></div>
+            <div class="chip">U校园<span class="n">2</span></div>
+          </div>
+
+          <div class="group-head">
+            <i class="gd danger"></i>
+            <span class="gt">已过期</span>
+            <span class="gc">1</span>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#E8453C"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag cx">学习通</span>
+                <span class="course">中国近现代史纲要</span>
+              </div>
+              <div class="title">期中在线测验（第 1—6 章）</div>
+              <div class="foot">
+                <span>⚠ 考试</span>
+                <span class="dl expired">已截止 2 天</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <i class="gd urgent"></i>
+            <span class="gt">今天截止</span>
+            <span class="gc">2</span>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#E8453C"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag cx">学习通</span>
+                <span class="course">高等数学（上）</span>
+              </div>
+              <div class="title">第三章 极限与连续 · 课后作业</div>
+              <div class="foot">
+                <span>📝 作业</span>
+                <span class="dl urgent">今天 23:59</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#2B7FFF"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag ed">希冀</span>
+                <span class="course">程序设计基础（C 语言）</span>
+              </div>
+              <div class="title">实验五 · 循环结构与嵌套</div>
+              <div class="foot">
+                <span>⌘ 实训 · 进度 3/5</span>
+                <span class="dl urgent">今天 22:00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <i class="gd normal"></i>
+            <span class="gt">一周内</span>
+            <span class="gc">3</span>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#11B981"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag up">U校园</span>
+                <span class="course">新视野大学英语（一）</span>
+              </div>
+              <div class="title">Unit 3 视听说 · Listening &amp; Speaking</div>
+              <div class="foot">
+                <span>⌘ 单元练习 · 进度 42/100</span>
+                <span class="dl soon">10月26日 23:59</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#2B7FFF"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag ed">希冀</span>
+                <span class="course">数据结构</span>
+              </div>
+              <div class="title">第 6 章 树与二叉树 · 编程实训</div>
+              <div class="foot">
+                <span>⌘ 实训</span>
+                <span class="dl soon">10月28日 23:59</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="task" style="margin-bottom:24px">
+            <div class="bar" style="background:#E8453C"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag cx">学习通</span>
+                <span class="course">大学英语（一）</span>
+              </div>
+              <div class="title">Unit 3 课堂讨论 · 谈谈你的家乡</div>
+              <div class="foot">
+                <span>💬 讨论</span>
+                <span class="dl normal">10月29日 20:00</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="remind">
+            <div class="rb">
+              <span class="rt">每日提醒</span>
+              <span class="rd">每天 21:30 提醒 48 小时内要交的任务</span>
+            </div>
+            <div class="rbtn">开启</div>
+          </div>
+
+          <div class="fade-bottom"></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">首页 · 三平台任务按截止时间聚合</div>
+  </div>
+
+  <!-- ============ 账号页 ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar">
+          <span>14:02</span>
+          <div class="icons">
+            <div class="dots"><i></i><i></i><i></i><i></i></div>
+            <div class="bar"></div>
+          </div>
+        </div>
+        <div class="navbar"><span class="title">账号绑定</span></div>
+
+        <div class="acct">
+          <div class="acct-head">
+            <h2>绑定学习平台</h2>
+            <p>绑定后，小程序会替你登录并汇总所有未完成的任务点、作业与考试。</p>
+          </div>
+
+          <div class="warn">
+            <span class="ico">◆</span>
+            <div>
+              <div class="tt">关于账号安全</div>
+              <div class="tx">密码加密后只存在你自己的云数据库里，按用户隔离，仅用于模拟登录。如果不放心，建议用 Cookie 模式——它不涉及密码。</div>
+            </div>
+          </div>
+
+          <div class="acard">
+            <div class="top">
+              <i class="dot cx"></i>
+              <div class="info">
+                <span class="nm">学习通</span>
+                <span class="ds">章节任务点 / 作业 / 考试</span>
+              </div>
+              <span class="state on">已绑定</span>
+              <span class="chev">›</span>
+            </div>
+            <div class="bound">
+              <div class="bound-row">
+                <span class="bound-user">138****5678</span>
+                <span class="mode">账号密码</span>
+              </div>
+              <div class="bound-st">正常 · 12 分钟前</div>
+              <div class="ops">
+                <span class="op">立即同步</span>
+                <span class="op">修改</span>
+                <span class="op danger">解绑</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="acard">
+            <div class="top">
+              <i class="dot ed"></i>
+              <div class="info">
+                <span class="nm">希冀平台</span>
+                <span class="ds">实训任务 / 作业提交</span>
+              </div>
+              <span class="state on">已绑定</span>
+              <span class="chev">›</span>
+            </div>
+            <div class="bound">
+              <div class="bound-row">
+                <span class="bound-user">2025***39</span>
+                <span class="mode">Cookie</span>
+              </div>
+              <div class="bound-st">正常 · 12 分钟前</div>
+              <div class="ops">
+                <span class="op">立即同步</span>
+                <span class="op">修改</span>
+                <span class="op danger">解绑</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="acard">
+            <div class="top">
+              <i class="dot up"></i>
+              <div class="info">
+                <span class="nm">U校园</span>
+                <span class="ds">视听说单元 / 作业</span>
+              </div>
+              <span class="state">未绑定</span>
+              <span class="chev">›</span>
+            </div>
+          </div>
+
+          <div class="acard">
+            <div class="top">
+              <i class="dot up"></i>
+              <div class="info">
+                <span class="nm">U校园（示例：失效态）</span>
+                <span class="ds">视听说单元 / 作业</span>
+              </div>
+              <span class="state on">已绑定</span>
+              <span class="chev">›</span>
+            </div>
+            <div class="bound">
+              <div class="bound-row">
+                <span class="bound-user">Cookie 登录</span>
+                <span class="mode">Cookie</span>
+              </div>
+              <div class="bound-st bad">登录已失效，请重新绑定</div>
+              <div class="ops">
+                <span class="op">立即同步</span>
+                <span class="op">修改</span>
+                <span class="op danger">解绑</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="note">抓取基于各平台网页端接口，平台改版后可能短暂失效。失效时重新绑一次 Cookie 通常就能恢复。</div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">账号绑定 · 三种平台状态</div>
+  </div>
+
+  <!-- ============ 登录：其他人员 ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+        <div class="login-wrap">
+          <div class="login-hero">
+            <span class="lg">📚</span>
+            <span class="tt">郑好有你</span>
+            <span class="ss">不登学校账号，记事本和专注也能用</span>
+          </div>
+
+          <div class="tabs">
+            <span>本校学生</span>
+            <span class="on">其他人员</span>
+          </div>
+
+          <div class="lcard">
+            <div class="mode-row">
+              <span class="mode-title">注册一个访客账号</span>
+              <span class="mode-link">已有账号 ›</span>
+            </div>
+
+            <div class="lfield">
+              <span class="lb">手机号</span>
+              <div class="ipt">13800138000</div>
+            </div>
+            <div class="lfield">
+              <span class="lb">密码</span>
+              <div class="ipt">••••••</div>
+            </div>
+            <div class="lfield">
+              <span class="lb">再输一次密码</span>
+              <div class="ipt">••••••</div>
+            </div>
+            <div class="lfield">
+              <span class="lb">昵称（可不填）</span>
+              <div class="ipt ph">别人怎么称呼你</div>
+            </div>
+
+            <div class="lbtn">注册并进入</div>
+          </div>
+
+          <div class="guest-tip">
+            <span class="t">访客账号能做什么</span>
+            <span class="b">记事本、番茄钟、手动课表、手动待办都能用；平台绑定要学校账号。</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">登录 · 其他人员（手机号注册）</div>
+  </div>
+
+  <!-- ============ 首页：访客态 ============ -->
+  <div class="frame-wrap">
+    <div class="phone">
+      <div class="screen">
+        <div class="home">
+          <div class="hero">
+            <div class="hero-top">
+              <span class="brand">课业看板</span>
+              <div class="hero-actions">
+                <div class="nav-acc"><span class="ic">👤</span>访客</div>
+                <div class="sync-btn">☀️</div>
+              </div>
+            </div>
+            <div class="hero-body">
+              <div class="hero-line">
+                <span class="greet">下午好</span>
+                <span class="date">10月26日 星期一</span>
+              </div>
+              <div class="count-row">
+                <span class="count-num">2</span>
+                <span class="count-unit">项待完成</span>
+              </div>
+              <div class="pills">
+                <span class="pill">0 项 7 天内截止</span>
+                <span class="pill">完成率 0%</span>
+              </div>
+              <div class="hero-guest">
+                <span class="ic">👤</span>
+                <span class="tx">小明 · 访客账号，只能用记事本、专注和手动课表</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="guest-bar">
+            <span class="t">访客模式</span>
+            <span class="b">课表导入、学习通 / U校园 / 雨课堂绑定和任务同步都关掉了。要这些功能，得用本校学号登录。</span>
+          </div>
+
+          <div class="tool-row">
+            <div class="tool-card">
+              <div class="top"><div class="bd n">📝</div><span class="ar">›</span></div>
+              <span class="nm">记事本</span>
+              <span class="sb">最近记了 6 条</span>
+            </div>
+            <div class="tool-card">
+              <div class="top"><div class="bd f">⏱</div><span class="ar">›</span></div>
+              <span class="nm">专注</span>
+              <span class="sb">今日专注 50 分钟</span>
+            </div>
+          </div>
+
+          <div class="group-head">
+            <i class="gd" style="background:#8B8FA3"></i>
+            <span class="gt">更晚 / 无期限</span>
+            <span class="gc">2</span>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#8B5CF6"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag" style="color:#4C45D6;background:#EDECFC">自定义</span>
+                <span class="course">自己建的</span>
+              </div>
+              <div class="title">看完《线性代数》第三章</div>
+              <div class="foot">
+                <span>无截止时间</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="task">
+            <div class="bar" style="background:#8B5CF6"></div>
+            <div class="body">
+              <div class="top">
+                <span class="tag" style="color:#4C45D6;background:#EDECFC">自定义</span>
+                <span class="course">自己建的</span>
+              </div>
+              <div class="title">给社团写招新推送</div>
+              <div class="foot">
+                <span>10月28日 23:59</span>
+                <span class="dl soon">2 天后</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="logout"><span>退出访客身份</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="caption">首页 · 访客模式（学校入口全关）</div>
+  </div>
+
+</div>
+
+</body>
+</html>

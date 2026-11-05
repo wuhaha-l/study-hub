@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>记事本 &amp; 专注 · 效果预览</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #F4F5F9;
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #16161D;
+    padding: 40px 24px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 20px; font-weight: 700; text-align: center; margin-bottom: 6px; }
+  .lead { text-align: center; font-size: 13px; color: #6E7180; margin-bottom: 34px; }
+  .stage { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; align-items: flex-start; }
+  .col { display: flex; flex-direction: column; align-items: center; }
+  .caption { margin-top: 16px; font-size: 13px; color: #6E7180; font-weight: 500; }
+
+  /* 手机壳 */
+  .phone {
+    width: 375px; height: 812px; border-radius: 42px; background: #F4F5F9;
+    box-shadow: 0 18px 50px rgba(24,28,56,.14), 0 0 0 9px #1B1C24, 0 0 0 10px #2E3039;
+    overflow: hidden; position: relative;
+  }
+  .screen { width: 100%; height: 100%; overflow: hidden; position: relative; }
+
+  /* 状态栏 + 胶囊 */
+  .statusbar {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 20px; font-size: 14px; font-weight: 600; position: relative; z-index: 5;
+  }
+  .capsule {
+    position: absolute; right: 12px; top: 50px; width: 87px; height: 32px;
+    border-radius: 16px; border: 1px solid rgba(0,0,0,.08); background: rgba(255,255,255,.6);
+    display: flex; align-items: center; justify-content: space-around; z-index: 6;
+    font-size: 12px; color: #555; letter-spacing: 1px;
+  }
+  .nav { height: 44px; display: flex; align-items: center; padding: 0 12px; }
+  .nav-back { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #16161D; margin-top: -4px; }
+  .nav-title { font-size: 17px; font-weight: 700; margin-left: 4px; letter-spacing: .3px; }
+  .nav-actions { margin-left: auto; margin-right: 95px; }
+  .round-btn {
+    width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,.75);
+    display: flex; align-items: center; justify-content: center; font-size: 15px; color: #4C45D6;
+  }
+
+  /* ========== 屏 1：便签列表 ========== */
+  .head-grad { background: linear-gradient(168deg, #EEEDFF 0%, #F7F4FF 60%, #F4F5F9 100%); }
+  .sub-row { padding: 2px 16px 9px; font-size: 12px; color: #A0A3B1; }
+  .search {
+    margin: 0 16px; height: 38px; border-radius: 10px; background: #fff;
+    box-shadow: 0 2px 10px rgba(24,28,56,.05); display: flex; align-items: center; padding: 0 11px;
+  }
+  .search .ico { font-size: 13px; opacity: .75; margin-right: 6px; }
+  .search .ph { font-size: 13.5px; color: #A0A3B1; }
+  .grid { display: flex; flex-wrap: wrap; padding: 12px 16px 0; gap: 10px; }
+  .note {
+    width: 166.5px; height: 150px; border-radius: 12px; padding: 12px 11px 9px;
+    box-shadow: 0 2px 10px rgba(24,28,56,.05); display: flex; flex-direction: column;
+    position: relative; overflow: hidden;
+  }
+  .n-plain { background: #fff; }
+  .n-yellow { background: #FFF7D6; }
+  .n-pink { background: #FDEAF0; }
+  .n-blue { background: #E8F1FE; }
+  .n-green { background: #E4F7EE; }
+  .n-purple { background: #F1ECFE; }
+  .pin { position: absolute; top: 8px; right: 9px; font-size: 10px; opacity: .85; }
+  .n-title {
+    font-size: 14px; font-weight: 600; line-height: 1.4; padding-right: 12px;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+  }
+  .n-body-wrap { flex: 1; overflow: hidden; margin-top: 5px; }
+  .n-body {
+    font-size: 12px; color: #6E7180; line-height: 1.55;
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden;
+  }
+  .n-foot { display: flex; justify-content: space-between; margin-top: 6px; font-size: 10px; color: #A0A3B1; }
+  .fab {
+    position: absolute; right: 20px; bottom: 36px; width: 54px; height: 54px; border-radius: 50%;
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    box-shadow: 0 5px 15px rgba(99,102,241,.36); display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 28px; font-weight: 300; padding-bottom: 3px;
+  }
+
+  /* ========== 屏 2：便签编辑 ========== */
+  .edit-nav { background: #F4F5F9; }
+  .nav-state { font-size: 12px; color: #A0A3B1; margin-left: 5px; flex: 1; }
+  .nav-done { font-size: 14.5px; font-weight: 600; color: #4C45D6; margin-right: 95px; }
+  .paper {
+    margin: 4px 12px 0; padding: 16px 15px; border-radius: 14px; background: #FFF7D6;
+    box-shadow: 0 2px 10px rgba(24,28,56,.05); height: 540px;
+  }
+  .e-title { font-size: 19px; font-weight: 700; line-height: 1.4; }
+  .e-line { height: 1px; background: #EEF0F4; margin: 10px 0; }
+  .e-body { font-size: 15px; line-height: 1.72; color: #16161D; white-space: pre-wrap; }
+  .toolbar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 74px; background: #fff;
+    border-top: 1px solid #EEF0F4; display: flex; align-items: center; padding: 0 12px 10px;
+  }
+  .tool { width: 59px; display: flex; flex-direction: column; align-items: center; }
+  .tool .ti { font-size: 16px; line-height: 1.3; }
+  .tool .tt { font-size: 9.5px; color: #A0A3B1; margin-top: 1px; }
+  .tool .tt.danger { color: #D6453B; }
+  .chars { margin-left: auto; font-size: 10.5px; color: #A0A3B1; }
+  .palette {
+    position: absolute; left: 12px; right: 12px; bottom: 84px; height: 62px;
+    background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(20,24,60,.16);
+    display: flex; align-items: center; justify-content: space-around; padding: 0 13px;
+  }
+  .sw { width: 36px; height: 36px; border-radius: 50%; border: 1px solid #EEF0F4; display: flex; align-items: center; justify-content: center; font-size: 13px; color: #4C45D6; font-weight: 700; }
+  .sw.on { border: 2px solid #4C45D6; }
+  .sw-plain { background: #fff; }
+  .sw-yellow { background: #FFE9A8; }
+  .sw-pink { background: #FBCFE0; }
+  .sw-blue { background: #C7DDFB; }
+  .sw-green { background: #BFEBD7; }
+  .sw-purple { background: #DCD3FB; }
+
+  /* ========== 屏 3：专注 ========== */
+  .stat-card {
+    position: relative; display: flex; align-items: center; margin: 6px 16px 0; padding: 13px 10px 17px;
+    background: #fff; border-radius: 13px; box-shadow: 0 2px 10px rgba(24,28,56,.05); overflow: hidden;
+  }
+  .stat { flex: 1; text-align: center; }
+  .stat-num { font-family: DIN Alternate, Helvetica Neue, sans-serif; font-size: 21px; font-weight: 700; letter-spacing: -.5px; }
+  .stat-num span { font-size: 11px; font-weight: 500; color: #A0A3B1; letter-spacing: 0; }
+  .stat-label { display: block; font-size: 10.5px; color: #A0A3B1; margin-top: 2px; }
+  .stat-line { width: 1px; height: 22px; background: #EEF0F4; }
+  .goal-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: #F6F7FA; }
+  .goal-fill { height: 100%; width: 63%; background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%); border-radius: 0 3px 3px 0; }
+
+  .timer-card { margin: 12px 16px 0; padding: 15px 16px 13px; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .ring-wrap { position: relative; width: 210px; height: 210px; margin: 3px auto 0; }
+  .ring-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .ring-mode { font-size: 11.5px; color: #6366F1; letter-spacing: 1px; margin-bottom: 3px; }
+  .ring-time { font-family: DIN Alternate, Helvetica Neue, sans-serif; font-size: 46px; font-weight: 700; letter-spacing: -1px; line-height: 1.1; }
+  .ring-task { max-width: 150px; margin-top: 5px; font-size: 11px; color: #A0A3B1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctrl { display: flex; margin-top: 13px; gap: 9px; }
+  .ctrl-main {
+    flex: 1; height: 48px; border-radius: 12px; background: #F2F3F8; color: #41445A;
+    display: flex; align-items: center; justify-content: center; font-size: 15.5px; font-weight: 600;
+  }
+  .ctrl-main.primary {
+    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #fff;
+    box-shadow: 0 4px 12px rgba(99,102,241,.28);
+  }
+  .ctrl-sub { width: 84px; height: 48px; border-radius: 12px; background: #F2F3F8; color: #6E7180; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .quick { display: flex; gap: 6px; margin-top: 12px; }
+  .q-chip { flex: 1; height: 34px; border-radius: 9px; background: #F6F7FA; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #6E7180; }
+  .q-chip.on { background: #EDECFC; color: #4C45D6; font-weight: 600; }
+  .timer-hint { display: block; margin-top: 9px; font-size: 10.5px; color: #A0A3B1; text-align: center; line-height: 1.6; }
+
+  .todo-card { margin: 12px 16px 0; padding: 13px 13px 9px; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .todo-head { display: flex; align-items: baseline; margin-bottom: 4px; }
+  .todo-title { font-size: 15px; font-weight: 600; }
+  .todo-count { font-size: 11px; color: #A0A3B1; margin-left: 6px; }
+  .todo-add { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; background: #EDECFC; color: #4C45D6; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .todo { display: flex; align-items: center; padding: 11px 0; border-bottom: 1px solid #EEF0F4; }
+  .todo:last-child { border-bottom: none; }
+  .tcheck { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid #EEF0F4; margin-right: 10px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; }
+  .tcheck.done { background: #10B981; border-color: #10B981; }
+  .tcheck.picked { border-color: #4C45D6; }
+  .tname { font-size: 14px; line-height: 1.45; }
+  .tname.done { color: #A0A3B1; text-decoration: line-through; }
+  .tmeta { display: flex; align-items: center; margin-top: 2px; gap: 6px; }
+  .tpomo { font-size: 10px; color: #A0A3B1; }
+  .ttag { font-size: 9.5px; color: #4C45D6; background: #EDECFC; padding: 0 5px; height: 15px; line-height: 15px; border-radius: 4px; }
+  .tgo { margin-left: auto; font-size: 13px; color: #A0A3B1; padding-left: 8px; }
+  .todo-tip { padding: 7px 0 3px; font-size: 10px; color: #A0A3B1; text-align: center; }
+
+  /* ========== 屏 4：学习时长统计 ========== */
+  .learn-card { margin: 12px 16px 0; padding: 13px 13px 11px; background: #fff; border-radius: 14px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .learn-head { margin-bottom: 9px; }
+  .learn-head-top { display: flex; align-items: center; justify-content: space-between; }
+  .learn-title { font-size: 15px; font-weight: 600; }
+  .learn-kind { display: flex; padding: 1.5px; border-radius: 7px; background: #F6F7FA; }
+  .learn-kind span { height: 22px; line-height: 22px; padding: 0 9px; border-radius: 5.5px; font-size: 10.5px; color: #A0A3B1; }
+  .learn-kind span.on { background: #fff; color: #4C45D6; font-weight: 600; box-shadow: 0 1px 4px rgba(99,102,241,.12); }
+  .learn-total { display: block; margin-top: 3px; font-size: 10.5px; color: #A0A3B1; }
+  .learn-grid { display: flex; flex-wrap: wrap; justify-content: space-between; }
+  .learn-tile { width: 48.6%; box-sizing: border-box; padding: 9px 10px 8px; margin-bottom: 7px; border-radius: 9px; background: #F6F7FA; }
+  .lt-label { display: block; font-size: 10.5px; color: #A0A3B1; }
+  .lt-val { display: block; margin-top: 2px; line-height: 1.25; white-space: nowrap; }
+  .lt-num { font-family: DIN Alternate, Helvetica Neue, sans-serif; font-size: 18px; font-weight: 700; letter-spacing: -.25px; }
+  .lt-unit { font-size: 9.5px; color: #A0A3B1; margin: 0 3px 0 1px; }
+  .lt-sub { display: block; margin-top: 3px; font-size: 9.5px; color: #A0A3B1; }
+  .learn-tabs { display: flex; margin: 5px 0 2px; padding: 2px; border-radius: 8px; background: #F6F7FA; }
+  .learn-tab { flex: 1; height: 28px; line-height: 28px; text-align: center; border-radius: 6.5px; font-size: 11px; color: #6E7180; }
+  .learn-tab.on { background: #fff; color: #4C45D6; font-weight: 600; box-shadow: 0 1px 4px rgba(99,102,241,.12); }
+  .bars { display: flex; align-items: flex-end; height: 95px; margin-top: 8px; border-bottom: 1px solid #EEF0F4; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; }
+  .bar-val { height: 14px; line-height: 14px; font-size: 8.5px; color: #A0A3B1; }
+  .bar-track { flex: 1; width: 13px; margin: 1px 0 0; display: flex; align-items: flex-end; border-radius: 6.5px 6.5px 2px 2px; background: #F6F7FA; overflow: hidden; }
+  .bar-fill { width: 100%; border-radius: 5.5px 5.5px 1.5px 1.5px; background: linear-gradient(180deg,#A5A7F8 0%,#6366F1 100%); }
+  .bar-fill.now { background: linear-gradient(180deg,#8B5CF6 0%,#4F46E5 100%); }
+  .bar-labs { display: flex; margin-top: 5px; }
+  .bar-lab { flex: 1; text-align: center; height: 15px; line-height: 15px; font-size: 9.5px; color: #A0A3B1; }
+  .bar-lab.now { color: #4C45D6; font-weight: 600; }
+  .learn-foot { display: block; margin-top: 4px; font-size: 10px; color: #A0A3B1; text-align: center; }
+
+  /* ========== 屏 5：自定义时长弹层 ========== */
+  .quick-row { display: flex; gap: 6px; margin-top: 12px; }
+  .q-more { flex: 1.35; border: 1px dashed #E2E4EC; background: transparent; color: #A0A3B1; font-size: 11px; }
+  .q-more.on { border: 1px solid #6366F1; background: #EDECFC; color: #4C45D6; font-weight: 600; }
+  .mask { position: absolute; inset: 0; background: rgba(16,17,22,.42); z-index: 40; }
+  .sheet {
+    position: absolute; left: 0; right: 0; bottom: 0; background: #fff;
+    border-radius: 16px 16px 0 0; padding: 10px 0 22px; z-index: 41;
+  }
+  .sheet-bar { width: 36px; height: 4px; border-radius: 2px; background: #EEF0F4; margin: 0 auto 11px; }
+  .sheet-title { padding: 0 20px 6px; font-size: 15px; font-weight: 600; }
+  .set-row { display: flex; align-items: center; justify-content: space-between; height: 54px; padding: 0 20px; border-bottom: 1px solid #EEF0F4; }
+  .set-label { font-size: 14px; }
+  .stepper { display: flex; align-items: center; }
+  .step-btn { width: 30px; height: 30px; line-height: 30px; text-align: center; border-radius: 8px; background: #F6F7FA; color: #6E7180; font-size: 15px; }
+  .step-val { min-width: 84px; text-align: center; font-size: 13px; }
+  .step-val.tap { border-bottom: 1px dashed #E2E4EC; line-height: 1.6; }
+  .set-switch { width: 40px; height: 23px; border-radius: 12px; background: #6366F1; position: relative; }
+  .set-switch::after { content: ""; position: absolute; right: 2px; top: 2px; width: 19px; height: 19px; border-radius: 50%; background: #fff; }
+  .sheet-done { margin: 12px 20px 0; height: 46px; line-height: 46px; text-align: center; border-radius: 12px; background: #F2F3F8; color: #41445A; font-size: 15px; font-weight: 500; }
+
+  .cus-kind { display: flex; margin: 3px 20px 10px; padding: 2px; border-radius: 8px; background: #F6F7FA; }
+  .cus-kind span { flex: 1; height: 31px; line-height: 31px; text-align: center; border-radius: 6.5px; font-size: 12px; color: #6E7180; }
+  .cus-kind span.on { background: #fff; color: #4C45D6; font-weight: 600; box-shadow: 0 1px 4px rgba(99,102,241,.12); }
+  .cus-input-row { display: flex; align-items: center; margin: 0 20px; padding: 0 13px; height: 55px; border-radius: 10px; background: #F6F7FA; }
+  .cus-input { flex: 1; font-family: DIN Alternate, Helvetica Neue, sans-serif; font-size: 26px; font-weight: 700; }
+  .cus-caret { display: inline-block; width: 1.5px; height: 26px; background: #6366F1; margin-left: 1px; vertical-align: -4px; }
+  .cus-unit { font-size: 12.5px; color: #A0A3B1; margin-left: 6px; }
+  .cus-presets { display: flex; flex-wrap: wrap; gap: 6px; margin: 9px 20px 0; }
+  .cus-preset { min-width: 46px; height: 32px; line-height: 32px; text-align: center; padding: 0 5px; border-radius: 8px; background: #F6F7FA; font-size: 12px; color: #6E7180; }
+  .cus-preset.on { background: #EDECFC; color: #4C45D6; font-weight: 600; }
+  .cus-hint { display: block; margin: 5px 20px 0; font-size: 10px; color: #A0A3B1; line-height: 1.6; }
+  .cus-btns { display: flex; gap: 9px; margin: 12px 20px 0; }
+  .cus-cancel { width: 100px; height: 46px; line-height: 46px; text-align: center; border-radius: 12px; background: #F2F3F8; color: #6E7180; font-size: 14px; }
+  .cus-ok { flex: 1; height: 46px; line-height: 46px; text-align: center; border-radius: 12px; background: linear-gradient(135deg,#6366F1 0%,#8B5CF6 100%); color: #fff; font-size: 14.5px; font-weight: 600; box-shadow: 0 4px 11px rgba(99,102,241,.26); }
+</style>
+</head>
+<body>
+
+<h1>记事本 &amp; 专注</h1>
+<p class="lead">首页两个入口进去的样子 · 数据全存手机本地，不联网也能用</p>
+
+<div class="stage">
+
+  <!-- ========== 屏 1 ========== -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="head-grad">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+          <div class="nav">
+            <div class="nav-back">‹</div>
+            <div class="nav-title">记事本</div>
+            <div class="nav-actions"><div class="round-btn">☰</div></div>
+          </div>
+          <div class="sub-row">共 6 条 · 1 条置顶</div>
+          <div class="search"><span class="ico">🔍</span><span class="ph">搜索标题或内容</span></div>
+        </div>
+
+        <div class="grid">
+          <div class="note n-yellow">
+            <div class="pin">📌</div>
+            <div class="n-title">高数第三章 极限</div>
+            <div class="n-body-wrap"><div class="n-body">夹逼定理要背的两个结论；连续与可导的关系别搞反，期末必考。P78 例 3-12 再推一遍。</div></div>
+            <div class="n-foot"><span>今天 14:32</span><span>46 字</span></div>
+          </div>
+
+          <div class="note n-blue">
+            <div class="n-title">实验报告</div>
+            <div class="n-body-wrap"><div class="n-body">周四前交。第三节数据要重测，示波器那台 3 号不准。截图用 Snipaste 贴到第 4 页。</div></div>
+            <div class="n-foot"><span>今天 10:05</span><span>38 字</span></div>
+          </div>
+
+          <div class="note n-pink">
+            <div class="n-title">买的东西</div>
+            <div class="n-body-wrap"><div class="n-body">牛奶、面包、红笔、A4 纸一包
+充电宝数据线（Type-C 那个）</div></div>
+            <div class="n-foot"><span>昨天</span><span>24 字</span></div>
+          </div>
+
+          <div class="note n-green">
+            <div class="n-title">软工 需求分析</div>
+            <div class="n-body-wrap"><div class="n-body">小组选题：校园二手交易平台。分工：我写需求规格说明书，周三晚前给组长。</div></div>
+            <div class="n-foot"><span>昨天</span><span>35 字</span></div>
+          </div>
+
+          <div class="note n-purple">
+            <div class="n-title">汇编</div>
+            <div class="n-body-wrap"><div class="n-body">第 5 章循环设计的例子要看懂：do-while 那种用 jnz 往回跳的写法。</div></div>
+            <div class="n-foot"><span>10月24日</span><span>30 字</span></div>
+          </div>
+
+          <div class="note n-plain">
+            <div class="n-title">突然想到</div>
+            <div class="n-body-wrap"><div class="n-body">图书馆 4 楼靠窗位置信号最好，下午三点后基本没人。</div></div>
+            <div class="n-foot"><span>10月22日</span><span>26 字</span></div>
+          </div>
+        </div>
+
+        <div class="fab">＋</div>
+        <div class="capsule">••• ⊙</div>
+      </div>
+    </div>
+    <div class="caption">① 记事本列表 · 宫格视图</div>
+  </div>
+
+  <!-- ========== 屏 2 ========== -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+        <div class="nav edit-nav">
+          <div class="nav-back">‹</div>
+          <div class="nav-state">已保存 14:32</div>
+          <div class="nav-done">完成</div>
+        </div>
+
+        <div class="paper">
+          <div class="e-title">高数第三章 极限</div>
+          <div class="e-line"></div>
+          <div class="e-body">夹逼定理要背的两个结论：
+
+1. 若 g(x) ≤ f(x) ≤ h(x)，且 lim g = lim h = A，
+   则 lim f = A
+2. 用的时候先找上下界，别硬凑
+
+连续与可导的关系：
+可导 ⇒ 连续，反过来不成立（y=|x| 在 0 处）</div>
+        </div>
+
+        <div class="palette">          <div class="sw sw-plain"></div>
+          <div class="sw sw-yellow on">✓</div>
+          <div class="sw sw-pink"></div>
+          <div class="sw sw-blue"></div>
+          <div class="sw sw-green"></div>
+          <div class="sw sw-purple"></div>
+        </div>
+
+        <div class="toolbar">
+          <div class="tool"><span class="ti">🎨</span><span class="tt">底色</span></div>
+          <div class="tool"><span class="ti">📌</span><span class="tt">已置顶</span></div>
+          <div class="tool"><span class="ti">⧉</span><span class="tt">复制</span></div>
+          <div class="tool"><span class="ti">🗑</span><span class="tt danger">删除</span></div>
+          <div class="chars">118 字</div>
+        </div>
+        <div class="capsule">••• ⊙</div>
+      </div>
+    </div>
+    <div class="caption">② 便签编辑 · 自动保存</div>
+  </div>
+
+  <!-- ========== 屏 3 ========== -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="head-grad" style="padding-bottom:2px;">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+          <div class="nav">
+            <div class="nav-back">‹</div>
+            <div class="nav-title">专注</div>
+            <div class="nav-actions"><div class="round-btn">⚙</div></div>
+          </div>
+        </div>
+
+          <div class="stat-card">
+            <div class="stat"><div class="stat-num">5<span>/8</span></div><span class="stat-label">今日番茄</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">125</div><span class="stat-label">专注分钟</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">25</div><span class="stat-label">休息分钟</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">6</div><span class="stat-label">连续天数</span></div>
+            <div class="goal-bar"><div class="goal-fill"></div></div>
+          </div>
+
+        <div class="timer-card">
+          <div class="ring-wrap">
+            <svg width="210" height="210" viewBox="0 0 210 210">
+              <circle cx="105" cy="105" r="97" fill="none" stroke="#ECEDF3" stroke-width="15"/>
+              <circle cx="105" cy="105" r="97" fill="none" stroke="#6366F1" stroke-width="15"
+                      stroke-linecap="round" stroke-dasharray="152.5 609.5" stroke-dashoffset="0"
+                      transform="rotate(-90 105 105)"/>
+            </svg>
+            <div class="ring-inner">
+              <div class="ring-mode">专注中</div>
+              <div class="ring-time">18:42</div>
+              <div class="ring-task">复习高数第三章</div>
+            </div>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-main">暂停</div>
+            <div class="ctrl-sub">放弃</div>
+          </div>
+        </div>
+
+        <div class="todo-card">
+          <div class="todo-head">
+            <span class="todo-title">今日待办</span>
+            <span class="todo-count">3 项未完成</span>
+            <div class="todo-add">＋</div>
+          </div>
+
+          <div class="todo">
+            <div class="tcheck picked"></div>
+            <div>
+              <div class="tname">复习高数第三章</div>
+              <div class="tmeta"><span class="tpomo">🍅 2</span><span class="ttag">正在专注</span></div>
+            </div>
+            <div class="tgo">▶</div>
+          </div>
+
+          <div class="todo">
+            <div class="tcheck"></div>
+            <div>
+              <div class="tname">写软件工程需求文档</div>
+              <div class="tmeta"><span class="tpomo">🍅 1</span></div>
+            </div>
+            <div class="tgo">▶</div>
+          </div>
+
+          <div class="todo">
+            <div class="tcheck done">✓</div>
+            <div>
+              <div class="tname done">交汇编实验报告</div>
+              <div class="tmeta"><span class="tpomo">🍅 2</span></div>
+            </div>
+            <div class="tgo">▶</div>
+          </div>
+
+          <div class="todo-tip">点圆圈打勾 · 点整行开始专注 · 长按删除</div>
+        </div>
+
+        <div class="capsule">••• ⊙</div>
+      </div>
+    </div>
+    <div class="caption">③ 专注 · 番茄钟 + 待办</div>
+  </div>
+
+  <!-- ========== 屏 4 ========== -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="head-grad" style="padding-bottom:2px;">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+          <div class="nav">
+            <div class="nav-back">‹</div>
+            <div class="nav-title">专注</div>
+            <div class="nav-actions"><div class="round-btn">⚙</div></div>
+          </div>
+        </div>
+
+          <div class="stat-card">
+            <div class="stat"><div class="stat-num">5<span>/8</span></div><span class="stat-label">今日番茄</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">125</div><span class="stat-label">专注分钟</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">25</div><span class="stat-label">休息分钟</span></div>
+            <div class="stat-line"></div>
+            <div class="stat"><div class="stat-num">6</div><span class="stat-label">连续天数</span></div>
+            <div class="goal-bar"><div class="goal-fill"></div></div>
+          </div>
+
+        <div class="learn-card">
+          <div class="learn-head">
+            <div class="learn-head-top">
+              <span class="learn-title">学习时长</span>
+              <div class="learn-kind"><span class="on">学习</span><span>休息</span></div>
+            </div>
+            <span class="learn-total">累计 128 小时 40 分 · 302 个番茄</span>
+          </div>
+
+          <div class="learn-grid">
+            <div class="learn-tile">
+              <span class="lt-label">今天</span>
+              <span class="lt-val"><span class="lt-num">2</span><span class="lt-unit">小时</span><span class="lt-num">5</span><span class="lt-unit">分</span></span>
+              <span class="lt-sub">5 个番茄</span>
+            </div>
+            <div class="learn-tile">
+              <span class="lt-label">本周</span>
+              <span class="lt-val"><span class="lt-num">9</span><span class="lt-unit">小时</span><span class="lt-num">40</span><span class="lt-unit">分</span></span>
+              <span class="lt-sub">21 个番茄 · 4 天</span>
+            </div>
+            <div class="learn-tile">
+              <span class="lt-label">本月</span>
+              <span class="lt-val"><span class="lt-num">38</span><span class="lt-unit">小时</span><span class="lt-num">15</span><span class="lt-unit">分</span></span>
+              <span class="lt-sub">96 个番茄 · 18 天</span>
+            </div>
+            <div class="learn-tile">
+              <span class="lt-label">今年</span>
+              <span class="lt-val"><span class="lt-num">128</span><span class="lt-unit">小时</span><span class="lt-num">40</span><span class="lt-unit">分</span></span>
+              <span class="lt-sub">302 个番茄 · 96 天</span>
+            </div>
+          </div>
+
+          <div class="learn-tabs">
+            <div class="learn-tab on">近 7 天</div>
+            <div class="learn-tab">近 6 周</div>
+            <div class="learn-tab">近 6 月</div>
+            <div class="learn-tab">近 4 年</div>
+          </div>
+
+          <div class="bars">
+            <div class="bar-col"><span class="bar-val">1h</span><div class="bar-track"><div class="bar-fill" style="height:40%"></div></div></div>
+            <div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill" style="height:0"></div></div></div>
+            <div class="bar-col"><span class="bar-val">1.5h</span><div class="bar-track"><div class="bar-fill" style="height:60%"></div></div></div>
+            <div class="bar-col"><span class="bar-val">2h</span><div class="bar-track"><div class="bar-fill" style="height:80%"></div></div></div>
+            <div class="bar-col"><span class="bar-val">30分</span><div class="bar-track"><div class="bar-fill" style="height:20%"></div></div></div>
+            <div class="bar-col"><span class="bar-val">2.5h</span><div class="bar-track"><div class="bar-fill" style="height:100%"></div></div></div>
+            <div class="bar-col"><span class="bar-val">2.1h</span><div class="bar-track"><div class="bar-fill now" style="height:83%"></div></div></div>
+          </div>
+
+          <div class="bar-labs">
+            <span class="bar-lab">二</span>
+            <span class="bar-lab">三</span>
+            <span class="bar-lab">四</span>
+            <span class="bar-lab">五</span>
+            <span class="bar-lab">六</span>
+            <span class="bar-lab">日</span>
+            <span class="bar-lab now">今天</span>
+          </div>
+
+          <span class="learn-foot">近 7 天合计 10 小时 35 分</span>
+        </div>
+
+        <div class="capsule">••• ⊙</div>
+      </div>
+    </div>
+    <div class="caption">④ 学习 / 休息时长 · 日/周/月/年</div>
+  </div>
+
+  <!-- ========== 屏 5 ========== -->
+  <div class="col">
+    <div class="phone">
+      <div class="screen">
+        <div class="head-grad" style="padding-bottom:2px;">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+          <div class="nav">
+            <div class="nav-back">‹</div>
+            <div class="nav-title">专注</div>
+            <div class="nav-actions"><div class="round-btn">⚙</div></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat"><div class="stat-num">5<span>/8</span></div><span class="stat-label">今日番茄</span></div>
+          <div class="stat-line"></div>
+          <div class="stat"><div class="stat-num">125</div><span class="stat-label">专注分钟</span></div>
+          <div class="stat-line"></div>
+          <div class="stat"><div class="stat-num">25</div><span class="stat-label">休息分钟</span></div>
+          <div class="stat-line"></div>
+          <div class="stat"><div class="stat-num">6</div><span class="stat-label">连续天数</span></div>
+          <div class="goal-bar"><div class="goal-fill"></div></div>
+        </div>
+
+        <div class="timer-card">
+          <div class="ring-wrap">
+            <svg width="210" height="210" viewBox="0 0 210 210">
+              <circle cx="105" cy="105" r="97" fill="none" stroke="#ECEDF3" stroke-width="15"/>
+            </svg>
+            <div class="ring-inner">
+              <div class="ring-mode" style="color:#A0A3B1;">准备专注</div>
+              <div class="ring-time">45:00</div>
+              <div class="ring-task">复习高数第三章</div>
+            </div>
+          </div>
+          <div class="ctrl">
+            <div class="ctrl-main primary">开始专注</div>
+          </div>
+          <div class="quick-row">
+            <div class="q-chip">15</div>
+            <div class="q-chip">25</div>
+            <div class="q-chip">45</div>
+            <div class="q-chip">60</div>
+            <div class="q-chip q-more on">45分</div>
+          </div>
+          <span class="timer-hint">选好待办后点「开始专注」，完成后自动记一个番茄</span>
+        </div>
+
+        <div class="mask"></div>
+        <div class="sheet">
+          <div class="sheet-bar"></div>
+          <div class="sheet-title">自定义时长</div>
+
+          <div class="cus-kind">
+            <span class="on">专注时长</span>
+            <span>休息时长</span>
+          </div>
+
+          <div class="cus-input-row">
+            <div class="cus-input">45<span class="cus-caret"></span></div>
+            <span class="cus-unit">分钟</span>
+          </div>
+
+          <div class="cus-presets">
+            <div class="cus-preset">20</div>
+            <div class="cus-preset">25</div>
+            <div class="cus-preset">30</div>
+            <div class="cus-preset on">45</div>
+            <div class="cus-preset">60</div>
+            <div class="cus-preset">90</div>
+          </div>
+
+          <span class="cus-hint">专注 1~180 分钟，休息 1~90 分钟；填完会存成下次的默认时长</span>
+
+          <div class="cus-btns">
+            <div class="cus-cancel">取消</div>
+            <div class="cus-ok">按这个时长开始</div>
+          </div>
+        </div>
+
+        <div class="capsule">••• ⊙</div>
+      </div>
+    </div>
+    <div class="caption">⑤ 时间自定义 · 专注/休息都能改</div>
+  </div>
+
+</div>
+
+</body>
+</html>

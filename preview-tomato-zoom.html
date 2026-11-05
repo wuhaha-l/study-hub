@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>专注页 · 静态预览</title>
+<style>
+/* 全局样式 */
+:root {
+  /* 主题变量（浅色）。深色在 .theme-dark 里整组替换，页面根节点挂类即可 */
+  --bg: #F4F5F9;
+  --card: #FFFFFF;
+  --card-2: #F6F7FA;
+  --text: #16161D;
+  --text-2: #6E7180;
+  --text-3: #A0A3B1;
+  --line: #EEF0F4;
+  --brand: #4C45D6;
+  --brand-2: #6C63E8;
+  --brand-soft: #EDECFC;
+  --danger: #D6453B;
+  --ok: #15803D;
+  --ok-bg: #E7F7EE;
+  --warn: #B45309;
+  --err-bg: #FDE9EF;
+  --shadow: 0 2px 10px rgba(24, 28, 56, 0.05);
+  --ghost-bg: #F2F3F8;
+  --ghost-fg: #41445A;
+  --mask: rgba(15, 17, 26, 0.45);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 深色模式：utils/theme.js 负责把类挂到每个页面的根节点上 */
+.theme-dark {
+  --bg: #101116;
+  --card: #1C1E28;
+  --card-2: #262938;
+  --text: #EDEFF7;
+  --text-2: #9CA1B5;
+  --text-3: #6A6F85;
+  --line: #2B2E3E;
+  --brand: #8B85F2;
+  --brand-2: #7D75F0;
+  --brand-soft: #2A2A45;
+  --danger: #E5695F;
+  --ok: #4ADE80;
+  --ok-bg: #17332A;
+  --warn: #F0B45C;
+  --err-bg: #3D2426;
+  --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --ghost-bg: #262938;
+  --ghost-fg: #C6CADB;
+  --mask: rgba(0, 0, 0, 0.62);
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+div, span, input, textarea, button {
+  box-sizing: border-box;
+}
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.card-pad {
+  padding: 16px;
+}
+
+/* ===== 文本 ===== */
+.t-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.1px;
+}
+
+.t-sub {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.t-hint {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.t-num {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* ===== 平台色标 ===== */
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.p-chaoxing { background: #E8453C; }
+.p-educoder { background: #2B7FFF; }
+.p-unipus   { background: #11B981; }
+
+.tag-chaoxing { background: #FDEEED; color: #C93A32; }
+.tag-educoder { background: #E9F1FF; color: #1E63CC; }
+.tag-unipus   { background: #E6F8F1; color: #0B8E63; }
+.tag-zhihuishu { background: #F1E9FB; color: #7C3AED; }
+.tag-icourse163 { background: #E4F2FE; color: #0369A1; }
+.tag-yuketang  { background: #FEF3E2; color: #B45309; }
+.tag-custom    { background: #F1F5F9; color: #64748B; }
+
+.theme-dark .tag-chaoxing { background: #3D2422; color: #F0A29B; }
+.theme-dark .tag-educoder { background: #1E2C44; color: #93BEF7; }
+.theme-dark .tag-unipus   { background: #17332A; color: #85DDB8; }
+.theme-dark .tag-zhihuishu { background: #2F2444; color: #C8ADF8; }
+.theme-dark .tag-icourse163 { background: #1E3348; color: #8CC2F5; }
+.theme-dark .tag-yuketang  { background: #3A2E1C; color: #F0C583; }
+.theme-dark .tag-custom    { background: #262938; color: #A9B0C2; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ===== 分隔线 ===== */
+.hr {
+  height: 0.5px;
+  background: var(--line);
+  transform: scaleY(0.5);
+}
+
+/* ===== 按钮 ===== */
+.btn-primary {
+  height: 46px;
+  line-height: 46px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  padding: 0;
+}
+
+.btn-primary::after { border: none; }
+
+.btn-primary.is-disabled {
+  background: #D8DAE5;
+  color: #FFFFFF;
+}
+
+.theme-dark .btn-primary.is-disabled {
+  background: #3A3D4C;
+  color: #8A8EA0;
+}
+
+.btn-ghost {
+  height: 46px;
+  line-height: 46px;
+  border-radius: 12px;
+  background: var(--ghost-bg);
+  color: var(--ghost-fg);
+  font-size: 15px;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  padding: 0;
+}
+
+.btn-ghost::after { border: none; }
+
+/* ===== 空状态 ===== */
+.empty {
+  padding: 50px 20px;
+  text-align: center;
+}
+
+.empty-emoji {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 12px;
+  opacity: 0.85;
+}
+
+.empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.empty-desc {
+  font-size: 13px;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 20px;
+}
+
+/* ================= 顶部 ================= */
+.head {
+  background: linear-gradient(168deg, #EEEDFF 0%, #F6F3FF 60%, #F4F5F9 100%);
+  padding-bottom: 4px;
+}
+
+.theme-dark .head {
+  background: linear-gradient(168deg, #1E1B33 0%, #191A26 60%, #101116 100%);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.nav-back {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.nav-back-ico {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--text);
+  margin-top: -3px;
+}
+
+.nav-title {
+  flex: 1;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+  margin-left: 4px;
+  letter-spacing: 0.25px;
+}
+
+.nav-set {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 95px;
+}
+
+.theme-dark .nav-set {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-set-ico {
+  font-size: 14px;
+  color: var(--brand);
+  line-height: 1;
+}
+
+/* ================= 统计 ================= */
+.stat-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 6px 16px 0;
+  padding: 13px 10px 17px;
+  background: var(--card);
+  border-radius: 13px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.stat-unit {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+  letter-spacing: 0;
+}
+
+.stat-label {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-top: 2px;
+}
+
+.stat-line {
+  width: 0.5px;
+  height: 22px;
+  background: var(--line);
+}
+
+.goal-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--card-2);
+}
+
+.goal-fill {
+  height: 100%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, #6366F1 0%, #8B5CF6 100%);
+  transition: width 0.4s ease;
+}
+
+/* ================= 计时 ================= */
+.timer-card {
+  margin: 12px 16px 0;
+  padding: 15px 16px 13px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.ring-wrap {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  margin: 3px auto 0;
+}
+
+.ring-canvas {
+  width: 210px;
+  height: 210px;
+}
+
+.ring-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 210px;
+  height: 210px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-mode {
+  font-size: 11.5px;
+  color: var(--text-3);
+  letter-spacing: 1px;
+  margin-bottom: 3px;
+}
+
+.ring-mode.is-focus {
+  color: #6366F1;
+}
+
+.ring-mode.is-break {
+  color: #10B981;
+}
+
+.ring-time {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 46px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.ring-task {
+  max-width: 150px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 拖动调时长的提示：只在准备状态出现 */
+.ring-drag {
+  display: block;
+  margin-top: 1px;
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: center;
+  letter-spacing: 0.25px;
+}
+
+.ctrl {
+  display: flex;
+  align-items: center;
+  margin-top: 13px;
+}
+
+.ctrl-main {
+  flex: 1;
+  height: 48px;
+  line-height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 15.5px;
+  font-weight: 600;
+  border: none;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.28);
+}
+
+.ctrl-main::after {
+  border: none;
+}
+
+.ctrl-main.is-running {
+  background: var(--ghost-bg);
+  color: var(--ghost-fg);
+  box-shadow: none;
+}
+
+.ctrl-sub {
+  width: 84px;
+  height: 48px;
+  line-height: 48px;
+  margin-left: 9px;
+  border-radius: 12px;
+  background: var(--ghost-bg);
+  color: var(--text-2);
+  font-size: 14px;
+  border: none;
+  padding: 0;
+}
+
+.ctrl-sub::after {
+  border: none;
+}
+
+.quick {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.quick-chip {
+  flex: 1;
+  height: 34px;
+  line-height: 34px;
+  text-align: center;
+  margin-right: 6px;
+  border-radius: 9px;
+  background: var(--card-2);
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.quick-chip:last-child {
+  margin-right: 0;
+}
+
+.quick-chip.is-on {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* 自定义那颗：虚线框，一眼看出不是预设值 */
+.quick-more {
+  flex: 1.35;
+  font-size: 11px;
+  color: var(--text-3);
+  border: 0.5px dashed var(--line);
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.quick-more.is-on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+
+.timer-hint {
+  display: block;
+  margin-top: 9px;
+  font-size: 10.5px;
+  color: var(--text-3);
+  text-align: center;
+  line-height: 1.6;
+}
+
+/* ================= 学习时长统计 ================= */
+.learn-card {
+  margin: 12px 16px 0;
+  padding: 13px 13px 11px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.learn-head {
+  margin-bottom: 9px;
+}
+
+.learn-head-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.learn-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* 学习 / 休息 / 生活 切换 */
+.learn-kind {
+  display: flex;
+  padding: 1.5px;
+  border-radius: 7px;
+  background: var(--card-2);
+}
+
+.learn-kind-item {
+  height: 22px;
+  line-height: 22px;
+  padding: 0 9px;
+  border-radius: 5.5px;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.learn-kind-item.is-on {
+  background: var(--card);
+  color: var(--brand);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
+}
+
+.learn-total {
+  display: block;
+  margin-top: 3px;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+.learn-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.learn-tile {
+  width: 48.6%;
+  box-sizing: border-box;
+  padding: 9px 10px 8px;
+  margin-bottom: 7px;
+  border-radius: 9px;
+  background: var(--card-2);
+}
+
+.learn-tile-label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-3);
+}
+
+/* 数字大、单位小：128 小时 40 分也不会顶出格子。
+   用 flex + baseline 而不是纯 inline：模板里 text 之间的换行会被当成空格，
+   inline 排下来「小时」和后面的数字之间会多一截。 */
+.learn-tile-val {
+  display: flex;
+  align-items: baseline;
+  margin-top: 2px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* 数字大、单位小：128 小时 40 分也不会顶出格子 */
+.lt-num {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.25px;
+}
+
+.lt-unit {
+  font-size: 9.5px;
+  color: var(--text-3);
+  margin: 0 3px 0 1px;
+}
+
+.learn-tile-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+.learn-tabs {
+  display: flex;
+  margin: 5px 0 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--card-2);
+}
+
+.learn-tab {
+  flex: 1;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  border-radius: 6.5px;
+  font-size: 11px;
+  color: var(--text-2);
+}
+
+.learn-tab.is-on {
+  background: var(--card);
+  color: var(--brand);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  height: 95px;
+  margin-top: 8px;
+  /* 基线：柱子落在这一条上，不然像浮在半空 */
+  border-bottom: 0.5px solid var(--line);
+}
+
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.bar-val {
+  height: 14px;
+  line-height: 14px;
+  font-size: 9px;
+  color: var(--text-3);
+}
+
+.bar-track {
+  flex: 1;
+  width: 13px;
+  margin: 1px 0 0;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 6.5px 6.5px 2px 2px;
+  background: var(--card-2);
+  overflow: hidden;
+}
+
+/* 只圆上沿：底部贴住基线，不然像浮在半空 */
+.bar-fill {
+  width: 100%;
+  border-radius: 5.5px 5.5px 1.5px 1.5px;
+  background: linear-gradient(180deg, #A5A7F8 0%, #6366F1 100%);
+  transition: height 0.3s ease;
+}
+
+.bar-fill.is-now {
+  background: linear-gradient(180deg, #8B5CF6 0%, #4F46E5 100%);
+}
+
+.bar-labs {
+  display: flex;
+  margin-top: 5px;
+}
+
+.bar-lab {
+  flex: 1;
+  height: 15px;
+  line-height: 15px;
+  text-align: center;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+.bar-lab.is-now {
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.learn-foot {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+/* ================= 生活关键词 ================= */
+.kw {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 0.5px solid var(--line);
+}
+
+.kw-head {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+
+.kw-row {
+  position: relative;
+  padding: 5px 0 7px;
+}
+
+.kw-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.kw-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.kw-val {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  color: #D97706;
+  letter-spacing: -0.15px;
+}
+
+.theme-dark .kw-val {
+  color: #FBBF24;
+}
+
+.kw-track {
+  height: 4px;
+  margin-top: 4px;
+  border-radius: 2px;
+  background: var(--card-2);
+  overflow: hidden;
+}
+
+.kw-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #FCD34D 0%, #F59E0B 100%);
+  transition: width 0.3s ease;
+}
+
+.kw-sub {
+  display: block;
+  margin-top: 3px;
+  font-size: 9.5px;
+  color: var(--text-3);
+}
+
+/* ================= 待办 ================= */
+.todo-card {
+  margin: 12px 16px 0;
+  padding: 13px 13px 9px;
+  background: var(--card);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.todo-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.todo-head-left {
+  display: flex;
+  align-items: baseline;
+}
+
+.todo-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.todo-count {
+  font-size: 11px;
+  color: var(--text-3);
+  margin-left: 6px;
+}
+
+.todo-add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todo-add-ico {
+  font-size: 15px;
+  color: var(--brand);
+  line-height: 1;
+}
+
+.add-row {
+  display: flex;
+  align-items: center;
+  margin: 8px 0 4px;
+  padding: 0 9px;
+  height: 42px;
+  border-radius: 9px;
+  background: var(--card-2);
+}
+
+.add-ipt {
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--text);
+}
+
+.ph {
+  color: var(--text-3);
+}
+
+.add-ok {
+  padding: 0 10px;
+  height: 28px;
+  line-height: 28px;
+  border-radius: 7px;
+  background: var(--brand);
+  color: #FFFFFF;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* 加待办时的标签选择：一条待办必须挂一个 */
+.add-tags {
+  display: flex;
+  align-items: center;
+  margin: 0 0 6px;
+}
+
+.add-tag-tip {
+  font-size: 10.5px;
+  color: var(--text-3);
+  margin-right: 7px;
+}
+
+.add-tag {
+  height: 26px;
+  line-height: 26px;
+  padding: 0 10px;
+  margin-right: 6px;
+  border-radius: 7px;
+  font-size: 11.5px;
+  color: var(--text-2);
+  background: var(--card-2);
+  border: 0.5px solid transparent;
+}
+
+.add-tag.is-on {
+  font-weight: 600;
+}
+
+.add-tag.tag-study.is-on {
+  color: #4F46E5;
+  background: rgba(99, 102, 241, 0.14);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.add-tag.tag-rest.is-on {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.add-tag.tag-life.is-on {
+  color: #B45309;
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.45);
+}
+
+.theme-dark .add-tag.tag-study.is-on {
+  color: #A5B4FC;
+}
+
+.theme-dark .add-tag.tag-rest.is-on {
+  color: #6EE7B7;
+}
+
+.theme-dark .add-tag.tag-life.is-on {
+  color: #FCD34D;
+}
+
+.add-tag-hint {
+  font-size: 9.5px;
+  color: #D97706;
+}
+
+.todo-empty {
+  padding: 17px 5px 13px;
+}
+
+.todo-empty-txt {
+  font-size: 12.5px;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+
+.todo {
+  display: flex;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 0.5px solid var(--line);
+}
+
+.todo:last-of-type {
+  border-bottom: none;
+}
+
+.todo-hover {
+  background: var(--card-2);
+}
+
+.todo-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.todo-check.is-done {
+  background: #10B981;
+  border-color: #10B981;
+}
+
+.todo-check.is-picked {
+  border-color: var(--brand);
+}
+
+.todo-check-ico {
+  font-size: 12px;
+  color: #FFFFFF;
+  line-height: 1;
+}
+
+.todo-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-name {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.todo-name.is-done {
+  color: var(--text-3);
+  text-decoration: line-through;
+}
+
+.todo-meta {
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.todo-pomo {
+  font-size: 10px;
+  color: var(--text-3);
+  margin-right: 6px;
+}
+
+.todo-tag {
+  font-size: 9.5px;
+  color: var(--brand);
+  background: var(--brand-soft);
+  padding: 0 5px;
+  height: 15px;
+  line-height: 15px;
+  border-radius: 4px;
+}
+
+/* 待办上的标签胶囊：学习 / 休息 / 生活，点一下能换 */
+.tag-pill {
+  font-size: 9.5px;
+  padding: 0 6px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 4px;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.tag-pill.tag-study {
+  color: #4F46E5;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.tag-pill.tag-rest {
+  color: #059669;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.tag-pill.tag-life {
+  color: #B45309;
+  background: rgba(245, 158, 11, 0.16);
+}
+
+.theme-dark .tag-pill.tag-study {
+  color: #A5B4FC;
+}
+
+.theme-dark .tag-pill.tag-rest {
+  color: #6EE7B7;
+}
+
+.theme-dark .tag-pill.tag-life {
+  color: #FCD34D;
+}
+
+.todo-go {
+  font-size: 13px;
+  color: var(--text-3);
+  padding-left: 8px;
+}
+
+.todo-tip {
+  padding: 7px 0 3px;
+  font-size: 10px;
+  color: var(--text-3);
+  text-align: center;
+}
+
+.safe-bottom {
+  height: 30px;
+}
+
+/* ================= 弹层 ================= */
+.mask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--mask);
+  z-index: 40;
+}
+
+.sheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  border-radius: 16px 16px 0 0;
+  padding: 10px 0 calc(10px + 0px);
+  z-index: 41;
+  animation: rise 0.22s ease-out;
+}
+
+@keyframes rise {
+  from { transform: translateY(20px); opacity: 0.6; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.sheet-bar {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--line);
+  margin: 0 auto 11px;
+}
+
+.sheet-title {
+  padding: 0 20px 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 54px;
+  padding: 0 20px;
+  border-bottom: 0.5px solid var(--line);
+}
+
+.set-label {
+  font-size: 14px;
+  color: var(--text);
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+}
+
+.step-btn {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  border-radius: 8px;
+  background: var(--card-2);
+  color: var(--text-2);
+  font-size: 15px;
+}
+
+.step-val {
+  min-width: 84px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text);
+}
+
+/* 点一下就能自己填时长，用虚线下划线提示可点 */
+.step-val.is-tap {
+  border-bottom: 1px dashed var(--line);
+  line-height: 1.6;
+}
+
+.set-switch {
+  transform: scale(0.85);
+}
+
+/* ================= 自定义时长弹层 ================= */
+.mask-top {
+  z-index: 50;
+}
+
+.sheet-top {
+  z-index: 51;
+}
+
+.cus-kind {
+  display: flex;
+  margin: 3px 20px 10px;
+  padding: 2px;
+  border-radius: 8px;
+  background: var(--card-2);
+}
+
+.cus-kind-item {
+  flex: 1;
+  height: 31px;
+  line-height: 31px;
+  text-align: center;
+  border-radius: 6.5px;
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.cus-kind-item.is-on {
+  background: var(--card);
+  color: var(--brand);
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.12);
+}
+
+.cus-input-row {
+  display: flex;
+  align-items: center;
+  margin: 0 20px;
+  padding: 0 13px;
+  height: 55px;
+  border-radius: 10px;
+  background: var(--card-2);
+}
+
+.cus-input {
+  flex: 1;
+  height: 55px;
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.cus-unit {
+  font-size: 12.5px;
+  color: var(--text-3);
+  margin-left: 6px;
+}
+
+.cus-presets {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 9px 20px 0;
+}
+
+.cus-preset {
+  min-width: 46px;
+  height: 32px;
+  line-height: 32px;
+  text-align: center;
+  padding: 0 5px;
+  box-sizing: border-box;
+  margin: 0 6px 6px 0;
+  border-radius: 8px;
+  background: var(--card-2);
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.cus-preset.is-on {
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.cus-hint {
+  display: block;
+  margin: 2px 20px 0;
+  font-size: 10px;
+  color: var(--text-3);
+  line-height: 1.6;
+}
+
+.cus-btns {
+  display: flex;
+  margin: 12px 20px 0;
+}
+
+.cus-cancel {
+  width: 100px;
+  height: 46px;
+  line-height: 46px;
+  text-align: center;
+  border-radius: 12px;
+  background: var(--ghost-bg);
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+.cus-ok {
+  flex: 1;
+  height: 46px;
+  line-height: 46px;
+  text-align: center;
+  margin-left: 9px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 14.5px;
+  font-weight: 600;
+  box-shadow: 0 4px 11px rgba(99, 102, 241, 0.26);
+}
+
+.sheet-done {
+  margin: 12px 20px 0;
+  height: 46px;
+  line-height: 46px;
+  text-align: center;
+  border-radius: 12px;
+  background: var(--ghost-bg);
+  color: var(--ghost-fg);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.hov {
+  opacity: 0.6;
+}
+
+body { margin: 0; padding: 24px; background: #EEF0F5; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+.row { display: flex; gap: 24px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+.phone { width: 375px; height: 1560px; overflow: hidden; border-radius: 28px; box-shadow: 0 12px 40px rgba(20,24,45,.2); background: #F5F6FA; position: relative; }
+.phone.theme-dark { background: #12131A; }
+.phone .page { height: 100%; overflow: hidden; }
+.cap { text-align: center; font-size: 12px; color: #6B7280; margin: 8px 0 14px; }
+
+body { padding: 0; }
+.row { gap: 16px; }
+.phone { width: 375px; height: 700px; border-radius: 0; box-shadow: none; }
+.phone .page { margin-top: -380px; }
+.zoom-body .row { zoom: 1.7; }
+</style></head><body class="zoom-body">
+<div class="row"><div>
+<div class="phone ">
+<div class="page">
+  <div class="head" style="padding-top:20px">
+    <div class="nav" style="height:44px">
+      <div class="nav-back"><span class="nav-back-ico">‹</span></div>
+      <span class="nav-title">专注</span>
+      <div class="nav-set"><span class="nav-set-ico">⚙</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat"><span class="stat-num">6<span class="stat-unit">/8</span></span><span class="stat-label">今日番茄</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">158</span><span class="stat-label">专注分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">休息分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">连续天数</span></div>
+    <div class="goal-bar"><div class="goal-fill" style="width:75%"></div></div>
+  </div>
+
+  
+  <div class="timer-card">
+    <div class="ring-wrap">
+      <svg width="210" height="210" viewBox="0 0 210 210" style="position:absolute;inset:0"><circle cx="105" cy="105" r="96" fill="none" stroke="#ECEDF3" stroke-width="7.5"/><circle cx="105" cy="18.75" r="2.4" fill="rgba(20,24,45,.2)"/><circle cx="148.125" cy="30.3053" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="179.695" cy="61.875" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="191.25" cy="105" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="179.695" cy="148.125" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="148.125" cy="179.695" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="105" cy="191.25" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="61.875" cy="179.695" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="30.3053" cy="148.125" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="18.75" cy="105" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="30.3053" cy="61.875" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="61.875" cy="30.3053" r="1.7" fill="rgba(20,24,45,.2)"/><circle cx="79.7422" cy="197.618" r="11" fill="#FFFFFF" stroke="#6366F1" stroke-width="4"/><circle cx="105" cy="105" r="96" fill="none" stroke="#6366F1" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="327.152 603.186" transform="rotate(-90 105 105)" opacity="0.55"/></svg>
+      <div class="ring-inner">
+        <span class="ring-mode">准备专注</span>
+        <span class="ring-time">32:00</span>
+        <span class="ring-task">还没选任务，也能直接开始</span>
+      </div>
+    </div>
+    <span class="ring-drag">按住圆环转 · 一圈 59 分钟</span><div class="ctrl"><button class="ctrl-main">开始专注</button></div><div class="quick"><div class="quick-chip">15</div><div class="quick-chip">25</div><div class="quick-chip">45</div><div class="quick-chip">60</div><div class="quick-chip quick-more is-on"><span>32 分</span></div></div><span class="timer-hint">选好待办后点「开始专注」，完成后自动记一个番茄</span>
+  </div>
+
+
+  <div class="learn-card">
+    <div class="learn-head">
+      <div class="learn-head-top">
+        <span class="learn-title">学习时长</span>
+        <div class="learn-kind"><span class="learn-kind-item is-on">学习</span><span class="learn-kind-item ">休息</span><span class="learn-kind-item ">生活</span></div>
+      </div>
+      <span class="learn-total">累计 12 小时 45 分 · 31 个番茄</span>
+    </div>
+    <div class="learn-grid"><div class="learn-tile"><span class="learn-tile-label">今天</span><div class="learn-tile-val"><span class="lt-num">23</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">1 个番茄</span></div><div class="learn-tile"><span class="learn-tile-label">本周</span><div class="learn-tile-val"><span class="lt-num">4</span><span class="lt-unit">小时</span><span class="lt-num">10</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">11 个番茄 · 5 天</span></div><div class="learn-tile"><span class="learn-tile-label">本月</span><div class="learn-tile-val"><span class="lt-num">12</span><span class="lt-unit">小时</span><span class="lt-num">45</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">31 个番茄 · 14 天</span></div><div class="learn-tile"><span class="learn-tile-label">今年</span><div class="learn-tile-val"><span class="lt-num">128</span><span class="lt-unit">小时</span><span class="lt-num">40</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">402 个番茄</span></div></div>
+    <div class="learn-tabs">
+      <div class="learn-tab is-on">日</div>
+      <div class="learn-tab">周</div>
+      <div class="learn-tab">月</div>
+      <div class="learn-tab">年</div>
+    </div>
+    <div class="bars"><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">31分</span><div class="bar-track"><div class="bar-fill " style="height:62%"></div></div></div><div class="bar-col"><span class="bar-val">50分</span><div class="bar-track"><div class="bar-fill " style="height:100%"></div></div></div><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">19分</span><div class="bar-track"><div class="bar-fill " style="height:38%"></div></div></div><div class="bar-col"><span class="bar-val">42分</span><div class="bar-track"><div class="bar-fill " style="height:84%"></div></div></div><div class="bar-col"><span class="bar-val">23分</span><div class="bar-track"><div class="bar-fill is-now" style="height:47%"></div></div></div></div>
+    <div class="bar-labs"><span class="bar-lab ">三</span><span class="bar-lab ">四</span><span class="bar-lab ">五</span><span class="bar-lab ">六</span><span class="bar-lab ">日</span><span class="bar-lab ">一</span><span class="bar-lab is-now">今天</span></div>
+    
+    <span class="learn-foot">近 7 天合计 2 小时 45 分</span>
+  </div>
+
+  <div class="todo-card">
+    <div class="todo-head">
+      <div class="todo-head-left"><span class="todo-title">今日待办</span><span class="todo-count">3 项未完成</span></div>
+      <div class="todo-add-btn"><span class="todo-add-ico">＋</span></div>
+    </div>
+    
+    <div class="todo">
+      <div class="todo-check  is-picked"><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">复习高数第三章</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 2</span>
+          <span class="todo-tag">正在专注</span>
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">健身 30 分钟</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-life">生活</span>
+          <span class="todo-pomo">🍅 1</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">午休</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-rest">休息</span>
+          
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check is-done "><span class="todo-check-ico">✓</span></div>
+      <div class="todo-main">
+        <span class="todo-name is-done">写实验报告</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 3</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    <div class="todo-tip">点圆圈打勾 · 点整行开始专注 · 点标签换分类 · 长按删除</div>
+  </div>
+
+  <div class="safe-bottom"></div>
+</div>
+</div>
+</div><div>
+<div class="phone ">
+<div class="page">
+  <div class="head" style="padding-top:20px">
+    <div class="nav" style="height:44px">
+      <div class="nav-back"><span class="nav-back-ico">‹</span></div>
+      <span class="nav-title">专注</span>
+      <div class="nav-set"><span class="nav-set-ico">⚙</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat"><span class="stat-num">6<span class="stat-unit">/8</span></span><span class="stat-label">今日番茄</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">158</span><span class="stat-label">专注分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">休息分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">连续天数</span></div>
+    <div class="goal-bar"><div class="goal-fill" style="width:75%"></div></div>
+  </div>
+
+  
+  <div class="timer-card">
+    <div class="ring-wrap">
+      <svg width="210" height="210" viewBox="0 0 210 210" style="position:absolute;inset:0"><circle cx="105" cy="105" r="96" fill="none" stroke="#ECEDF3" stroke-width="7.5"/><circle cx="105" cy="105" r="96" fill="none" stroke="#6366F1" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="283.497 603.186" transform="rotate(-90 105 105)" opacity="1"/></svg>
+      <div class="ring-inner">
+        <span class="ring-mode is-focus">专注中</span>
+        <span class="ring-time">12:18</span>
+        <span class="ring-task">复习高数第三章</span>
+      </div>
+    </div>
+    <div class="ctrl"><button class="ctrl-main is-running">暂停</button><button class="ctrl-sub">放弃</button></div>
+  </div>
+
+
+  <div class="learn-card">
+    <div class="learn-head">
+      <div class="learn-head-top">
+        <span class="learn-title">学习时长</span>
+        <div class="learn-kind"><span class="learn-kind-item is-on">学习</span><span class="learn-kind-item ">休息</span><span class="learn-kind-item ">生活</span></div>
+      </div>
+      <span class="learn-total">累计 12 小时 45 分 · 31 个番茄</span>
+    </div>
+    <div class="learn-grid"><div class="learn-tile"><span class="learn-tile-label">今天</span><div class="learn-tile-val"><span class="lt-num">23</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">1 个番茄</span></div><div class="learn-tile"><span class="learn-tile-label">本周</span><div class="learn-tile-val"><span class="lt-num">4</span><span class="lt-unit">小时</span><span class="lt-num">10</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">11 个番茄 · 5 天</span></div><div class="learn-tile"><span class="learn-tile-label">本月</span><div class="learn-tile-val"><span class="lt-num">12</span><span class="lt-unit">小时</span><span class="lt-num">45</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">31 个番茄 · 14 天</span></div><div class="learn-tile"><span class="learn-tile-label">今年</span><div class="learn-tile-val"><span class="lt-num">128</span><span class="lt-unit">小时</span><span class="lt-num">40</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">402 个番茄</span></div></div>
+    <div class="learn-tabs">
+      <div class="learn-tab is-on">日</div>
+      <div class="learn-tab">周</div>
+      <div class="learn-tab">月</div>
+      <div class="learn-tab">年</div>
+    </div>
+    <div class="bars"><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">31分</span><div class="bar-track"><div class="bar-fill " style="height:62%"></div></div></div><div class="bar-col"><span class="bar-val">50分</span><div class="bar-track"><div class="bar-fill " style="height:100%"></div></div></div><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">19分</span><div class="bar-track"><div class="bar-fill " style="height:38%"></div></div></div><div class="bar-col"><span class="bar-val">42分</span><div class="bar-track"><div class="bar-fill " style="height:84%"></div></div></div><div class="bar-col"><span class="bar-val">23分</span><div class="bar-track"><div class="bar-fill is-now" style="height:47%"></div></div></div></div>
+    <div class="bar-labs"><span class="bar-lab ">三</span><span class="bar-lab ">四</span><span class="bar-lab ">五</span><span class="bar-lab ">六</span><span class="bar-lab ">日</span><span class="bar-lab ">一</span><span class="bar-lab is-now">今天</span></div>
+    
+    <span class="learn-foot">近 7 天合计 2 小时 45 分</span>
+  </div>
+
+  <div class="todo-card">
+    <div class="todo-head">
+      <div class="todo-head-left"><span class="todo-title">今日待办</span><span class="todo-count">3 项未完成</span></div>
+      <div class="todo-add-btn"><span class="todo-add-ico">＋</span></div>
+    </div>
+    
+    <div class="todo">
+      <div class="todo-check  is-picked"><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">复习高数第三章</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 2</span>
+          <span class="todo-tag">正在专注</span>
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">健身 30 分钟</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-life">生活</span>
+          <span class="todo-pomo">🍅 1</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">午休</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-rest">休息</span>
+          
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check is-done "><span class="todo-check-ico">✓</span></div>
+      <div class="todo-main">
+        <span class="todo-name is-done">写实验报告</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 3</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    <div class="todo-tip">点圆圈打勾 · 点整行开始专注 · 点标签换分类 · 长按删除</div>
+  </div>
+
+  <div class="safe-bottom"></div>
+</div>
+</div>
+</div><div>
+<div class="phone theme-dark">
+<div class="page">
+  <div class="head" style="padding-top:20px">
+    <div class="nav" style="height:44px">
+      <div class="nav-back"><span class="nav-back-ico">‹</span></div>
+      <span class="nav-title">专注</span>
+      <div class="nav-set"><span class="nav-set-ico">⚙</span></div>
+    </div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat"><span class="stat-num">6<span class="stat-unit">/8</span></span><span class="stat-label">今日番茄</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">158</span><span class="stat-label">专注分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">休息分钟</span></div>
+    <div class="stat-line"></div>
+    <div class="stat"><span class="stat-num">12</span><span class="stat-label">连续天数</span></div>
+    <div class="goal-bar"><div class="goal-fill" style="width:75%"></div></div>
+  </div>
+
+  
+  <div class="timer-card">
+    <div class="ring-wrap">
+      <svg width="210" height="210" viewBox="0 0 210 210" style="position:absolute;inset:0"><circle cx="105" cy="105" r="96" fill="none" stroke="#ECEDF3" stroke-width="7.5"/><circle cx="105" cy="105" r="96" fill="none" stroke="#6366F1" stroke-width="7.5" stroke-linecap="round" stroke-dasharray="144.765 603.186" transform="rotate(-90 105 105)" opacity="1"/></svg>
+      <div class="ring-inner">
+        <span class="ring-mode is-focus">专注中</span>
+        <span class="ring-time">06:00</span>
+        <span class="ring-task">复习高数第三章</span>
+      </div>
+    </div>
+    <div class="ctrl"><button class="ctrl-main is-running">暂停</button><button class="ctrl-sub">放弃</button></div>
+  </div>
+
+
+  <div class="learn-card">
+    <div class="learn-head">
+      <div class="learn-head-top">
+        <span class="learn-title">生活时长</span>
+        <div class="learn-kind"><span class="learn-kind-item ">学习</span><span class="learn-kind-item ">休息</span><span class="learn-kind-item is-on">生活</span></div>
+      </div>
+      <span class="learn-total">累计 1 小时 06 分 · 6 次</span>
+    </div>
+    <div class="learn-grid"><div class="learn-tile"><span class="learn-tile-label">今天</span><div class="learn-tile-val"><span class="lt-num">12</span><span class="lt-unit">分</span><span class="lt-num">40</span><span class="lt-unit">秒</span></div><span class="learn-tile-sub">2 次</span></div><div class="learn-tile"><span class="learn-tile-label">本周</span><div class="learn-tile-val"><span class="lt-num">48</span><span class="lt-unit">分</span><span class="lt-num">20</span><span class="lt-unit">秒</span></div><span class="learn-tile-sub">5 次 · 3 天</span></div><div class="learn-tile"><span class="learn-tile-label">本月</span><div class="learn-tile-val"><span class="lt-num">1</span><span class="lt-unit">小时</span><span class="lt-num">6</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">6 次 · 4 天</span></div><div class="learn-tile"><span class="learn-tile-label">今年</span><div class="learn-tile-val"><span class="lt-num">1</span><span class="lt-unit">小时</span><span class="lt-num">6</span><span class="lt-unit">分</span></div><span class="learn-tile-sub">6 次</span></div></div>
+    <div class="learn-tabs">
+      <div class="learn-tab is-on">日</div>
+      <div class="learn-tab">周</div>
+      <div class="learn-tab">月</div>
+      <div class="learn-tab">年</div>
+    </div>
+    <div class="bars"><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">31分</span><div class="bar-track"><div class="bar-fill " style="height:62%"></div></div></div><div class="bar-col"><span class="bar-val">50分</span><div class="bar-track"><div class="bar-fill " style="height:100%"></div></div></div><div class="bar-col"><span class="bar-val"></span><div class="bar-track"><div class="bar-fill " style="height:0%"></div></div></div><div class="bar-col"><span class="bar-val">19分</span><div class="bar-track"><div class="bar-fill " style="height:38%"></div></div></div><div class="bar-col"><span class="bar-val">42分</span><div class="bar-track"><div class="bar-fill " style="height:84%"></div></div></div><div class="bar-col"><span class="bar-val">23分</span><div class="bar-track"><div class="bar-fill is-now" style="height:47%"></div></div></div></div>
+    <div class="bar-labs"><span class="bar-lab ">三</span><span class="bar-lab ">四</span><span class="bar-lab ">五</span><span class="bar-lab ">六</span><span class="bar-lab ">日</span><span class="bar-lab ">一</span><span class="bar-lab is-now">今天</span></div>
+    <div class="kw"><span class="kw-head">按待办关键词 · 跟上面这张图同一段</span>
+    <div class="kw-row">
+      <div class="kw-top"><span class="kw-name">健身房</span><span class="kw-val">36 分 20 秒</span></div>
+      <div class="kw-track"><div class="kw-fill" style="width:100%"></div></div>
+      <span class="kw-sub">3 次</span>
+    </div>
+
+    <div class="kw-row">
+      <div class="kw-top"><span class="kw-name">跑步</span><span class="kw-val">21 分 05 秒</span></div>
+      <div class="kw-track"><div class="kw-fill" style="width:58%"></div></div>
+      <span class="kw-sub">2 次</span>
+    </div>
+
+    <div class="kw-row">
+      <div class="kw-top"><span class="kw-name">做饭</span><span class="kw-val">8 分 40 秒</span></div>
+      <div class="kw-track"><div class="kw-fill" style="width:24%"></div></div>
+      <span class="kw-sub">1 次</span>
+    </div>
+</div>
+    <span class="learn-foot">近 7 天合计 1 小时 06 分</span>
+  </div>
+
+  <div class="todo-card">
+    <div class="todo-head">
+      <div class="todo-head-left"><span class="todo-title">今日待办</span><span class="todo-count">3 项未完成</span></div>
+      <div class="todo-add-btn"><span class="todo-add-ico">＋</span></div>
+    </div>
+    
+    <div class="todo">
+      <div class="todo-check  is-picked"><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">复习高数第三章</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 2</span>
+          <span class="todo-tag">正在专注</span>
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">健身 30 分钟</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-life">生活</span>
+          <span class="todo-pomo">🍅 1</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check  "><span class="todo-check-ico"></span></div>
+      <div class="todo-main">
+        <span class="todo-name ">午休</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-rest">休息</span>
+          
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    
+    <div class="todo">
+      <div class="todo-check is-done "><span class="todo-check-ico">✓</span></div>
+      <div class="todo-main">
+        <span class="todo-name is-done">写实验报告</span>
+        <div class="todo-meta">
+          <span class="tag-pill tag-study">学习</span>
+          <span class="todo-pomo">🍅 3</span>
+          
+        </div>
+      </div>
+      <span class="todo-go">▶</span>
+    </div>
+
+    <div class="todo-tip">点圆圈打勾 · 点整行开始专注 · 点标签换分类 · 长按删除</div>
+  </div>
+
+  <div class="safe-bottom"></div>
+</div>
+</div>
+</div></div>
+</body></html>

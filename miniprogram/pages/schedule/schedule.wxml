@@ -1,0 +1,243 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+
+  <!-- ===== 顶部 ===== -->
+  <view class="head">
+    <view class="head-left">
+      <text class="head-title">课表</text>
+      <text class="head-sub">{{termStartLabel}}</text>
+    </view>
+    <view class="head-set" data-sheet="setting" bindtap="openSheet">设置</view>
+  </view>
+
+  <!-- ===== 周次 ===== -->
+  <view class="weekbar">
+    <view class="wk-btn" bindtap="onPrevWeek">‹</view>
+    <picker class="wk-pick" mode="selector" range="{{weekOptions}}" value="{{weekIndex}}" bindchange="onWeekPick">
+      <view class="wk-mid">
+        <text class="wk-no">第 {{weekNo}} 周</text>
+        <text class="wk-date">{{weekDates}}</text>
+      </view>
+    </picker>
+    <view class="wk-btn" bindtap="onNextWeek">›</view>
+    <view class="wk-now" wx:if="{{!isThisWeek}}" bindtap="onThisWeek">回本周</view>
+  </view>
+
+  <!-- ===== 网格 ===== -->
+  <view class="grid" wx:if="{{total}}">
+    <view class="col col-time">
+      <view class="col-head"></view>
+      <view class="cell cell-no {{item.isNow ? 'is-now' : ''}}" wx:for="{{grid.rows}}" wx:key="no" style="height:{{grid.rowH}}rpx">
+        <text class="cno">{{item.no}}</text>
+      </view>
+    </view>
+
+    <view class="col" wx:for="{{grid.days}}" wx:key="day" wx:for-item="d">
+      <view class="col-head {{d.isToday ? 'is-today' : ''}}">
+        <text class="ch-d">{{d.name}}</text>
+        <text class="ch-date">{{d.date}}</text>
+      </view>
+      <view class="col-body" style="height:{{grid.bodyH}}rpx">
+        <view class="cell" wx:for="{{grid.rows}}" wx:key="no" wx:for-item="r" style="height:{{grid.rowH}}rpx"></view>
+        <view
+          class="blk"
+          wx:for="{{d.items}}"
+          wx:key="id"
+          wx:for-item="b"
+          style="top:{{b.top}}rpx;height:{{b.height}}rpx;background:{{b.bg}};color:{{b.fg}};border-left-color:{{b.bar}}"
+          data-id="{{b.id}}"
+          bindtap="onBlockTap"
+          catchlongpress="onBlockLong"
+          hover-class="blk-hover"
+        >
+          <text class="blk-name">{{b.name}}</text>
+          <text class="blk-place" wx:if="{{b.showPlace}}">{{b.place}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="no-week" wx:if="{{total && !grid.total}}">
+    这一周没有课（可能都排在单双周或指定周次里，翻翻别的周看看）
+  </view>
+
+  <!-- ===== 空态 ===== -->
+  <view class="empty" wx:if="{{!total}}">
+    <text class="empty-emoji">🗓</text>
+    <view class="empty-title">还没有课表</view>
+    <view class="empty-desc" wx:if="{{isGuest}}">访客身份不能从教务系统导入。点「粘贴导入」把课表原样粘进来，也能一节一节手动加。</view>
+    <view class="empty-desc" wx:else>点「教务导入」从郑大教务系统一键拉课表；拉不动就点「粘贴导入」，把课表原样粘进来。也能一节一节手动加。</view>
+  </view>
+
+  <!-- ===== 操作 ===== -->
+  <view class="tools">
+    <view class="tool" data-sheet="jw" bindtap="openSheet" wx:if="{{!isGuest}}">
+      <text class="tool-ico">🏫</text>
+      <text class="tool-txt">教务导入</text>
+    </view>
+    <view class="tool" data-sheet="import" bindtap="openSheet">
+      <text class="tool-ico">📋</text>
+      <text class="tool-txt">粘贴导入</text>
+    </view>
+    <view class="tool" data-sheet="add" bindtap="openSheet">
+      <text class="tool-ico">＋</text>
+      <text class="tool-txt">手动添加</text>
+    </view>
+  </view>
+
+  <view class="foot" wx:if="{{total}}">点课程块看详情 · 长按可重命名 / 按周拆分（实验课）/ 删除 · 共 {{total}} 节</view>
+  <view class="safe-bottom"></view>
+</view>
+
+<!-- ================= 遮罩 + 面板 ================= -->
+<view class="mask" wx:if="{{sheet || detail}}" bindtap="closeSheet"></view>
+
+<!-- 课程详情 -->
+<view class="sheet" wx:if="{{detail}}">
+  <view class="sheet-bar"></view>
+  <view class="dt-head">
+    <text class="dt-name">{{detail.name}}</text>
+    <text class="dt-meta">{{detail.dayLabel}} · {{detail.period}} · {{detail.weeksLabel}}</text>
+    <text class="dt-place" wx:if="{{detail.place}}">📍 {{detail.place}}</text>
+  </view>
+  <view class="sheet-btns">
+    <view class="sbtn sbtn-ghost" bindtap="closeSheet">关闭</view>
+    <view class="sbtn sbtn-ghost" bindtap="doRenameDetail">重命名</view>
+    <view class="sbtn sbtn-danger" bindtap="doRemove">删除</view>
+  </view>
+</view>
+
+<!-- 教务导入 -->
+<view class="sheet" wx:if="{{sheet === 'jw'}}">
+  <view class="sheet-bar"></view>
+  <view class="sheet-title">从学校系统导入</view>
+  <view class="sheet-desc">
+    用统一身份认证登录一次，课表自动写进这里 —— 宿舍、家里、手机流量都能用，不挑网络。学号密码填在「登录设置 → 课表导入」，填一次就记住。
+  </view>
+
+  <view class="jw-steps">
+    <view class="jw-step">
+      <text class="jw-n">1</text>
+      <view class="jw-txt">
+        <text class="jw-t">去「登录设置」填学号密码</text>
+        <text class="jw-d">首页右上角 ⚙ → 课表导入 → 统一身份认证，填一次就存手机上</text>
+      </view>
+    </view>
+    <view class="jw-step">
+      <text class="jw-n">2</text>
+      <view class="jw-txt">
+        <text class="jw-t">第一次会弹验证码</text>
+        <text class="jw-d">照着图填，填完就登录成功；登录态存在电脑上的代理里，两小时内不用再填</text>
+      </view>
+    </view>
+    <view class="jw-step">
+      <text class="jw-n">3</text>
+      <view class="jw-txt">
+        <text class="jw-t">回这里点「拉取课表」</text>
+        <text class="jw-d">电脑上开着本地代理、手机电脑同一 WiFi 就行</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="jw-live {{jwStateCls}}">{{jwState || '还没拉取过'}}</view>
+
+  <view class="sheet-btns">
+    <view class="sbtn sbtn-ghost" bindtap="goPasteJw">改成手动粘</view>
+    <view class="sbtn sbtn-ghost" bindtap="doTableDebug">数据诊断</view>
+    <view class="sbtn sbtn-primary" bindtap="doJwPull">{{jwBusy ? '拉取中…' : '拉取课表'}}</view>
+  </view>
+  <view class="jw-alt" bindtap="goPasteImport">或者：把代理生成的文本粘进来 →</view>
+</view>
+
+<!-- 粘贴导入 -->
+<view class="sheet" wx:if="{{sheet === 'import'}}">
+  <view class="sheet-bar"></view>
+  <view class="sheet-title">粘贴导入</view>
+  <view class="sheet-desc">
+    每行一节课，顺序随便，带「周几」和课程名就行。有周次更准（不写就按每周都上）。
+  </view>
+  <view class="sample">周一 1-2节 汇编语言 松园3-201 1-16周
+星期二,第3-4节,大学英语,北3-105 1-16周(单)
+周三 5-6 数据结构@松园2-301 1-8周</view>
+  <textarea
+    class="ta"
+    placeholder="把课表粘到这里…"
+    placeholder-class="ta-ph"
+    value="{{text}}"
+    bindinput="onText"
+    maxlength="6000"
+    auto-height
+  />
+  <view class="sheet-btns">
+    <view class="sbtn sbtn-ghost" bindtap="closeSheet">取消</view>
+    <view class="sbtn sbtn-primary" bindtap="doImport">解析并导入</view>
+  </view>
+</view>
+
+<!-- 手动添加 -->
+<view class="sheet" wx:if="{{sheet === 'add'}}">
+  <view class="sheet-bar"></view>
+  <view class="sheet-title">添加一节课</view>
+
+  <view class="form-row">
+    <picker class="pick" mode="selector" range="{{dayOptions}}" value="{{dayIndex}}" bindchange="onDay">
+      <view class="pick-in">{{dayOptions[dayIndex]}} ▾</view>
+    </picker>
+    <picker class="pick" mode="selector" range="{{periodOptions}}" value="{{periodIndex}}" bindchange="onPeriod">
+      <view class="pick-in">{{periodOptions[periodIndex]}} ▾</view>
+    </picker>
+  </view>
+
+  <input class="ipt" placeholder="课程名，如 汇编语言" placeholder-class="ta-ph" value="{{formName}}" bindinput="onName" />
+  <input class="ipt" placeholder="地点（可不填），如 松园3-201" placeholder-class="ta-ph" value="{{formPlace}}" bindinput="onPlace" />
+
+  <view class="form-row">
+    <input class="ipt ipt-flex" placeholder="周次，如 1-16（可不填）" placeholder-class="ta-ph" value="{{formWeeks}}" bindinput="onFormWeeks" />
+    <picker class="pick pick-narrow" mode="selector" range="{{parityOptions}}" value="{{parityIndex}}" bindchange="onParity">
+      <view class="pick-in">{{parityOptions[parityIndex]}} ▾</view>
+    </picker>
+  </view>
+
+  <view class="sheet-btns">
+    <view class="sbtn sbtn-ghost" bindtap="closeSheet">取消</view>
+    <view class="sbtn sbtn-primary" bindtap="doAdd">添加</view>
+  </view>
+</view>
+
+<!-- 设置 -->
+<view class="sheet" wx:if="{{sheet === 'setting'}}">
+  <view class="sheet-bar"></view>
+  <view class="sheet-title">设置</view>
+  <view class="sheet-desc">
+    设好开学第一周的周一，左上角就能算出「现在是第几周」，单双周和多周次课程才会显示对。
+  </view>
+
+  <view class="set-row">
+    <view class="set-left">
+      <text class="set-name">深色模式</text>
+      <text class="set-val">晚上看课表不刺眼，全小程序一起换</text>
+    </view>
+    <switch checked="{{theme === 'dark'}}" color="#6C63E8" bindchange="onThemeChange" />
+  </view>
+
+  <picker mode="date" value="{{termStart || '2026-09-07'}}" bindchange="onTermStart">
+    <view class="set-row">
+      <view class="set-left">
+        <text class="set-name">开学第一周（周一）</text>
+        <text class="set-val">{{termStart || '点这里选日期'}}</text>
+      </view>
+      <text class="set-arrow">›</text>
+    </view>
+  </picker>
+
+  <view class="set-row" bindtap="doClear" wx:if="{{total}}">
+    <view class="set-left">
+      <text class="set-name" style="color:#D6453B">清空课表</text>
+      <text class="set-val">删掉全部 {{total}} 节课</text>
+    </view>
+    <text class="set-arrow">›</text>
+  </view>
+
+  <view class="sheet-btns">
+    <view class="sbtn sbtn-ghost" bindtap="closeSheet">关闭</view>
+  </view>
+</view>

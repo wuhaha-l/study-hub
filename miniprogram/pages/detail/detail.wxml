@@ -1,0 +1,60 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}" wx:if="{{task}}">
+
+  <view class="card main-card">
+    <view class="top">
+      <text class="tag {{task.pTag}}">{{task.pName}}</text>
+      <text class="course">{{task.courseName}}</text>
+    </view>
+
+    <view class="title">{{task.title}}</view>
+
+    <view class="meta">
+      <view class="meta-item">
+        <text class="meta-label">类型</text>
+        <text class="meta-value">{{task.typeLabel}}</text>
+      </view>
+      <view class="meta-item">
+        <text class="meta-label">截止</text>
+        <text class="meta-value dl-{{task.dlLevel}}">{{task.deadlineText}}</text>
+      </view>
+      <view class="meta-item">
+        <text class="meta-label">状态</text>
+        <text class="meta-value {{task.status === 'done' ? 'ok' : ''}}">{{task.status === 'done' ? '已完成' : '未完成'}}</text>
+      </view>
+    </view>
+
+    <view class="progress" wx:if="{{task.progressText}}">
+      <view class="prog-head">
+        <text class="prog-label">完成进度</text>
+        <text class="prog-val">{{task.progressText}}</text>
+      </view>
+      <view class="prog-bar">
+        <view class="prog-fill" style="width:{{task.percentText}}%"></view>
+      </view>
+    </view>
+
+    <view class="countdown">
+      <text class="cd-text dl-{{task.dlLevel}}">{{task.dlText}}</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="btn-primary" bindtap="toggleStatus" disabled="{{busy}}">
+      {{task.status === 'done' ? '标记为未完成' : '标记为已完成'}}
+    </button>
+    <button class="btn-ghost" bindtap="copyUrl">复制任务链接</button>
+  </view>
+
+  <view class="tip">
+    <text>想直接去做任务？复制链接后在浏览器打开即可。手动标记完成只影响本小程序里的显示，不会同步回平台。</text>
+  </view>
+
+</view>
+
+<view class="page" wx:elif="{{notFound}}">
+  <view class="card empty">
+    <text class="empty-emoji">🗂</text>
+    <view class="empty-title">找不到这条任务</view>
+    <view class="empty-desc">可能刚刚同步过，任务列表已刷新。</view>
+  </view>
+</view>

@@ -1,0 +1,28 @@
+# 本地代理的登录态存档：里面有学习通的明文 cookie，绝对不要提交
+localserver/session.json
+localserver/*.json
+!localserver/package.json
+
+# 本地真实配置：云开发环境 ID、凭据加密密钥（仓库里只放 *.example.js）
+miniprogram/env.js
+cloudfunctions/studyHub/lib/secret.local.js
+
+# 依赖与构建产物
+node_modules/
+cloudfunctions/**/node_modules/
+miniprogram_npm/
+
+# 微信开发者工具的本地私有配置
+project.private.config.json
+
+# 系统杂项
+.DS_Store
+Thumbs.db
+
+# 调试产物
+*.log
+launch.log
+
+# 开发过程中的核对截图（README 用的展示图在 docs/images）
+/shot-*.png
+/diag-*.png

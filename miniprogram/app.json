@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/welcome/welcome",
+    "pages/detail/detail",
+    "pages/accounts/accounts",
+    "pages/schedule/schedule",
+    "pages/notes/notes",
+    "pages/note/note",
+    "pages/tomato/tomato"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "郑好有你",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F4F5F9",
+    "backgroundColorTop": "#F4F5F9",
+    "backgroundColorBottom": "#F4F5F9"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {},
+  "requiredPrivateInfos": []
+}

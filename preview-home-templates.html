@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>首页模板 · 四个方向</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #EDEEF3;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    color: #16161D;
+    -webkit-font-smoothing: antialiased;
+    padding: 28px 24px 60px;
+  }
+  .top { max-width: 1640px; margin: 0 auto 22px; }
+  .top h1 { font-size: 22px; letter-spacing: .3px; }
+  .top p { font-size: 13px; color: #6E7180; margin-top: 6px; line-height: 1.7; }
+  .top b { color: #4C45D6; font-weight: 600; }
+
+  .rail { display: flex; gap: 22px; max-width: 1640px; margin: 0 auto; align-items: flex-start; }
+  .col { flex: 0 0 375px; }
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600; letter-spacing: .4px;
+    padding: 5px 10px; border-radius: 7px; background: #fff; color: #3A3D4D;
+    box-shadow: 0 1px 3px rgba(24,28,56,.08);
+  }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; display: block; }
+  .note {
+    margin-top: 12px; background: #fff; border-radius: 12px; padding: 13px 14px;
+    font-size: 12px; line-height: 1.75; color: #565A6B;
+    box-shadow: 0 1px 3px rgba(24,28,56,.06);
+  }
+  .note h4 { font-size: 12px; color: #16161D; margin-bottom: 5px; letter-spacing: .3px; }
+  .note .pro { color: #15803D; }
+  .note .con { color: #B45309; }
+  .note code { background: #F2F3F8; border-radius: 4px; padding: 1px 4px; font-size: 11px; color: #4C45D6; }
+
+  .phone {
+    width: 375px; height: 812px; border-radius: 30px; overflow: hidden;
+    background: #fff; position: relative;
+    box-shadow: 0 12px 34px rgba(24,28,56,.16), 0 0 0 1px rgba(24,28,56,.06);
+  }
+  /* 状态栏 + 微信胶囊，四屏共用 */
+  .sbar {
+    height: 44px; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px 0 22px; font-size: 12px; font-weight: 600; letter-spacing: .2px;
+    position: relative; z-index: 5;
+  }
+  .capsule {
+    width: 78px; height: 28px; border-radius: 999px; display: flex; align-items: center;
+    justify-content: space-around; font-size: 13px;
+  }
+
+  /* ==================== A 现状 ==================== */
+  .a { background: #F4F5F9; }
+  .a .sbar { color: #3A3D4D; }
+  .a .capsule { background: rgba(255,255,255,.7); border: 1px solid rgba(24,28,56,.06); }
+  .a-hero {
+    padding: 0 16px 62px; position: relative; overflow: hidden;
+    background:
+      radial-gradient(120% 78% at 88% 0%, rgba(139,92,246,.22) 0%, rgba(139,92,246,0) 62%),
+      radial-gradient(90% 70% at 6% 24%, rgba(99,102,241,.14) 0%, rgba(99,102,241,0) 66%),
+      linear-gradient(170deg, #EFECFF 0%, #F4F1FF 38%, #F5F6FB 100%);
+  }
+  .a-nav { display: flex; align-items: center; justify-content: space-between; height: 44px; }
+  .a-nav .t { font-size: 17px; font-weight: 700; }
+  .a-acts { display: flex; gap: 8px; margin-right: 96px; }
+  .a-ico {
+    width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,.78);
+    display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B5BD6;
+    box-shadow: 0 1px 6px rgba(80,70,160,.12);
+  }
+  .a-greet { font-size: 14px; color: #6E7180; font-weight: 500; display: flex; gap: 8px; align-items: baseline; margin-top: 14px; }
+  .a-greet span { font-size: 12px; color: #A0A3B1; }
+  .a-num { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; }
+  .a-num b { font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif; font-size: 52px; font-weight: 700; line-height: 1.05; }
+  .a-num span { font-size: 13px; color: #6E7180; }
+  .a-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+  .a-pill {
+    font-size: 11px; padding: 4px 9px; border-radius: 999px;
+    background: rgba(255,255,255,.75); color: #55586B; border: 1px solid rgba(24,28,56,.05);
+  }
+  .a-pill.d { background: #FDE9EF; color: #D6453B; border-color: rgba(214,69,59,.14); display: flex; align-items: center; gap: 4px; }
+  .a-pill.d i { width: 5px; height: 5px; border-radius: 50%; background: #D6453B; }
+  .a-sync {
+    margin-top: 14px; background: rgba(255,255,255,.85); border-radius: 999px; padding: 9px 14px;
+    display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4C45D6; font-weight: 500;
+    box-shadow: 0 2px 10px rgba(80,70,160,.1);
+  }
+  .a-body { padding: 0 16px; margin-top: -46px; position: relative; }
+  .a-plat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .a-pc { background: #fff; border-radius: 12px; padding: 10px 10px 11px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .a-pc .h { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #565A6B; }
+  .a-pc .h i { width: 6px; height: 6px; border-radius: 50%; }
+  .a-pc .n { font-size: 21px; font-weight: 700; margin-top: 5px; font-family: 'DIN Alternate', sans-serif; }
+  .a-pc .s { font-size: 10px; color: #A0A3B1; margin-top: 1px; }
+  .a-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .a-tool { background: #fff; border-radius: 12px; padding: 11px 12px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .a-tool .bd { width: 28px; height: 28px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .a-tool .nm { font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .a-tool .sb { font-size: 10px; color: #A0A3B1; margin-top: 2px; }
+  .a-today { background: #fff; border-radius: 14px; padding: 13px 14px; margin-top: 10px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .a-today .hd { display: flex; justify-content: space-between; align-items: center; }
+  .a-today .hd b { font-size: 13px; }
+  .a-today .hd span { font-size: 11px; color: #4C45D6; }
+  .a-cls { display: flex; align-items: center; gap: 9px; margin-top: 9px; font-size: 12px; }
+  .a-cls .p { font-size: 10px; color: #fff; background: #4C45D6; border-radius: 4px; padding: 2px 5px; }
+  .a-cls .p.off { background: #C9CBD8; }
+  .a-cls .pl { font-size: 10px; color: #A0A3B1; margin-left: auto; }
+  .a-gh { display: flex; align-items: center; gap: 6px; margin: 14px 0 7px; }
+  .a-gh i { width: 6px; height: 6px; border-radius: 50%; }
+  .a-gh b { font-size: 13px; font-weight: 600; }
+  .a-gh span { font-size: 11px; color: #A0A3B1; }
+  .a-task { background: #fff; border-radius: 12px; padding: 11px 12px 11px 0; display: flex; gap: 11px; margin-bottom: 8px; box-shadow: 0 2px 10px rgba(24,28,56,.05); }
+  .a-task .bar { width: 3px; border-radius: 0 3px 3px 0; flex: 0 0 3px; }
+  /* 注意：这里不能叫 .c —— C 屏的根容器就是 .c（深底浅字），会串色 */
+  .a-task .a-tk { flex: 1; min-width: 0; }
+  .a-task .t1 { display: flex; align-items: center; gap: 6px; }
+  .a-tag { font-size: 9px; padding: 2px 5px; border-radius: 4px; font-weight: 500; }
+  .a-task .cn { font-size: 11px; color: #A0A3B1; }
+  .a-task .tt { font-size: 13.5px; font-weight: 600; margin-top: 5px; letter-spacing: .1px; }
+  .a-task .tf { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; font-size: 10.5px; color: #A0A3B1; }
+  .a-task .dl { font-weight: 600; }
+  .a-task .dl.red { color: #D6453B; }
+  .a-task .dl.amber { color: #B45309; }
+
+  /* ==================== B 纸感极简 ==================== */
+  .b { background: #FFFFFF; color: #111318; }
+  .b .sbar { color: #111318; }
+  .b .capsule { border: 1px solid #E5E6EB; }
+  .b-wrap { padding: 0 20px; }
+  .b-nav { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-right: 90px; }
+  .b-nav .t { font-size: 13px; font-weight: 600; letter-spacing: .5px; }
+  .b-nav .s { font-size: 12px; color: #8A8F9E; }
+  .b-hero { padding-top: 14px; }
+  .b-date { font-size: 12px; color: #8A8F9E; letter-spacing: 1.2px; text-transform: uppercase; }
+  .b-title { font-size: 30px; font-weight: 700; line-height: 1.25; letter-spacing: -.6px; margin-top: 8px; }
+  .b-title em { font-style: normal; color: #4C45D6; }
+  .b-bar { height: 3px; background: #EDEEF3; border-radius: 2px; margin-top: 16px; overflow: hidden; }
+  .b-bar i { display: block; height: 100%; width: 63%; background: #111318; border-radius: 2px; }
+  .b-barmeta { display: flex; justify-content: space-between; font-size: 11px; color: #8A8F9E; margin-top: 7px; }
+  .b-barmeta b { color: #111318; font-weight: 600; }
+  .b-plats { display: flex; gap: 14px; font-size: 11.5px; color: #565A6B; margin-top: 16px; padding-bottom: 14px; border-bottom: 1px solid #EDEEF3; }
+  .b-plats span { display: flex; align-items: center; gap: 5px; }
+  .b-plats i { width: 5px; height: 5px; border-radius: 50%; }
+  .b-plats b { color: #111318; }
+  .b-alert { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: #C0392B; margin-top: 12px; }
+  .b-alert i { width: 5px; height: 5px; border-radius: 50%; background: #C0392B; }
+  .b-list { margin-top: 4px; padding-bottom: 62px; }
+  .b-row { display: flex; gap: 10px; padding: 13px 0; border-bottom: 1px solid #F1F2F6; align-items: flex-start; }
+  .b-row .chk {
+    width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid #D3D6E0; flex: 0 0 15px; margin-top: 2px;
+  }
+  .b-row .chk.urgent { border-color: #C0392B; }
+  .b-row .m { flex: 1; min-width: 0; }
+  .b-row .tt { font-size: 13.5px; font-weight: 600; letter-spacing: .1px; }
+  .b-row .mt { font-size: 11px; color: #8A8F9E; margin-top: 3px; display: flex; gap: 6px; align-items: center; }
+  .b-row .mt i { width: 4px; height: 4px; border-radius: 50%; }
+  .b-row .when { font-size: 11px; color: #8A8F9E; text-align: right; white-space: nowrap; padding-top: 3px; letter-spacing: .2px; }
+  .b-row .when b { display: block; font-size: 12px; color: #111318; font-weight: 600; }
+  .b-row .when.red b { color: #C0392B; }
+  .b-cls { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid #F1F2F6; align-items: center; }
+  .b-cls .when { font-size: 11px; color: #8A8F9E; width: 46px; }
+  .b-cls .tt { font-size: 13px; font-weight: 500; color: #3A3D4D; }
+  .b-cls .rm { font-size: 10.5px; color: #8A8F9E; margin-left: auto; }
+  .b-sect { font-size: 11px; color: #8A8F9E; letter-spacing: 1.4px; margin-top: 20px; text-transform: uppercase; }
+  .b-past .tt { color: #9A9EAE; text-decoration: line-through; }
+  .b-fab {
+    position: absolute; right: 18px; bottom: 26px; height: 44px; padding: 0 18px; border-radius: 999px;
+    background: #111318; color: #fff; font-size: 12.5px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 8px 20px rgba(17,19,24,.24);
+  }
+
+  /* ==================== C 深色仪表盘 ==================== */
+  .c { background: #0E1014; color: #EAECF2; }
+  .c .sbar { color: #EAECF2; }
+  .c .capsule { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.09); }
+  .c-wrap { padding: 0 16px; }
+  .c-nav { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-right: 90px; }
+  .c-nav .t { font-size: 15px; font-weight: 600; }
+  .c-nav .r { display: flex; gap: 7px; }
+  .c-nav .r i {
+    width: 27px; height: 27px; border-radius: 50%; background: rgba(255,255,255,.07);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; color: #B9BFD0; font-style: normal;
+  }
+  .c-main {
+    margin-top: 12px; border-radius: 20px; padding: 16px; display: flex; gap: 16px; align-items: center;
+    background: linear-gradient(155deg, rgba(108,99,232,.16), rgba(108,99,232,.02) 60%), rgba(255,255,255,.035);
+    border: 1px solid rgba(255,255,255,.07);
+  }
+  .c-ring { position: relative; width: 94px; height: 94px; flex: 0 0 94px; }
+  .c-ring .ctr { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .c-ring .ctr b { font-size: 27px; font-weight: 700; font-family: 'DIN Alternate', sans-serif; letter-spacing: -.5px; }
+  .c-ring .ctr s { font-size: 9.5px; color: #8B92A6; text-decoration: none; margin-top: 1px; }
+  .c-kpi { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+  .c-kpi .k .v { font-size: 19px; font-weight: 700; font-family: 'DIN Alternate', sans-serif; }
+  .c-kpi .k .l { font-size: 10px; color: #8B92A6; margin-top: 1px; }
+  .c-kpi .k.red .v { color: #FF6B5E; }
+  .c-chips { display: flex; gap: 7px; margin-top: 14px; }
+  .c-chip {
+    flex: 1; border-radius: 12px; padding: 9px 10px; background: rgba(255,255,255,.045);
+    border: 1px solid rgba(255,255,255,.06);
+  }
+  .c-chip .h { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #8B92A6; }
+  .c-chip .h i { width: 5px; height: 5px; border-radius: 50%; }
+  .c-chip .n { font-size: 16px; font-weight: 700; margin-top: 4px; font-family: 'DIN Alternate', sans-serif; }
+  .c-sync {
+    margin-top: 10px; border-radius: 12px; padding: 11px 13px; display: flex; align-items: center; gap: 8px;
+    background: rgba(108,99,232,.14); border: 1px solid rgba(108,99,232,.26); font-size: 12px; color: #C3BEF8;
+  }
+  .c-gh { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 9px; }
+  .c-gh b { font-size: 12px; letter-spacing: .6px; color: #B9BFD0; }
+  .c-gh span { font-size: 10.5px; color: #6C7286; }
+  .c-card {
+    border-radius: 14px; padding: 12px 13px; margin-bottom: 8px;
+    background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06);
+    display: flex; gap: 11px; align-items: flex-start;
+  }
+  .c-card.hot { background: linear-gradient(100deg, rgba(255,107,94,.1), rgba(255,107,94,.015)); border-color: rgba(255,107,94,.22); }
+  .c-bar { width: 3px; border-radius: 2px; flex: 0 0 3px; align-self: stretch; }
+  .c-card .m { flex: 1; min-width: 0; }
+  .c-card .top { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: #8B92A6; }
+  .c-card .top i { width: 5px; height: 5px; border-radius: 50%; }
+  .c-card .tt { font-size: 13.5px; font-weight: 600; margin-top: 5px; }
+  .c-card .ft { display: flex; align-items: center; gap: 7px; margin-top: 6px; font-size: 10.5px; color: #8B92A6; }
+  .c-card .ft .left {
+    margin-left: auto; font-size: 10.5px; font-weight: 600; color: #B9BFD0;
+    background: rgba(255,255,255,.07); border-radius: 5px; padding: 2px 6px;
+  }
+  .c-card .ft .left.hot { color: #FF8A7E; background: rgba(255,107,94,.15); }
+  .c-card .prog { height: 2px; border-radius: 2px; background: rgba(255,255,255,.08); margin-top: 8px; overflow: hidden; }
+  .c-card .prog i { display: block; height: 100%; background: #6C63E8; }
+  .c-today {
+    border-radius: 14px; padding: 11px 13px; background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.06); font-size: 11.5px; color: #B9BFD0;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .c-today .p { font-size: 9.5px; background: rgba(108,99,232,.24); color: #C3BEF8; border-radius: 4px; padding: 2px 5px; }
+
+  /* ==================== D 日程流 ==================== */
+  .d { background: #FAF8F4; color: #20211D; }
+  .d .sbar { color: #20211D; }
+  .d .capsule { border: 1px solid rgba(32,33,29,.12); }
+  .d-wrap { padding: 0 20px; }
+  .d-nav { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-right: 90px; }
+  .d-nav .t { font-size: 12px; letter-spacing: 2px; color: #7C7A70; }
+  .d-nav .r i {
+    width: 27px; height: 27px; border-radius: 50%; border: 1px solid rgba(32,33,29,.14);
+    display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5B594F; font-style: normal;
+  }
+  .d-head { padding-top: 6px; }
+  .d-month { font-size: 11px; letter-spacing: 3px; color: #9A978C; }
+  .d-big {
+    font-family: Georgia, 'Songti SC', 'SimSun', serif;
+    font-size: 34px; line-height: 1.2; letter-spacing: 1px; margin-top: 6px;
+  }
+  .d-big em { font-style: normal; color: #B4744A; }
+  .d-sub { font-size: 11.5px; color: #7C7A70; margin-top: 7px; letter-spacing: .3px; }
+  .d-sub b { color: #B4402F; }
+  .d-line { height: 1px; background: rgba(32,33,29,.1); margin: 14px 0 0; }
+  .d-body { margin-top: 4px; position: relative; }
+  .d-day { font-size: 11px; letter-spacing: 2px; color: #9A978C; margin: 15px 0 6px; }
+  .d-ev { display: flex; gap: 12px; position: relative; padding-bottom: 10px; }
+  .d-ev .tl { width: 44px; flex: 0 0 44px; text-align: right; padding-top: 1px; }
+  .d-ev .tl b { font-size: 12.5px; font-weight: 600; letter-spacing: .2px; }
+  .d-ev .tl s { display: block; font-size: 9.5px; color: #9A978C; text-decoration: none; }
+  .d-ev .axis { width: 9px; flex: 0 0 9px; position: relative; }
+  .d-ev .axis::before {
+    content: ''; position: absolute; left: 4px; top: 6px; bottom: -10px; width: 1px; background: rgba(32,33,29,.13);
+  }
+  .d-ev:last-child .axis::before { display: none; }
+  .d-ev .axis i {
+    position: absolute; left: 0; top: 4px; width: 9px; height: 9px; border-radius: 50%;
+    background: #FAF8F4; border: 1.5px solid #B4B1A6;
+  }
+  .d-ev .axis i.hot { border-color: #B4402F; background: #B4402F; box-shadow: 0 0 0 3px rgba(180,64,47,.13); }
+  .d-ev .axis i.cls { border-color: #8D9A7A; background: #8D9A7A; }
+  .d-ev .axis i.past { border-color: #C3BFB4; background: #EDEAE2; }
+  .d-ev .box { flex: 1; min-width: 0; }
+  .d-ev .tt { font-size: 13.5px; font-weight: 600; line-height: 1.35; }
+  .d-ev .tt.past { color: #9A978C; text-decoration: line-through; }
+  .d-ev .mt { font-size: 10.5px; color: #8A877C; margin-top: 3px; display: flex; align-items: center; gap: 5px; }
+  .d-ev .mt i { width: 4px; height: 4px; border-radius: 50%; }
+  .d-ev .course {
+    background: rgba(141,154,122,.13); border-radius: 9px; padding: 7px 10px;
+    font-size: 12.5px; color: #4C5142; display: flex; align-items: center; gap: 7px;
+  }
+  .d-ev .course .rm { margin-left: auto; font-size: 10px; color: #8D9A7A; }
+  .d-fab {
+    position: absolute; right: 18px; bottom: 26px; width: 46px; height: 46px; border-radius: 50%;
+    background: #20211D; color: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; box-shadow: 0 8px 18px rgba(32,33,29,.26);
+  }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>首页 · 四个方向</h1>
+  <p>四屏数据完全一样：<b>12 项待完成 / 3 项过期 / 5 项本周 / 完成率 63%</b>，今日两节课，任务列表都是同样 5 条。差别只在信息怎么摆。<br>
+     A 是你现在在用的；B / C / D 是三种新方向，看中哪个我就照它重做 index 页。</p>
+</div>
+
+<div class="rail">
+
+  <!-- ================= A ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#4C45D6"></i>A · 现状（在用）</div>
+    <div class="phone a">
+      <div class="sbar"><span>22:41</span><span class="capsule">••• ⊙</span></div>
+      <div class="a-hero">
+        <div class="a-nav">
+          <div class="t">郑好有你</div>
+          <div class="a-acts"><div class="a-ico">⚙</div><div class="a-ico">🌙</div><div class="a-ico">⟳</div></div>
+        </div>
+        <div class="a-greet">晚上好 <span>10月27日 周二</span></div>
+        <div class="a-num"><b>12</b><span>项待完成</span></div>
+        <div class="a-pills">
+          <div class="a-pill d"><i></i>3 项已过期</div>
+          <div class="a-pill">5 项 7 天内截止</div>
+          <div class="a-pill">完成率 63%</div>
+        </div>
+        <div class="a-sync">⟳ 同步全部课程和任务</div>
+      </div>
+      <div class="a-body">
+        <div class="a-plat">
+          <div class="a-pc"><div class="h"><i style="background:#1FA97C"></i>学习通</div><div class="n">8</div><div class="s">正常</div></div>
+          <div class="a-pc"><div class="h"><i style="background:#4C45D6"></i>希冀</div><div class="n">3</div><div class="s">内网直连</div></div>
+          <div class="a-pc"><div class="h"><i style="background:#E8833A"></i>U校园</div><div class="n">1</div><div class="s">正常</div></div>
+        </div>
+        <div class="a-tools">
+          <div class="a-tool"><div class="bd" style="background:#EDECFC">📝</div><div class="nm">记事本</div><div class="sb">最近记了 4 条</div></div>
+          <div class="a-tool"><div class="bd" style="background:#FDECE6">⏱</div><div class="nm">专注</div><div class="sb">今日专注 86 分钟</div></div>
+        </div>
+        <div class="a-today">
+          <div class="hd"><b>今天 · 周二</b><span>课表 ›</span></div>
+          <div class="a-cls"><span class="p">1-2</span>高等数学<span class="pl">教二 305</span></div>
+          <div class="a-cls"><span class="p off">3-4</span>软件工程导论<span class="pl">教三 201</span></div>
+        </div>
+        <div class="a-gh"><i style="background:#D6453B"></i><b>近期截止</b><span>5</span></div>
+        <div class="a-task">
+          <div class="bar" style="background:#4C45D6"></div>
+          <div class="a-tk">
+            <div class="t1"><span class="a-tag" style="background:#EDECFC;color:#4C45D6">希冀</span><span class="cn">离散数学</span></div>
+            <div class="tt">集合的概念</div>
+            <div class="tf"><span>📖 练习</span><span class="dl red">今天 23:59 截止</span></div>
+          </div>
+        </div>
+        <div class="a-task">
+          <div class="bar" style="background:#4C45D6"></div>
+          <div class="a-tk">
+            <div class="t1"><span class="a-tag" style="background:#EDECFC;color:#4C45D6">希冀</span><span class="cn">汇编语言</span></div>
+            <div class="tt">实验二 循环程序设计</div>
+            <div class="tf"><span>🧪 实验</span><span class="dl amber">明天 18:00 截止</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <h4>现在这套的脾气</h4>
+      大数字撑场面、平台和工具各占一排卡片、任务按分组往下堆。<br>
+      <span class="pro">优点</span>：首屏信息全，平台状态一眼可见。<br>
+      <span class="con">代价</span>：滑到第一条任务要滚过大半屏；「12」很醒目但没告诉你哪件最急。
+    </div>
+  </section>
+
+  <!-- ================= B ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#111318"></i>B · 纸感极简</div>
+    <div class="phone b">
+      <div class="sbar"><span>22:41</span><span class="capsule">••• ⊙</span></div>
+      <div class="b-wrap">
+        <div class="b-nav"><div class="t">郑好有你</div><div class="s">⟳</div></div>
+        <div class="b-hero">
+          <div class="b-date">10 / 27 · 周二</div>
+          <div class="b-title">还剩 <em>12</em> 件事<br>今晚有一件要交</div>
+          <div class="b-bar"><i></i></div>
+          <div class="b-barmeta"><span>完成率 <b>63%</b></span><span>这学期 41 / 65</span></div>
+          <div class="b-plats">
+            <span><i style="background:#1FA97C"></i>学习通 <b>8</b></span>
+            <span><i style="background:#4C45D6"></i>希冀 <b>3</b></span>
+            <span><i style="background:#E8833A"></i>U校园 <b>1</b></span>
+          </div>
+          <div class="b-alert"><i></i>3 项已过期，长按可以手动归档</div>
+        </div>
+
+        <div class="b-list">
+          <div class="b-row">
+            <div class="chk urgent"></div>
+            <div class="m">
+              <div class="tt">集合的概念</div>
+              <div class="mt"><i style="background:#4C45D6"></i>希冀 · 离散数学</div>
+            </div>
+            <div class="when red"><b>今天</b>23:59</div>
+          </div>
+          <div class="b-cls">
+            <div class="when">08:00</div>
+            <div class="tt">高等数学</div>
+            <div class="rm">教二 305</div>
+          </div>
+          <div class="b-cls">
+            <div class="when">10:00</div>
+            <div class="tt" style="color:#9A9EAE">软件工程导论</div>
+            <div class="rm">已上完</div>
+          </div>
+          <div class="b-row">
+            <div class="chk"></div>
+            <div class="m">
+              <div class="tt">实验二 循环程序设计</div>
+              <div class="mt"><i style="background:#4C45D6"></i>希冀 · 汇编语言 · 未提交</div>
+            </div>
+            <div class="when"><b>明天</b>18:00</div>
+          </div>
+          <div class="b-row">
+            <div class="chk"></div>
+            <div class="m">
+              <div class="tt">第三章 单元测验</div>
+              <div class="mt"><i style="background:#1FA97C"></i>学习通 · 大学英语</div>
+            </div>
+            <div class="when"><b>10-30</b>23:59</div>
+          </div>
+          <div class="b-row">
+            <div class="chk"></div>
+            <div class="m">
+              <div class="tt">图的应用</div>
+              <div class="mt"><i style="background:#1FA97C"></i>学习通 · 数据结构 · 进度 2/5</div>
+            </div>
+            <div class="when"><b>11-02</b>23:59</div>
+          </div>
+          <div class="b-sect">已过期</div>
+          <div class="b-row b-past">
+            <div class="chk"></div>
+            <div class="m">
+              <div class="tt">期中论文提纲</div>
+              <div class="mt"><i style="background:#E8833A"></i>U校园 · 软件工程</div>
+            </div>
+            <div class="when red"><b>过期</b>2 天</div>
+          </div>
+        </div>
+      </div>
+      <div class="b-fab">＋ 新任务</div>
+    </div>
+    <div class="note">
+      <h4>去掉装饰，只留截止时间</h4>
+      纯白底、一条细线、无阴影，标题直接说结论（「今晚有一件要交」），课程和作业混在同一条时间线上。<br>
+      <span class="pro">优点</span>：首屏就能看到 4 条任务，安静、耐看，长时间用不累。<br>
+      <span class="con">代价</span>：平台卡和工具入口退成一行小字，存在感弱；少了一点「打开有仪式感」。
+    </div>
+  </section>
+
+  <!-- ================= C ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#6C63E8"></i>C · 深色仪表盘</div>
+    <div class="phone c">
+      <div class="sbar"><span>22:41</span><span class="capsule">••• ⊙</span></div>
+      <div class="c-wrap">
+        <div class="c-nav">
+          <div class="t">郑好有你</div>
+          <div class="r"><i>🌙</i><i>⟳</i></div>
+        </div>
+
+        <div class="c-main">
+          <div class="c-ring">
+            <svg width="94" height="94" viewBox="0 0 94 94">
+              <circle cx="47" cy="47" r="40" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="7"></circle>
+              <circle cx="47" cy="47" r="40" fill="none" stroke="#6C63E8" stroke-width="7" stroke-linecap="round"
+                      stroke-dasharray="251" stroke-dashoffset="93" transform="rotate(-90 47 47)"></circle>
+            </svg>
+            <div class="ctr"><b>12</b><s>待完成</s></div>
+          </div>
+          <div class="c-kpi">
+            <div class="k red"><div class="v">3</div><div class="l">已过期</div></div>
+            <div class="k"><div class="v">5</div><div class="l">7 天内</div></div>
+            <div class="k"><div class="v">63%</div><div class="l">完成率</div></div>
+            <div class="k"><div class="v">2</div><div class="l">今日课程</div></div>
+          </div>
+        </div>
+
+        <div class="c-chips">
+          <div class="c-chip"><div class="h"><i style="background:#1FA97C"></i>学习通</div><div class="n">8</div></div>
+          <div class="c-chip"><div class="h"><i style="background:#8B7BFF"></i>希冀</div><div class="n">3</div></div>
+          <div class="c-chip"><div class="h"><i style="background:#E8833A"></i>U校园</div><div class="n">1</div></div>
+        </div>
+
+        <div class="c-sync">⟳ 同步全部课程和任务 · 3 个平台</div>
+
+        <div class="c-gh"><b>接下来</b><span>按截止时间排</span></div>
+
+        <div class="c-card hot">
+          <div class="c-bar" style="background:#FF6B5E"></div>
+          <div class="m">
+            <div class="top"><i style="background:#8B7BFF"></i>希冀 · 离散数学</div>
+            <div class="tt">集合的概念</div>
+            <div class="ft">练习 · 未提交<span class="left hot">还剩 2 小时</span></div>
+          </div>
+        </div>
+
+        <div class="c-card">
+          <div class="c-bar" style="background:#8B7BFF"></div>
+          <div class="m">
+            <div class="top"><i style="background:#8B7BFF"></i>希冀 · 汇编语言</div>
+            <div class="tt">实验二 循环程序设计</div>
+            <div class="ft">实验<span class="left">明天 18:00</span></div>
+          </div>
+        </div>
+
+        <div class="c-card">
+          <div class="c-bar" style="background:#1FA97C"></div>
+          <div class="m">
+            <div class="top"><i style="background:#1FA97C"></i>学习通 · 大学英语</div>
+            <div class="tt">第三章 单元测验</div>
+            <div class="ft">测验<span class="left">10-30</span></div>
+            <div class="prog"><i style="width:40%"></i></div>
+          </div>
+        </div>
+
+        <div class="c-today"><span class="p">08:00</span>高等数学 · 教二 305</div>
+      </div>
+    </div>
+    <div class="note">
+      <h4>把「还剩多久」做成主角</h4>
+      深底 + 半透明卡，环形进度取代大数字，每条任务右下角直接挂倒计时（「还剩 2 小时」），最急的那条整卡泛红。<br>
+      <span class="pro">优点</span>：晚上用最舒服；紧迫感强，不容易漏交。<br>
+      <span class="con">代价</span>：白天户外对比度一般；和课表、专注这些浅色页放一起会跳。
+    </div>
+  </section>
+
+  <!-- ================= D ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#B4744A"></i>D · 日程流</div>
+    <div class="phone d">
+      <div class="sbar"><span>22:41</span><span class="capsule">••• ⊙</span></div>
+      <div class="d-wrap">
+        <div class="d-nav"><div class="t">郑 好 有 你</div><div class="r"><i>⟳</i></div></div>
+        <div class="d-head">
+          <div class="d-month">二〇二六 · 十月</div>
+          <div class="d-big">二十七日<br><em>周二</em></div>
+          <div class="d-sub">12 项待办 · <b>3 项已过期</b> · 完成率 63%</div>
+        </div>
+        <div class="d-line"></div>
+
+        <div class="d-body">
+          <div class="d-day">今天</div>
+
+          <div class="d-ev">
+            <div class="tl"><b>08:00</b><s>1-2 节</s></div>
+            <div class="axis"><i class="cls"></i></div>
+            <div class="box"><div class="course">高等数学 <span class="rm">教二 305 ›</span></div></div>
+          </div>
+
+          <div class="d-ev">
+            <div class="tl"><b>10:00</b><s>3-4 节</s></div>
+            <div class="axis"><i class="cls" style="opacity:.5"></i></div>
+            <div class="box"><div class="course" style="background:rgba(141,154,122,.07);color:#8A877C">软件工程导论 <span class="rm">已上完</span></div></div>
+          </div>
+
+          <div class="d-ev">
+            <div class="tl"><b>23:59</b><s>2 小时后</s></div>
+            <div class="axis"><i class="hot"></i></div>
+            <div class="box">
+              <div class="tt">集合的概念</div>
+              <div class="mt"><i style="background:#4C45D6"></i>希冀 · 离散数学 · 练习</div>
+            </div>
+          </div>
+
+          <div class="d-day">明天 · 周三</div>
+
+          <div class="d-ev">
+            <div class="tl"><b>18:00</b><s>未提交</s></div>
+            <div class="axis"><i></i></div>
+            <div class="box">
+              <div class="tt">实验二 循环程序设计</div>
+              <div class="mt"><i style="background:#4C45D6"></i>希冀 · 汇编语言 · 实验</div>
+            </div>
+          </div>
+
+          <div class="d-day">周五 · 10.30</div>
+
+          <div class="d-ev">
+            <div class="tl"><b>23:59</b><s>3 天后</s></div>
+            <div class="axis"><i></i></div>
+            <div class="box">
+              <div class="tt">第三章 单元测验</div>
+              <div class="mt"><i style="background:#1FA97C"></i>学习通 · 大学英语 · 测验</div>
+            </div>
+          </div>
+
+          <div class="d-day">已过期</div>
+
+          <div class="d-ev">
+            <div class="tl"><b>—</b><s>2 天前</s></div>
+            <div class="axis"><i class="past"></i></div>
+            <div class="box">
+              <div class="tt past">期中论文提纲</div>
+              <div class="mt"><i style="background:#E8833A"></i>U校园 · 软件工程</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="d-fab">＋</div>
+    </div>
+    <div class="note">
+      <h4>课程和作业排进同一条时间轴</h4>
+      米色纸底 + 衬线标题，左边一列是时刻，圆点标记类型（绿=上课、橘=紧迫、灰=过期），日期分组往下走。<br>
+      <span class="pro">优点</span>：一眼看出「今天几点要干什么」，最像手账/日历，跟课表页天然一致。<br>
+      <span class="con">代价</span>：日期分组和小标题吃高度，一屏只看得到 4~5 条；平台筛选得挪到别处。
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,119 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+
+  <!-- ===== 顶部 ===== -->
+  <view class="head" style="padding-top:{{statusBarHeight}}px;">
+    <view class="nav" style="height:{{navBarHeight}}px;">
+      <view class="nav-back" bindtap="goBack" hover-class="hov">
+        <text class="nav-back-ico">‹</text>
+      </view>
+      <text class="nav-title">记事本</text>
+      <view class="nav-actions">
+        <view class="view-btn" bindtap="onToggleView" hover-class="hov">
+          <text class="view-ico">{{view === 'grid' ? '☰' : '⊞'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="sub-row">
+      <text class="sub-txt">{{headText}}</text>
+    </view>
+
+    <view class="search">
+      <text class="search-ico">🔍</text>
+      <input
+        class="search-ipt"
+        value="{{kw}}"
+        bindinput="onInputKw"
+        placeholder="搜索标题或内容"
+        placeholder-class="ph"
+        confirm-type="search"
+      />
+      <text class="search-clear" wx:if="{{kw}}" bindtap="onClearKw">✕</text>
+    </view>
+  </view>
+
+  <!-- ===== 空状态 ===== -->
+  <view class="empty" wx:if="{{!items.length}}">
+    <text class="empty-emoji">{{kw ? '🔍' : '📝'}}</text>
+    <view class="empty-title">{{kw ? '没找到相关便签' : '还没有便签'}}</view>
+    <view class="empty-desc">{{kw ? '换个关键词试试，或者把搜索框清空。' : '随手记点东西：上课的重点、要买的东西、突然想到的灵感。'}}</view>
+    <view class="empty-btn" wx:if="{{!kw}}" bindtap="goNew">写第一条</view>
+  </view>
+
+  <!-- ===== 宫格视图 ===== -->
+  <view class="grid" wx:if="{{items.length && view === 'grid'}}">
+    <view
+      class="note-c note-c-{{item.color}}"
+      wx:for="{{items}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goEdit"
+      bindlongpress="onLongPress"
+      hover-class="note-hover"
+    >
+      <view class="pin-flag" wx:if="{{item.pinned}}">📌</view>
+      <text class="note-title">{{item.title}}</text>
+      <view class="note-body-wrap" wx:if="{{item.digest}}">
+        <text class="note-body">{{item.digest}}</text>
+      </view>
+      <view class="note-foot">
+        <text class="note-time">{{item.timeLabel}}</text>
+        <text class="note-chars">{{item.chars}} 字</text>
+      </view>
+    </view>
+    <view class="grid-fill" wx:if="{{items.length % 2 === 1}}"></view>
+  </view>
+
+  <!-- ===== 列表视图 ===== -->
+  <view class="list" wx:if="{{items.length && view === 'list'}}">
+    <view
+      class="row-c row-c-{{item.color}}"
+      wx:for="{{items}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="goEdit"
+      bindlongpress="onLongPress"
+      hover-class="note-hover"
+    >
+      <view class="row-bar"></view>
+      <view class="row-main">
+        <view class="row-top">
+          <text class="pin-mini" wx:if="{{item.pinned}}">📌</text>
+          <text class="row-title">{{item.title}}</text>
+        </view>
+        <text class="row-body" wx:if="{{item.digest}}">{{item.digest}}</text>
+        <view class="row-foot">
+          <text class="note-time">{{item.timeLabel}}</text>
+          <text class="note-chars">{{item.chars}} 字</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- ===== 新建 ===== -->
+  <view class="fab" bindtap="goNew" hover-class="fab-hover">
+    <text class="fab-ico">＋</text>
+  </view>
+
+  <!-- ===== 长按菜单 ===== -->
+  <view class="mask" wx:if="{{menu}}" bindtap="closeMenu"></view>
+  <view class="sheet" wx:if="{{menu}}" catchtap="noop">
+    <view class="sheet-bar"></view>
+    <view class="sheet-title">{{menu.title}}</view>
+    <view class="sheet-item" bindtap="onMenuPin">
+      <text class="sheet-ico">📌</text>
+      <text class="sheet-txt">{{menu.pinned ? '取消置顶' : '置顶便签'}}</text>
+    </view>
+    <view class="sheet-item" bindtap="onMenuCopy">
+      <text class="sheet-ico">⧉</text>
+      <text class="sheet-txt">复制内容</text>
+    </view>
+    <view class="sheet-item" bindtap="onMenuDelete">
+      <text class="sheet-ico">🗑</text>
+      <text class="sheet-txt is-danger">删除便签</text>
+    </view>
+    <view class="sheet-cancel" bindtap="closeMenu">取消</view>
+  </view>
+</view>

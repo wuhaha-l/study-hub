@@ -1,0 +1,9 @@
+{
+  "name": "studyHub",
+  "version": "1.0.0",
+  "description": "学习通 / 希冀 / U校园 任务聚合抓取",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

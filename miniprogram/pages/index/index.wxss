@@ -1,0 +1,1656 @@
+/* ============================================================
+   首页 · 小组件磁贴方向
+   设计语言：iOS 系统色 + 半透明卡片 + 极轻阴影 + hairline 分割线
+   尺寸按 750rpx 屏宽换算（原型 375pt × 2）
+   ============================================================ */
+
+.page {
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+  position: relative;
+  /*
+   * 背景直接挂在根容器上，不要另起一个 position: fixed + z-index: 0 的整屏背景层。
+   * 层叠顺序里「z-index: 0 的定位元素」画在所有未定位的普通流元素之上，
+   * 那一层是不透明渐变，会把下面的内容整片盖住 —— 而 scroll-view 自带
+   * position: relative、.head 有 z-index: 2，它们反而浮在上面。
+   * 真机上的表现就是：磁贴 / 筛选胶囊都在，课程卡和任务列表一片空白，
+   * 控制台零报错，预览（浏览器）看着还正常。这个坑踩过一次，别再改回去。
+   */
+  background-color: #F6F6F9;
+  background-image:
+    radial-gradient(70% 44% at 88% -4%, rgba(175, 82, 222, 0.16), transparent 62%),
+    radial-gradient(64% 40% at 4% 10%, rgba(0, 122, 255, 0.13), transparent 66%),
+    linear-gradient(180deg, #F4F4FB 0%, #F7F7FA 60%, #F6F6F9 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 820rpx, 100% 820rpx, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+  --tile-bg: rgba(255, 255, 255, 0.9);
+  --tile-line: rgba(0, 0, 0, 0.035);
+  --tile-shadow: 0 4rpx 20rpx rgba(24, 28, 56, 0.06);
+  --sep: rgba(60, 60, 67, 0.1);
+  --gray: #8E8E93;
+  --blue: #007AFF;
+  --red: #FF3B30;
+  --green: #34C759;
+  --orange: #FF9500;
+  --purple: #AF52DE;
+}
+
+/* 这里原来是一个 position: fixed 的整屏渐变层（.page-bg），
+   它把下面所有未定位的内容都盖住了，已删除（背景并入 .page）。
+   WXML 里对应的 <view class="page-bg"> 也一起去掉了，别再加回来。 */
+
+/* ===== 内容块统一提层 =====
+   这几个是「页面主体内容」，全部没有定位。给它们 position: relative + z-index: 1，
+   是为了万一以后又有人在 .page 里塞一个 fixed 背景层，内容也不会被整片盖掉。
+   弹层（.tmask / .tmenu / .asheet）不在这里，它们的 z-index 是 200+，
+   绝不能加 position: relative（会把 fixed 覆盖掉）。 */
+.today-card,
+.group-head,
+.task,
+.notice,
+.skeleton,
+.empty-guide,
+.remind {
+  position: relative;
+  z-index: 1;
+}
+
+/* ================= 顶部：小标栏 ================= */
+.head {
+  position: relative;
+  z-index: 2;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  padding-bottom: 28rpx;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.nav-brand {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.4rpx;
+}
+
+.nav-acts {
+  display: flex;
+  align-items: center;
+  margin-right: 200rpx; /* 避开右上角微信胶囊 */
+}
+
+.nav-acc {
+  display: flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 18rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1rpx solid rgba(0, 0, 0, 0.045);
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.05);
+}
+
+.nav-acc-ico {
+  font-size: 22rpx;
+  color: var(--blue);
+  margin-right: 6rpx;
+}
+
+.nav-acc-txt {
+  font-size: 21rpx;
+  color: var(--blue);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.nav-acc.is-guest .nav-acc-ico,
+.nav-acc.is-guest .nav-acc-txt {
+  color: var(--text-2);
+}
+
+.rbtn {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1rpx solid rgba(0, 0, 0, 0.045);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.05);
+  margin-left: 10rpx;
+}
+
+.rbtn-ico {
+  font-size: 27rpx;
+  line-height: 1;
+  display: block;
+  color: #48484A;
+}
+
+.spin .rbtn-ico,
+.spin .sync-all-ico {
+  display: inline-block;
+  animation: rotate 0.9s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.tap-dim {
+  opacity: 0.55;
+}
+
+/* ================= 结论式大标题 ================= */
+.hello {
+  padding-top: 10rpx;
+}
+
+.hello-hi {
+  font-size: 24rpx;
+  color: var(--gray);
+  letter-spacing: -0.2rpx;
+}
+
+.hello-big {
+  margin-top: 6rpx;
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: -1.4rpx;
+  line-height: 1.22;
+  color: var(--text);
+}
+
+.hello-n {
+  color: var(--blue);
+  font-variant-numeric: tabular-nums;
+}
+
+.hello-sub {
+  margin-top: 8rpx;
+  font-size: 23rpx;
+  color: var(--text-2);
+  letter-spacing: -0.2rpx;
+}
+
+/* ================= 2×2 磁贴 ================= */
+/* 两行两列：靠 flex 平分，不用 flex-wrap / gap / calc。
+   旧写法 width: calc(50% - 7rpx) 在部分基础库上 rpx 不参与换算，
+   整条声明作废 → 磁贴塌成一行一个，真机上就是这个症状。 */
+.tiles {
+  padding-top: 22rpx;
+}
+
+.tile-row {
+  display: flex;
+}
+
+.tile-row + .tile-row {
+  margin-top: 14rpx;
+}
+
+.tile {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 148rpx;
+  padding: 18rpx 24rpx;
+  border-radius: 40rpx;
+  background: var(--tile-bg);
+  box-shadow: 0 4rpx 20rpx rgba(24, 28, 56, 0.06), 0 0 0 1rpx var(--tile-line);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.12s ease;
+}
+
+.tile + .tile {
+  margin-left: 14rpx;
+}
+
+.tile-hover {
+  transform: scale(0.975);
+}
+
+.tile-k {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  font-size: 22rpx;
+  color: var(--gray);
+  letter-spacing: 0.2rpx;
+}
+
+.tile-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 数字和单位按基线对齐：单位小字不会把数字顶歪 */
+.tile-v {
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-size: 54rpx;
+  font-weight: 700;
+  letter-spacing: -2.4rpx;
+  line-height: 1;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.tile-u {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  font-size: 22rpx;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--gray);
+}
+
+.tile-s {
+  font-size: 21rpx;
+  color: var(--gray);
+  letter-spacing: -0.2rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tile-red {
+  color: var(--red);
+  font-weight: 600;
+}
+
+/* 完成率磁贴：进度环压在右下角，文字留出空间 */
+.tile-ring .tile-s {
+  padding-right: 88rpx;
+}
+
+.ring {
+  position: absolute;
+  right: 22rpx;
+  bottom: 18rpx;
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 50%;
+  /* 兜底：万一内核不认 conic-gradient，至少还是一圈灰环，不会变成空白 */
+  background: rgba(120, 120, 128, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-hole {
+  width: 62rpx;
+  height: 62rpx;
+  border-radius: 50%;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================= 平台胶囊 ================= */
+/* ================= 需要重新登录 =================
+   放在同步条上面：它解释的是「为什么点了同步也没变化」，
+   所以必须先于那颗按钮被看见。橙色调而不是红色 —— 这事要处理，
+   但还没到「出故障」的程度（红只留给过期任务）。 */
+.relogin {
+  margin-top: 16rpx;
+  padding: 20rpx 24rpx 16rpx;
+  border-radius: 30rpx;
+  background: rgba(255, 149, 0, 0.1);
+  border: 1rpx solid rgba(255, 149, 0, 0.28);
+}
+
+.relogin-hover {
+  opacity: 0.82;
+}
+
+.relogin-top {
+  display: flex;
+  align-items: center;
+}
+
+.relogin-ico {
+  font-size: 26rpx;
+  margin-right: 10rpx;
+}
+
+.relogin-t {
+  flex: 1;
+  min-width: 0;
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #B45309;
+  letter-spacing: -0.2rpx;
+}
+
+.relogin-go {
+  flex: none;
+  font-size: 25rpx;
+  color: #B45309;
+  opacity: 0.85;
+}
+
+.relogin-list {
+  margin-top: 10rpx;
+}
+
+.relogin-i {
+  display: flex;
+  align-items: center;
+  padding: 5rpx 0;
+}
+
+.relogin-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 12rpx;
+  flex: none;
+}
+
+.relogin-name {
+  font-size: 25rpx;
+  color: #3A3A3C;
+  font-weight: 500;
+}
+
+.relogin-why {
+  font-size: 24rpx;
+  color: #8E8E93;
+  margin-left: 10rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.relogin-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid rgba(255, 149, 0, 0.18);
+}
+
+.relogin-tip {
+  font-size: 22rpx;
+  color: #A16207;
+  flex: 1;
+  min-width: 0;
+  opacity: 0.9;
+}
+
+.relogin-later {
+  flex: none;
+  margin-left: 16rpx;
+  font-size: 23rpx;
+  color: #B45309;
+  padding: 6rpx 8rpx;
+}
+
+.plats {
+  display: flex;
+  gap: 14rpx;
+  padding-top: 16rpx;
+}
+
+.plat {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 2rpx 8rpx rgba(24, 28, 56, 0.05);
+  transition: transform 0.12s ease;
+}
+
+.plat-i {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 10rpx;
+  flex-shrink: 0;
+  color: #FFFFFF;
+  font-size: 18rpx;
+  font-weight: 700;
+  line-height: 30rpx;
+  text-align: center;
+}
+
+.plat-n {
+  font-size: 23rpx;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plat-c {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.plat.off {
+  opacity: 0.55;
+}
+
+.plat.off .plat-c {
+  font-size: 20rpx;
+  color: var(--blue);
+  font-weight: 500;
+}
+
+.plat.bad {
+  box-shadow: 0 2rpx 8rpx rgba(255, 59, 48, 0.16), 0 0 0 1rpx rgba(255, 59, 48, 0.28);
+}
+
+.plat.bad .plat-c {
+  color: var(--red);
+}
+
+/* 访客：顶替平台行 */
+.guest-bar {
+  margin-top: 16rpx;
+  padding: 22rpx 26rpx 24rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 2rpx 8rpx rgba(24, 28, 56, 0.05);
+}
+
+.guest-bar-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8rpx;
+}
+
+.guest-bar-body {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.65;
+}
+
+/* ================= 全量同步 ================= */
+.sync-all {
+  margin-top: 20rpx;
+  height: 92rpx;
+  border-radius: 46rpx;
+  background: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10rpx 28rpx rgba(0, 122, 255, 0.3);
+}
+
+.sync-all.is-on {
+  background: #3D9BFF;
+}
+
+.sync-hover {
+  opacity: 0.88;
+}
+
+.sync-all-ico {
+  font-size: 28rpx;
+  color: #FFFFFF;
+  margin-right: 10rpx;
+}
+
+.sync-all-t {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+  letter-spacing: 0.2rpx;
+}
+
+/* 访客：顶替同步按钮 */
+.guest-strip {
+  margin-top: 20rpx;
+  height: 80rpx;
+  padding: 0 24rpx;
+  border-radius: 40rpx;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 2rpx 10rpx rgba(27, 29, 42, 0.05);
+  display: flex;
+  align-items: center;
+}
+
+.guest-strip-ico {
+  font-size: 24rpx;
+  margin-right: 10rpx;
+}
+
+.guest-strip-txt {
+  flex: 1;
+  font-size: 21rpx;
+  color: var(--text-2);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ================= 云函数版本过旧 ================= */
+.ver-warn {
+  display: flex;
+  align-items: flex-start;
+  margin: 16rpx 32rpx 0;
+  padding: 18rpx 22rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 149, 0, 0.1);
+  box-shadow: 0 0 0 1rpx rgba(255, 149, 0, 0.18);
+}
+
+.ver-warn-ico {
+  font-size: 22rpx;
+  line-height: 1.6;
+  margin-right: 10rpx;
+}
+
+.ver-warn-txt {
+  flex: 1;
+  font-size: 21rpx;
+  line-height: 1.6;
+  color: #B25000;
+}
+
+/* ================= 筛选胶囊 ================= */
+.chips {
+  display: flex;
+  white-space: nowrap;
+  padding: 24rpx 32rpx 4rpx;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 22rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 23rpx;
+  color: #48484A;
+  box-shadow: 0 1rpx 6rpx rgba(24, 28, 56, 0.05);
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.chip.is-on {
+  background: #1C1C1E;
+  color: #FFFFFF;
+  font-weight: 500;
+  box-shadow: 0 6rpx 18rpx rgba(28, 28, 30, 0.24);
+}
+
+.chip-num {
+  margin-left: 8rpx;
+  font-size: 20rpx;
+  opacity: 0.66;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 学期行：放在最上面，比平台行更轻 */
+.chips-sem {
+  padding: 20rpx 32rpx 0;
+}
+
+.chip-sem {
+  height: 52rpx;
+  padding: 0 20rpx;
+  font-size: 22rpx;
+}
+
+.chip-sem.is-on {
+  background: var(--text);
+  color: var(--card);
+}
+
+.sem-hint {
+  padding: 10rpx 34rpx 0;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+/* 课程行：换成浅底细描边，进一步退后 */
+.chips-sub {
+  padding: 8rpx 32rpx 4rpx;
+}
+
+.chip-course {
+  height: 50rpx;
+  padding: 0 18rpx;
+  font-size: 21rpx;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 0 0 1rpx rgba(0, 0, 0, 0.04);
+  color: var(--text-2);
+  max-width: 320rpx;
+}
+
+.chip-course .chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chip-course.is-on {
+  background: rgba(0, 122, 255, 0.1);
+  color: var(--blue);
+  font-weight: 600;
+  box-shadow: 0 0 0 1rpx rgba(0, 122, 255, 0.18);
+}
+
+/* ================= 平台筛选 + 新任务 ================= */
+.seg-row {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx 4rpx;
+}
+
+.seg {
+  /* scroll-view 当 flex 子项：flex:1 + min-width:0 在真机上仍可能被内容撑开，
+     把右边的「新任务」按钮挤出屏幕。width: 0 是硬约束，先归零再由 flex 分配 */
+  flex: 1 1 0;
+  width: 0;
+  min-width: 0;
+  display: flex;
+  white-space: nowrap;
+}
+
+.seg-i {
+  display: inline-flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 16rpx;
+  margin-right: 8rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.8);
+  color: #48484A;
+  font-size: 22rpx;
+  box-shadow: 0 1rpx 6rpx rgba(24, 28, 56, 0.05);
+  flex-shrink: 0;
+}
+
+.seg-i.is-on {
+  background: #1C1C1E;
+  color: #FFFFFF;
+  font-weight: 500;
+  box-shadow: 0 6rpx 18rpx rgba(28, 28, 30, 0.24);
+}
+
+.seg-n {
+  line-height: 1;
+}
+
+.seg-c {
+  margin-left: 6rpx;
+  font-size: 19rpx;
+  opacity: 0.66;
+  font-variant-numeric: tabular-nums;
+}
+
+.add-fab {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  height: 56rpx;
+  padding: 0 18rpx;
+  margin-left: 10rpx;
+  border-radius: 999rpx;
+  background: var(--blue);
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 600;
+  box-shadow: 0 6rpx 16rpx rgba(0, 122, 255, 0.28);
+}
+
+.add-fab-ico {
+  font-size: 26rpx;
+  margin-right: 4rpx;
+  line-height: 1;
+}
+
+.add-fab-txt {
+  line-height: 1;
+}
+
+/* ================= 提示 ================= */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12rpx;
+  margin: 20rpx 32rpx 0;
+  padding: 20rpx 24rpx;
+  border-radius: 22rpx;
+  background: rgba(255, 149, 0, 0.1);
+  box-shadow: 0 0 0 1rpx rgba(255, 149, 0, 0.16);
+}
+
+.notice-ico {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 50%;
+  background: var(--orange);
+  color: #FFFFFF;
+  font-size: 20rpx;
+  font-weight: 700;
+  text-align: center;
+  line-height: 30rpx;
+  flex-shrink: 0;
+  margin-top: 2rpx;
+}
+
+.notice-text {
+  flex: 1;
+  font-size: 22rpx;
+  color: #B25000;
+  line-height: 1.55;
+}
+
+/* ================= 骨架屏 ================= */
+.skeleton {
+  padding: 28rpx 32rpx;
+}
+
+.sk-block {
+  height: 150rpx;
+  border-radius: 36rpx;
+  background: var(--tile-bg);
+  margin-bottom: 14rpx;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ================= 空态 ================= */
+.empty-guide {
+  margin: 28rpx 32rpx;
+  padding: 56rpx 40rpx 48rpx;
+  text-align: center;
+  border-radius: 36rpx;
+  background: var(--tile-bg);
+  box-shadow: 0 2rpx 12rpx rgba(24, 28, 56, 0.055);
+}
+
+.empty-emoji {
+  font-size: 60rpx;
+  line-height: 1;
+}
+
+.empty-title {
+  margin-top: 20rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3rpx;
+}
+
+.empty-desc {
+  margin-top: 10rpx;
+  font-size: 23rpx;
+  color: var(--text-3);
+  line-height: 1.65;
+}
+
+.guide-btn {
+  margin: 36rpx auto 0;
+  width: 320rpx;
+  height: 84rpx;
+  line-height: 84rpx;
+  border-radius: 42rpx;
+  background: var(--blue);
+  color: #FFFFFF;
+  font-size: 27rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 22rpx rgba(0, 122, 255, 0.28);
+}
+
+/* ================= 今日课程 ================= */
+.today-card {
+  margin: 24rpx 32rpx 6rpx;
+  padding: 24rpx 26rpx 22rpx;
+  border-radius: 36rpx;
+  background: var(--tile-bg);
+  box-shadow: 0 2rpx 12rpx rgba(24, 28, 56, 0.055);
+}
+
+.today-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.today-head-left {
+  display: flex;
+  align-items: center;
+}
+
+.today-title {
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2rpx;
+}
+
+.today-week {
+  margin-left: 10rpx;
+  font-size: 19rpx;
+  color: var(--blue);
+  background: rgba(0, 122, 255, 0.1);
+  border-radius: 8rpx;
+  padding: 2rpx 10rpx;
+}
+
+.today-more {
+  font-size: 22rpx;
+  color: var(--blue);
+}
+
+.today-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  margin-top: 14rpx;
+}
+
+.today-period {
+  min-width: 92rpx;
+  height: 38rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10rpx;
+  border-radius: 10rpx;
+  background: rgba(0, 122, 255, 0.09);
+  font-size: 20rpx;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.today-period.is-now {
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--red);
+}
+
+.today-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 25rpx;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.today-place {
+  font-size: 21rpx;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+.today-state {
+  margin-top: 14rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid var(--sep);
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+
+.today-empty {
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+}
+
+/* ================= 分组标题 ================= */
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx 36rpx 12rpx;
+}
+
+.group-left {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  flex: 1;
+  min-width: 0;
+}
+
+.group-title {
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--text-2);
+  letter-spacing: 0.6rpx;
+  flex-shrink: 0;
+}
+
+.gt-danger { color: var(--red); }
+.gt-urgent { color: #B25000; }
+.gt-normal { color: var(--text-2); }
+.gt-muted  { color: var(--text-3); }
+
+.group-count {
+  flex-shrink: 0;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 9rpx;
+  border-radius: 999rpx;
+  background: rgba(120, 120, 128, 0.12);
+  color: var(--text-2);
+  font-size: 19rpx;
+  font-weight: 600;
+  line-height: 32rpx;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.group-more {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  font-size: 22rpx;
+  color: var(--blue);
+}
+
+/* ================= 任务卡 ================= */
+.task {
+  margin: 0 32rpx 12rpx;
+  padding: 20rpx 26rpx 18rpx;
+  border-radius: 36rpx;
+  background: var(--tile-bg);
+  box-shadow: 0 2rpx 12rpx rgba(24, 28, 56, 0.055);
+  transition: transform 0.12s ease;
+}
+
+.task-hover {
+  transform: scale(0.985);
+}
+
+/* 最急的那几张（已过期）整卡泛红，扫一眼就知道先处理谁 */
+.task.is-hot {
+  background:
+    linear-gradient(100deg, rgba(255, 59, 48, 0.055), rgba(255, 59, 48, 0.012) 60%),
+    var(--tile-bg);
+  box-shadow: 0 2rpx 14rpx rgba(255, 59, 48, 0.12), 0 0 0 1rpx rgba(255, 59, 48, 0.16);
+}
+
+.task-ct {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.task-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.task-pf {
+  font-size: 22rpx;
+  color: var(--text-2);
+  flex-shrink: 0;
+}
+
+.task-cs {
+  font-size: 22rpx;
+  color: var(--text-3);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.task-sem {
+  flex-shrink: 0;
+  font-size: 18rpx;
+  color: var(--text-3);
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 6rpx;
+  padding: 1rpx 8rpx;
+}
+
+/* 截止时间做成右侧小胶囊，眼睛不用再扫到底部 */
+.task-when {
+  flex-shrink: 0;
+  margin-left: 8rpx;
+  font-size: 21rpx;
+  font-weight: 600;
+  padding: 3rpx 12rpx;
+  border-radius: 10rpx;
+  color: #48484A;
+  background: rgba(120, 120, 128, 0.1);
+  font-variant-numeric: tabular-nums;
+}
+
+.w-expired { color: var(--red); background: rgba(255, 59, 48, 0.11); }
+.w-urgent  { color: #B25000; background: rgba(255, 149, 0, 0.14); }
+.w-soon    { color: #0A6BD6; background: rgba(0, 122, 255, 0.11); }
+.w-normal  { color: #48484A; background: rgba(120, 120, 128, 0.1); }
+.w-none    { color: var(--text-3); background: rgba(120, 120, 128, 0.08); }
+
+.task-title {
+  margin-top: 10rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.4rpx;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 老师标记的必做任务：标题标红 + 「必做」角标 */
+.task-title.is-required {
+  color: var(--red);
+}
+
+.req-badge {
+  display: inline-block;
+  margin-left: 8rpx;
+  padding: 1rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #B25000;
+  background: rgba(255, 149, 0, 0.15);
+  vertical-align: 2rpx;
+}
+
+/* 选做（没标星）任务：标题淡色 + 「选做」角标 */
+.task-title.is-optional {
+  color: var(--text-3);
+}
+
+.opt-badge {
+  display: inline-block;
+  margin-left: 8rpx;
+  padding: 1rpx 8rpx;
+  border-radius: 6rpx;
+  font-size: 18rpx;
+  color: var(--text-3);
+  background: rgba(120, 120, 128, 0.12);
+  vertical-align: 2rpx;
+}
+
+.task-meta {
+  margin-top: 8rpx;
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+
+.task.is-done {
+  opacity: 0.5;
+}
+
+.task.is-done .task-title {
+  text-decoration: line-through;
+}
+
+/* ================= 每日提醒 ================= */
+.remind {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin: 32rpx 32rpx 0;
+  padding: 24rpx 26rpx;
+  border-radius: 32rpx;
+  background: var(--tile-bg);
+  box-shadow: 0 2rpx 12rpx rgba(24, 28, 56, 0.055);
+}
+
+.remind-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.remind-title {
+  display: block;
+  font-size: 26rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4rpx;
+  letter-spacing: -0.2rpx;
+}
+
+.remind-desc {
+  display: block;
+  font-size: 21rpx;
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.remind-btn {
+  flex-shrink: 0;
+  height: 56rpx;
+  line-height: 56rpx;
+  padding: 0 26rpx;
+  border-radius: 28rpx;
+  background: rgba(0, 122, 255, 0.12);
+  color: var(--blue);
+  font-size: 23rpx;
+  font-weight: 600;
+}
+
+/* ================= 页脚 ================= */
+.footer-note {
+  text-align: center;
+  font-size: 21rpx;
+  color: #AEAEB2;
+  padding: 36rpx 0 8rpx;
+  line-height: 1.6;
+}
+
+.footer-tip {
+  text-align: center;
+  font-size: 20rpx;
+  color: #AEAEB2;
+  padding-bottom: 12rpx;
+}
+
+.logout-row {
+  display: flex;
+  justify-content: center;
+  padding: 26rpx 0 46rpx;
+}
+
+.logout-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 420rpx;
+  height: 84rpx;
+  border-radius: 42rpx;
+  background: var(--tile-bg);
+  color: var(--red);
+  font-size: 27rpx;
+  font-weight: 500;
+}
+
+.safe-bottom {
+  height: env(safe-area-inset-bottom);
+}
+
+/* ================= 长按任务菜单 ================= */
+.tmask {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 200;
+  background: var(--mask);
+}
+
+.tmenu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  background: var(--card);
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 12rpx 24rpx calc(24rpx + env(safe-area-inset-bottom));
+  animation: sheet-up 0.2s ease-out;
+}
+
+.tmenu-bar {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: rgba(120, 120, 128, 0.3);
+  margin: 8rpx auto 20rpx;
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(60rpx);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.tmenu-head {
+  padding: 0 8rpx 20rpx;
+  border-bottom: 1rpx solid var(--sep);
+}
+
+.tmenu-name {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.tmenu-sub {
+  display: block;
+  margin-top: 6rpx;
+  font-size: 21rpx;
+  color: var(--text-3);
+}
+
+.tmenu-item {
+  display: flex;
+  align-items: center;
+  height: 100rpx;
+  padding: 0 8rpx;
+  border-bottom: 1rpx solid var(--sep);
+}
+
+.tmenu-ico {
+  width: 40rpx;
+  font-size: 28rpx;
+  color: var(--blue);
+}
+
+.tmenu-txt {
+  flex: 1;
+  font-size: 28rpx;
+  color: var(--text);
+}
+
+.tmenu-item.is-primary .tmenu-txt {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.tmenu-item.is-primary .tmenu-ico {
+  color: var(--blue);
+}
+
+.tmenu-hint {
+  font-size: 20rpx;
+  color: var(--text-3);
+}
+
+.tmenu-txt.is-danger {
+  color: var(--red);
+}
+
+.tmenu-cancel {
+  margin-top: 16rpx;
+  height: 92rpx;
+  line-height: 92rpx;
+  text-align: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  color: var(--text);
+  background: rgba(120, 120, 128, 0.12);
+  border-radius: 20rpx;
+}
+
+/* ================= 新建任务 ================= */
+.asheet {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 201;
+  background: var(--card);
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 12rpx 32rpx calc(28rpx + env(safe-area-inset-bottom));
+  animation: sheet-up 0.2s ease-out;
+}
+
+.asheet-bar {
+  width: 72rpx;
+  height: 8rpx;
+  border-radius: 999rpx;
+  background: rgba(120, 120, 128, 0.3);
+  margin: 2rpx auto 18rpx;
+}
+
+.asheet-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.4rpx;
+  margin-bottom: 18rpx;
+}
+
+.aipt {
+  width: 100%;
+  height: 84rpx;
+  margin-top: 12rpx;
+  background: var(--card-2);
+  border-radius: 18rpx;
+  padding: 0 20rpx;
+  font-size: 27rpx;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.aipt-ph {
+  color: var(--text-3);
+}
+
+.arow {
+  display: flex;
+  gap: 14rpx;
+  margin-top: 12rpx;
+}
+
+.arow picker {
+  flex: 1;
+}
+
+.apick {
+  height: 84rpx;
+  line-height: 84rpx;
+  background: var(--card-2);
+  border-radius: 18rpx;
+  padding: 0 20rpx;
+  font-size: 26rpx;
+  color: var(--text);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.abtns {
+  display: flex;
+  margin-top: 26rpx;
+}
+
+.abtn {
+  flex: 1;
+  height: 92rpx;
+  line-height: 92rpx;
+  text-align: center;
+  border-radius: 20rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.abtn + .abtn {
+  margin-left: 16rpx;
+}
+
+.abtn-ghost {
+  background: rgba(120, 120, 128, 0.14);
+  color: var(--text);
+}
+
+.abtn-primary {
+  background: var(--blue);
+  color: #FFFFFF;
+  box-shadow: 0 6rpx 18rpx rgba(0, 122, 255, 0.28);
+}
+
+.ahint {
+  margin-top: 16rpx;
+  font-size: 20rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+  text-align: center;
+}
+
+/* ============================================================
+   深色模式
+   注意：这里必须用 .page.theme-dark（两个类）—— 上面 .page 里
+   定义的 --tile-* 是单类权重，.theme-dark 单类会被它压掉。
+   ============================================================ */
+.page.theme-dark {
+  --tile-bg: #1B1D27;
+  --tile-line: rgba(255, 255, 255, 0.07);
+  --sep: rgba(255, 255, 255, 0.09);
+  /* iOS 深色系统色：浅色那套 #007AFF / #FF3B30 在近黑底上会发闷，
+     深色模式统一换成提亮一档的对应色 */
+  --blue: #0A84FF;
+  --red: #FF453A;
+  --green: #30D158;
+  --orange: #FF9F0A;
+  --purple: #BF5AF2;
+}
+
+/* 深色背景同样挂在根容器上（原来这层是 .page-bg，会把内容整片盖住，见文件开头） */
+.page.theme-dark {
+  background-color: #0C0D12;
+  background-image:
+    radial-gradient(72% 46% at 88% -6%, rgba(191, 90, 242, 0.22), transparent 62%),
+    radial-gradient(66% 42% at 2% 8%, rgba(10, 132, 255, 0.2), transparent 66%),
+    linear-gradient(180deg, #191B25 0%, #101119 44%, #0C0D12 100%);
+  background-repeat: no-repeat;
+  background-size: 100% 820rpx, 100% 820rpx, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
+}
+
+/* 深色下这枚数字是整屏最亮的一点，用比系统蓝再亮一档的色调，深底上才跳得出来 */
+.theme-dark .hello-n {
+  color: #4DA3FF;
+}
+
+.theme-dark .nav-acc,
+.theme-dark .rbtn {
+  background: rgba(38, 41, 56, 0.85);
+  border-color: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.3);
+}
+
+.theme-dark .rbtn-ico {
+  color: #C6CADB;
+}
+
+.theme-dark .nav-acc-ico,
+.theme-dark .nav-acc-txt {
+  color: #7FB2FF;
+}
+
+.theme-dark .nav-acc.is-guest .nav-acc-ico,
+.theme-dark .nav-acc.is-guest .nav-acc-txt {
+  color: var(--text-2);
+}
+
+.theme-dark .tile {
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.32), 0 0 0 1rpx var(--tile-line);
+}
+
+.theme-dark .plat,
+.theme-dark .guest-bar,
+.theme-dark .guest-strip {
+  background: var(--card);
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.28);
+}
+
+/* 深色下的重新登录提醒：橙色降低饱和、文字提亮，别在近黑底上糊成一团 */
+.theme-dark .relogin {
+  background: rgba(255, 159, 10, 0.13);
+  border-color: rgba(255, 159, 10, 0.32);
+}
+
+.theme-dark .relogin-t,
+.theme-dark .relogin-go {
+  color: #FFC46B;
+}
+
+.theme-dark .relogin-name {
+  color: #E7E9F2;
+}
+
+.theme-dark .relogin-why {
+  color: #9CA1B5;
+}
+
+.theme-dark .relogin-tip {
+  color: #E0A75E;
+}
+
+.theme-dark .relogin-later {
+  color: #FFC46B;
+}
+
+.theme-dark .relogin-foot {
+  border-top-color: rgba(255, 159, 10, 0.2);
+}
+
+.theme-dark .chip {
+  background: var(--card);
+  color: #C6CADB;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.28);
+}
+
+.theme-dark .chip-course {
+  background: var(--card-2);
+  color: var(--text-2);
+  box-shadow: none;
+}
+
+.theme-dark .chip-course.is-on {
+  background: rgba(10, 132, 255, 0.16);
+  color: #7FB2FF;
+  box-shadow: 0 0 0 1rpx rgba(10, 132, 255, 0.28);
+}
+
+.theme-dark .seg-i {
+  background: var(--card);
+  color: #C6CADB;
+  box-shadow: 0 1rpx 6rpx rgba(0, 0, 0, 0.28);
+}
+
+.theme-dark .chip.is-on,
+.theme-dark .seg-i.is-on {
+  background: #EDEFF7;
+  color: #101116;
+  box-shadow: 0 6rpx 18rpx rgba(0, 0, 0, 0.4);
+}
+
+.theme-dark .chip-sem.is-on {
+  background: #EDEFF7;
+  color: #101116;
+}
+
+.theme-dark .task {
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.24), 0 0 0 1rpx var(--tile-line);
+}
+
+.theme-dark .task.is-hot {
+  background: linear-gradient(100deg, rgba(255, 69, 58, 0.14), rgba(255, 69, 58, 0.03) 60%), var(--card);
+  box-shadow: 0 2rpx 14rpx rgba(0, 0, 0, 0.3), 0 0 0 1rpx rgba(255, 69, 58, 0.26);
+}
+
+.theme-dark .task-when {
+  color: #C6CADB;
+}
+
+.theme-dark .w-expired { color: #FF6961; background: rgba(255, 69, 58, 0.18); }
+.theme-dark .w-urgent  { color: #F0A26B; background: rgba(255, 159, 10, 0.16); }
+.theme-dark .w-soon    { color: #7FB2FF; background: rgba(10, 132, 255, 0.18); }
+.theme-dark .w-normal  { color: #C6CADB; }
+.theme-dark .w-none    { color: var(--text-3); }
+
+.theme-dark .req-badge {
+  color: #F0A26B;
+  background: rgba(255, 159, 10, 0.16);
+}
+
+.theme-dark .task-sem,
+.theme-dark .group-count {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-dark .today-week {
+  color: #7FB2FF;
+  background: rgba(10, 132, 255, 0.16);
+}
+
+.theme-dark .today-period {
+  background: rgba(10, 132, 255, 0.14);
+  color: #7FB2FF;
+}
+
+.theme-dark .today-period.is-now {
+  background: rgba(255, 69, 58, 0.16);
+  color: #FF6961;
+}
+
+.theme-dark .today-more,
+.theme-dark .group-more {
+  color: #7FB2FF;
+}
+
+.theme-dark .tile-red {
+  color: #FF6961;
+}
+
+.theme-dark .ring-hole {
+  background: var(--tile-bg);
+}
+
+.theme-dark .sync-all {
+  box-shadow: 0 10rpx 28rpx rgba(10, 132, 255, 0.34);
+}
+
+.theme-dark .notice,
+.theme-dark .ver-warn {
+  box-shadow: 0 0 0 1rpx rgba(255, 159, 10, 0.22);
+}
+
+.theme-dark .notice-text,
+.theme-dark .ver-warn-txt {
+  color: #F0C583;
+}
+
+.theme-dark .remind-btn {
+  background: rgba(10, 132, 255, 0.18);
+  color: #7FB2FF;
+}
+
+.theme-dark .footer-note,
+.theme-dark .footer-tip {
+  color: #6A6F85;
+}
+
+.theme-dark .tmenu-cancel {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.theme-dark .abtn-ghost {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.theme-dark .empty-guide {
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.28);
+}

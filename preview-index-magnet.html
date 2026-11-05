@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>首页 · 小组件磁贴</title>
+<link rel="stylesheet" href="preview-index-magnet.css">
+<style>
+  body {
+    margin: 0; padding: 34px 30px 50px;
+    background: #ECEDF2; font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  }
+  .top { max-width: 1640px; margin: 0 auto 22px; }
+  .top h1 { font-size: 20px; margin: 0; letter-spacing: -.4px; color: #1C1C1E; }
+  .top p { font-size: 13px; color: #6E7180; margin: 7px 0 0; line-height: 1.7; }
+  .top b { color: #007AFF; }
+
+  .row { display: flex; gap: 26px; max-width: 1640px; margin: 0 auto; flex-wrap: wrap; }
+
+  /* 手机外壳：375×812，内容裁切，模拟首屏 */
+  .phone-box { width: 375px; flex: 0 0 375px; }
+  .cap { font-size: 12px; color: #6E7180; margin: 0 0 8px 2px; font-weight: 600; letter-spacing: .2px; }
+
+  .phone {
+    width: 375px; height: 812px; border-radius: 34px; position: relative;
+    overflow: hidden; box-shadow: 0 12px 40px rgba(24,28,56,.16), 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .scroll { position: relative; z-index: 2; height: 100%; overflow: hidden; }
+
+  /* 状态栏 + 微信胶囊，用来核对右上角避让 */
+  .sbar {
+    position: absolute; left: 0; right: 0; top: 0; height: 44px; z-index: 9;
+    display: flex; align-items: center; justify-content: space-between; padding: 0 18px;
+    font-size: 12.5px; font-weight: 600; color: #1C1C1E; pointer-events: none;
+  }
+  .phone.theme-dark .sbar { color: #EDEFF7; }
+  .sbar .ic { letter-spacing: 2px; font-size: 10px; }
+  .wxcap {
+    position: absolute; right: 8px; top: 52px; z-index: 10; width: 87px; height: 32px;
+    border-radius: 16px; background: rgba(255,255,255,.66); border: 1px solid rgba(0,0,0,.07);
+    display: flex; align-items: center; justify-content: space-around; color: #1C1C1E; font-size: 13px;
+  }
+  .phone.theme-dark .wxcap { background: rgba(38,41,56,.8); border-color: rgba(255,255,255,.1); color: #EDEFF7; }
+
+  .homebar {
+    position: absolute; left: 50%; bottom: 7px; transform: translateX(-50%);
+    width: 118px; height: 4px; border-radius: 3px; background: rgba(28,28,30,.32); z-index: 30;
+  }
+  .phone.theme-dark .homebar { background: rgba(255,255,255,.35); }
+
+  .phone .tmask, .phone .tmenu, .phone .asheet { position: absolute; }
+
+  /* 备注卡 */
+  .notes { max-width: 1640px; margin: 26px auto 0; background: #fff; border-radius: 16px;
+    padding: 18px 20px; box-shadow: 0 2px 10px rgba(24,28,56,.06); }
+  .notes h2 { font-size: 15px; margin: 0 0 10px; letter-spacing: -.2px; color: #1C1C1E; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: .5px solid #EDEEF3; vertical-align: top; }
+  th { font-size: 11.5px; color: #8A8F9E; font-weight: 600; }
+  td:first-child { color: #1C1C1E; font-weight: 500; width: 180px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>首页 · 小组件磁贴（方案二落地）</h1>
+  <p>样式直接来自 <b>index.wxss</b>（rpx÷2），结构照 <b>index.wxml</b> 拼。三屏分别是：浅色首屏、深色首屏、往下滚的分组与提醒区。右上角那个白框是微信胶囊，用来核对按钮有没有压上去。</p>
+</div>
+
+<div class="row">
+
+  <!-- ============ 屏 1：浅色首屏 ============ -->
+  <div class="phone-box">
+    <div class="cap">浅色 · 首屏</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="ic">▮▮▮ ⌾ ▰</span></div>
+      <div class="wxcap"><span>···</span><span>◎</span></div>
+
+      <div class="scroll">
+        <div class="head" style="padding-top:20px;">
+          <div class="nav" style="height:44px;">
+            <span class="nav-brand">郑好有你</span>
+            <div class="nav-acts">
+              <div class="nav-acc"><span class="nav-acc-ico">⚙</span><span class="nav-acc-txt">登录设置</span></div>
+              <div class="rbtn"><span class="rbtn-ico">🌙</span></div>
+              <div class="rbtn"><span class="rbtn-ico">⟳</span></div>
+            </div>
+          </div>
+
+          <div class="hello">
+            <div class="hello-hi">下午好 · 10月28日 周三</div>
+            <div class="hello-big">还有 <span class="hello-n">12</span> 件事要交</div>
+            <div class="hello-sub">今天要交 2 件 · 3 项已过期</div>
+          </div>
+
+          <div class="tiles">
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF3B30"></div>待完成</div>
+                          <div class="tile-v">12<span class="tile-u">件</span></div>
+                          <div class="tile-s"><span class="tile-red">3 项已过期</span></div>
+                        </div>
+            <div class="tile tile-ring">
+                          <div class="tile-k"><div class="tile-dot" style="background:#34C759"></div>完成率</div>
+                          <div class="tile-v">63<span class="tile-u">%</span></div>
+                          <div class="tile-s">已完成 20 项</div>
+                          <div class="ring" style="background: conic-gradient(#0A84FF 63%, rgba(120,120,128,0.16) 63%);">
+                            <div class="ring-hole">63</div>
+                          </div>
+                        </div>
+          </div>
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#AF52DE"></div>专注</div>
+                          <div class="tile-v">42<span class="tile-u">分钟</span></div>
+                          <div class="tile-s">今天 2 个番茄</div>
+                        </div>
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF9500"></div>记事本</div>
+                          <div class="tile-v">7<span class="tile-u">条</span></div>
+                          <div class="tile-s">最近记过 7 条</div>
+                        </div>
+          </div>
+        </div>
+
+          <div class="plats">
+            <div class="plat">
+              <div class="plat-i" style="background:#E8453C">超</div>
+              <span class="plat-n">学习通</span>
+              <span class="plat-c">8</span>
+            </div>
+            <div class="plat">
+              <div class="plat-i" style="background:#2B7FFF">希</div>
+              <span class="plat-n">希冀</span>
+              <span class="plat-c">3</span>
+            </div>
+            <div class="plat off">
+              <div class="plat-i" style="background:#11B981">U</div>
+              <span class="plat-n">U校园</span>
+              <span class="plat-c">绑定</span>
+            </div>
+          </div>
+
+          <div class="sync-all">
+            <span class="sync-all-ico">⟳</span>
+            <span class="sync-all-t">同步全部课程和任务</span>
+          </div>
+        </div>
+
+        <div class="seg-row">
+          <div class="seg">
+            <div class="seg-i is-on"><span class="seg-n">全部</span><span class="seg-c">12</span></div>
+            <div class="seg-i"><span class="seg-n">学习通</span><span class="seg-c">8</span></div>
+            <div class="seg-i"><span class="seg-n">希冀</span><span class="seg-c">3</span></div>
+            <div class="seg-i"><span class="seg-n">U校园</span><span class="seg-c">1</span></div>
+          </div>
+          <div class="add-fab"><span class="add-fab-ico">＋</span><span class="add-fab-txt">新任务</span></div>
+        </div>
+
+        <div class="chips chips-sub">
+          <div class="chip chip-course is-on"><span class="chip-name">全部课程</span><span class="chip-num">12</span></div>
+          <div class="chip chip-course"><span class="chip-name">高等数学</span><span class="chip-num">4</span></div>
+          <div class="chip chip-course"><span class="chip-name">数据结构</span><span class="chip-num">3</span></div>
+        </div>
+
+        <div class="today-card">
+          <div class="today-head">
+            <div class="today-head-left">
+              <span class="today-title">今天 · 周二</span>
+              <span class="today-week">第 9 周</span>
+            </div>
+            <span class="today-more">课表 ›</span>
+          </div>
+          <div class="today-row">
+            <span class="today-period is-now">1-2 节</span>
+            <span class="today-name">高等数学</span>
+            <span class="today-place">教二 305</span>
+          </div>
+          <div class="today-row">
+            <span class="today-period">3-4 节</span>
+            <span class="today-name">软件工程导论</span>
+            <span class="today-place">教三 201</span>
+          </div>
+          <div class="today-state">现在正在上 高等数学（9:40 下课）</div>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-danger">已过期</span>
+            <span class="group-count">3</span>
+          </div>
+        </div>
+
+        <div class="task is-hot">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#2B7FFF"></div>
+            <span class="task-pf">希冀</span>
+            <span class="task-cs">数据结构</span>
+            <span class="task-when w-expired">已截止 2 天</span>
+          </div>
+          <div class="task-title">实验二：二叉树的遍历</div>
+          <div class="task-meta">📝 作业</div>
+        </div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+
+  <!-- ============ 屏 2：深色首屏 ============ -->
+  <div class="phone-box">
+    <div class="cap">深色 · 首屏</div>
+    <div class="phone theme-dark">
+      <div class="sbar"><span>9:41</span><span class="ic">▮▮▮ ⌾ ▰</span></div>
+      <div class="wxcap"><span>···</span><span>◎</span></div>
+
+      <div class="scroll">
+        <div class="head" style="padding-top:20px;">
+          <div class="nav" style="height:44px;">
+            <span class="nav-brand">郑好有你</span>
+            <div class="nav-acts">
+              <div class="nav-acc"><span class="nav-acc-ico">⚙</span><span class="nav-acc-txt">登录设置</span></div>
+              <div class="rbtn"><span class="rbtn-ico">☀️</span></div>
+              <div class="rbtn"><span class="rbtn-ico">⟳</span></div>
+            </div>
+          </div>
+
+          <div class="hello">
+            <div class="hello-hi">晚上好 · 10月28日 周三</div>
+            <div class="hello-big">还有 <span class="hello-n">12</span> 件事要交</div>
+            <div class="hello-sub">今天要交 2 件 · 3 项已过期</div>
+          </div>
+
+          <div class="tiles">
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF3B30"></div>待完成</div>
+                          <div class="tile-v">12<span class="tile-u">件</span></div>
+                          <div class="tile-s"><span class="tile-red">3 项已过期</span></div>
+                        </div>
+            <div class="tile tile-ring">
+                          <div class="tile-k"><div class="tile-dot" style="background:#34C759"></div>完成率</div>
+                          <div class="tile-v">63<span class="tile-u">%</span></div>
+                          <div class="tile-s">已完成 20 项</div>
+                          <div class="ring" style="background: conic-gradient(#0A84FF 63%, rgba(120,120,128,0.16) 63%);">
+                            <div class="ring-hole">63</div>
+                          </div>
+                        </div>
+          </div>
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#AF52DE"></div>专注</div>
+                          <div class="tile-v">42<span class="tile-u">分钟</span></div>
+                          <div class="tile-s">今天 2 个番茄</div>
+                        </div>
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF9500"></div>记事本</div>
+                          <div class="tile-v">7<span class="tile-u">条</span></div>
+                          <div class="tile-s">最近记过 7 条</div>
+                        </div>
+          </div>
+        </div>
+
+          <div class="plats">
+            <div class="plat">
+              <div class="plat-i" style="background:#E8453C">超</div>
+              <span class="plat-n">学习通</span>
+              <span class="plat-c">8</span>
+            </div>
+            <div class="plat bad">
+              <div class="plat-i" style="background:#2B7FFF">希</div>
+              <span class="plat-n">希冀</span>
+              <span class="plat-c">失效</span>
+            </div>
+            <div class="plat">
+              <div class="plat-i" style="background:#11B981">U</div>
+              <span class="plat-n">U校园</span>
+              <span class="plat-c">1</span>
+            </div>
+          </div>
+
+          <div class="sync-all">
+            <span class="sync-all-ico">⟳</span>
+            <span class="sync-all-t">同步全部课程和任务</span>
+          </div>
+        </div>
+
+        <div class="seg-row">
+          <div class="seg">
+            <div class="seg-i is-on"><span class="seg-n">全部</span><span class="seg-c">12</span></div>
+            <div class="seg-i"><span class="seg-n">学习通</span><span class="seg-c">8</span></div>
+            <div class="seg-i"><span class="seg-n">希冀</span><span class="seg-c">3</span></div>
+            <div class="seg-i"><span class="seg-n">U校园</span><span class="seg-c">1</span></div>
+          </div>
+          <div class="add-fab"><span class="add-fab-ico">＋</span><span class="add-fab-txt">新任务</span></div>
+        </div>
+
+        <div class="chips chips-sub">
+          <div class="chip chip-course is-on"><span class="chip-name">全部课程</span><span class="chip-num">12</span></div>
+          <div class="chip chip-course"><span class="chip-name">高等数学</span><span class="chip-num">4</span></div>
+          <div class="chip chip-course"><span class="chip-name">数据结构</span><span class="chip-num">3</span></div>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-urgent">今天截止</span>
+            <span class="group-count">2</span>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#E8453C"></div>
+            <span class="task-pf">学习通</span>
+            <span class="task-cs">大学英语</span>
+            <span class="task-when w-urgent">今天 23:59</span>
+          </div>
+          <div class="task-title">Unit 4 单元测验<span class="req-badge">必做</span></div>
+          <div class="task-meta">✎ 测验</div>
+        </div>
+      
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#2B7FFF"></div>
+            <span class="task-pf">希冀</span>
+            <span class="task-cs">数据结构</span>
+            <span class="task-when w-urgent">今天 22:00</span>
+          </div>
+          <div class="task-title">集合的概念</div>
+          <div class="task-meta">📝 作业 · 进度 2/5</div>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-normal">一周内</span>
+            <span class="group-count">5</span>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#3FAE5A"></div>
+            <span class="task-pf">U校园</span>
+            <span class="task-cs">大学英语视听说</span>
+            <span class="task-when w-soon">3 天后 · 11月1日</span>
+          </div>
+          <div class="task-title">Unit 3 Further Listening</div>
+          <div class="task-meta">▶ 视频 · 进度 1/4</div>
+        </div>
+</div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+
+  <!-- ============ 屏 4：长按菜单 ============ -->
+  <div class="phone-box">
+    <div class="cap">长按任务 · 菜单</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="ic">▮▮▮ ⌾ ▰</span></div>
+      <div class="wxcap"><span>···</span><span>◎</span></div>
+
+      <div class="scroll">
+        <div class="head" style="padding-top:20px;">
+          <div class="nav" style="height:44px;">
+            <span class="nav-brand">郑好有你</span>
+            <div class="nav-acts">
+              <div class="nav-acc"><span class="nav-acc-ico">⚙</span><span class="nav-acc-txt">登录设置</span></div>
+              <div class="rbtn"><span class="rbtn-ico">🌙</span></div>
+              <div class="rbtn"><span class="rbtn-ico">⟳</span></div>
+            </div>
+          </div>
+          <div class="hello">
+            <div class="hello-hi">下午好 · 10月28日 周三</div>
+            <div class="hello-big">还有 <span class="hello-n">12</span> 件事要交</div>
+            <div class="hello-sub">今天要交 2 件 · 3 项已过期</div>
+          </div>
+          <div class="tiles">
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF3B30"></div>待完成</div>
+                          <div class="tile-v">12<span class="tile-u">件</span></div>
+                          <div class="tile-s"><span class="tile-red">3 项已过期</span></div>
+                        </div>
+            <div class="tile tile-ring">
+                          <div class="tile-k"><div class="tile-dot" style="background:#34C759"></div>完成率</div>
+                          <div class="tile-v">63<span class="tile-u">%</span></div>
+                          <div class="tile-s">已完成 20 项</div>
+                          <div class="ring" style="background: conic-gradient(#0A84FF 63%, rgba(120,120,128,0.16) 63%);">
+                            <div class="ring-hole">63</div>
+                          </div>
+                        </div>
+          </div>
+          <div class="tile-row">
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#AF52DE"></div>专注</div>
+                          <div class="tile-v">42<span class="tile-u">分钟</span></div>
+                          <div class="tile-s">今天 2 个番茄</div>
+                        </div>
+            <div class="tile">
+                          <div class="tile-k"><div class="tile-dot" style="background:#FF9500"></div>记事本</div>
+                          <div class="tile-v">7<span class="tile-u">条</span></div>
+                          <div class="tile-s">最近记过 7 条</div>
+                        </div>
+          </div>
+        </div>
+        </div>
+      
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-urgent">今天截止</span>
+            <span class="group-count">2</span>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#2B7FFF"></div>
+            <span class="task-pf">希冀</span>
+            <span class="task-cs">数据结构</span>
+            <span class="task-when w-urgent">今天 22:00</span>
+          </div>
+          <div class="task-title">集合的概念</div>
+          <div class="task-meta">📝 作业 · 进度 2/5</div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#E8453C"></div>
+            <span class="task-pf">学习通</span>
+            <span class="task-cs">大学英语</span>
+            <span class="task-when w-urgent">今天 23:59</span>
+          </div>
+          <div class="task-title">Unit 4 单元测验<span class="req-badge">必做</span></div>
+          <div class="task-meta">✎ 测验</div>
+        </div>
+</div>
+
+      <div class="tmask"></div>
+      <div class="tmenu">
+        <div class="tmenu-bar"></div>
+        <div class="tmenu-head">
+          <span class="tmenu-name">集合的概念</span>
+          <span class="tmenu-sub">希冀 · 数据结构 · 待完成</span>
+        </div>
+        <div class="tmenu-item is-primary">
+          <span class="tmenu-ico">✓</span>
+          <span class="tmenu-txt">标记为已完成</span>
+          <span class="tmenu-hint">会移到「已完成」</span>
+        </div>
+        <div class="tmenu-item">
+          <span class="tmenu-ico">›</span>
+          <span class="tmenu-txt">查看详情</span>
+        </div>
+        <div class="tmenu-item">
+          <span class="tmenu-ico">⧉</span>
+          <span class="tmenu-txt">复制任务链接</span>
+        </div>
+        <div class="tmenu-cancel">取消</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+
+  <!-- ============ 屏 3：滚下去的分组 / 提醒 / 页脚 ============ -->
+  <div class="phone-box">
+    <div class="cap">浅色 · 往下滚</div>
+    <div class="phone">
+      <div class="sbar"><span>9:41</span><span class="ic">▮▮▮ ⌾ ▰</span></div>
+      <div class="wxcap"><span>···</span><span>◎</span></div>
+
+      <div class="scroll" style="padding-top:50px;">
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-urgent">今天截止</span>
+            <span class="group-count">2</span>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#E8453C"></div>
+            <span class="task-pf">学习通</span>
+            <span class="task-cs">大学英语</span>
+            <span class="task-when w-urgent">今天 23:59</span>
+          </div>
+          <div class="task-title">Unit 4 单元测验<span class="req-badge">必做</span></div>
+          <div class="task-meta">✎ 测验</div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#2B7FFF"></div>
+            <span class="task-pf">希冀</span>
+            <span class="task-cs">数据结构</span>
+            <span class="task-when w-urgent">今天 22:00</span>
+          </div>
+          <div class="task-title">集合的概念</div>
+          <div class="task-meta">📝 作业 · 进度 2/5</div>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-normal">一周内</span>
+            <span class="group-count">5</span>
+          </div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#11B981"></div>
+            <span class="task-pf">U校园</span>
+            <span class="task-cs">大学英语视听说</span>
+            <span class="task-when w-soon">3 天后 · 11月1日</span>
+          </div>
+          <div class="task-title">Unit 3 Further Listening</div>
+          <div class="task-meta">▶ 视频 · 进度 1/4</div>
+        </div>
+
+        <div class="task">
+          <div class="task-ct">
+            <div class="task-dot" style="background:#E8453C"></div>
+            <span class="task-pf">学习通</span>
+            <span class="task-cs">线性代数</span>
+            <span class="task-sem">25-26-1</span>
+            <span class="task-when w-normal">11月3日 23:59</span>
+          </div>
+          <div class="task-title">第 3 章 习题</div>
+          <div class="task-meta">📄 文档</div>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-muted">已完成</span>
+            <span class="group-count">20</span>
+          </div>
+          <span class="group-more">展开</span>
+        </div>
+
+        <div class="group-head">
+          <div class="group-left">
+            <span class="group-title gt-muted">章节任务点</span>
+            <span class="group-count">6</span>
+          </div>
+          <span class="group-more">展开</span>
+        </div>
+
+        <div class="remind">
+          <div class="remind-body">
+            <span class="remind-title">每日提醒</span>
+            <span class="remind-desc">已开启 · 还可接收 8 次</span>
+          </div>
+          <div class="remind-btn">续订</div>
+        </div>
+
+        <div class="footer-note">上次同步 · 5 分钟前 · 服务 v20261028.1</div>
+        <div class="footer-tip">长按任意任务可以标记完成、复制链接</div>
+
+        <div class="logout-row">
+          <div class="logout-link">退出登录</div>
+        </div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="notes">
+  <h2>改动对照：原来的东西都还在</h2>
+  <table>
+    <tr><th>原功能</th><th>现在落在哪</th></tr>
+    <tr><td>紫色渐变头卡 + 104rpx 大数字</td><td>换成结论式标题「还有 12 件事要交」，数字用蓝色高亮；下面一行补「今天要交 2 件 · 3 项已过期」</td></tr>
+    <tr><td>三个指标 pill（过期 / 7 天内 / 完成率）</td><td>拆进磁贴：待完成格里写过期数，完成率格自带进度环，7 天内写进「待完成」副标题</td></tr>
+    <tr><td>平台三卡（数量 / 最近同步 / 失效角标）</td><td>压成三格胶囊，数量还在，未绑定显示「绑定」、失效整格描红；点一下仍然进账号页</td></tr>
+    <tr><td>记事本 / 专注两张工具卡</td><td>合并成磁贴的第 3、4 格，仍然可点，数字和副标题都在</td></tr>
+    <tr><td>「同步全部课程和任务」渐变条</td><td>换成 iOS 蓝实心按钮，同步中仍然转圈 + 走阶段文案</td></tr>
+    <tr><td>平台筛选 chip + 新任务按钮</td><td>换成黑底分段胶囊，右侧「＋ 新任务」改蓝底，位置不变</td></tr>
+    <tr><td>学期 / 课程 chip</td><td>都在，只是更轻：学期仍是黑底选中，课程改浅蓝描边</td></tr>
+    <tr><td>任务卡（左侧色条 + 底部截止胶囊）</td><td>去掉色条，改成平台圆点 + 截止时间挪到右上角胶囊；已过期的整卡泛红</td></tr>
+    <tr><td>长按菜单 / 新建任务 sheet</td><td>结构不变，只换成圆角 20、加把手条、按钮改 iOS 蓝</td></tr>
+  </table>
+</div>
+
+</body>
+<script>
+  // 单屏模式：?only=2 只留第二台手机，方便放大核对
+  (function () {
+    var m = location.search.match(/only=(\d)/);
+    if (!m) return;
+    var keep = +m[1] - 1;
+    document.querySelectorAll('.phone-box').forEach(function (el, i) {
+      if (i !== keep) el.style.display = 'none';
+    });
+    var notes = document.querySelector('.notes');
+    if (notes) notes.style.display = 'none';
+    document.querySelector('.top').style.display = 'none';
+    document.querySelector('.row').style.maxWidth = 'none';
+    document.body.style.padding = '0';
+  })();
+</script>
+
+</html>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>首页模板 · 再来三个 iOS 方向</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #E9EAEE;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    color: #1C1C1E; padding: 28px 24px 60px; -webkit-font-smoothing: antialiased;
+  }
+  :root {
+    --blue: #007AFF; --red: #FF3B30; --green: #34C759; --orange: #FF9500;
+    --indigo: #5856D6; --purple: #AF52DE; --gray: #8E8E93; --gray2: #C7C7CC;
+    --bg: #F2F2F7; --sep: #E5E5EA;
+  }
+  .top { max-width: 1250px; margin: 0 auto 20px; }
+  .top h1 { font-size: 22px; letter-spacing: -.3px; }
+  .top p { font-size: 13px; color: #6E7180; margin-top: 7px; line-height: 1.75; }
+  .top b { color: #007AFF; font-weight: 600; }
+  .top a { font-size: 12px; color: #007AFF; text-decoration: none; border-bottom: .5px solid rgba(0,122,255,.4); }
+  .rail { display: flex; gap: 22px; max-width: 1250px; margin: 0 auto; align-items: flex-start; }
+  .col { flex: 0 0 375px; }
+  .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+    padding: 5px 10px; border-radius: 8px; background: #fff; color: #3A3D4D; margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(24,28,56,.1); }
+  .badge i { width: 7px; height: 7px; border-radius: 50%; }
+
+  .phone { width: 375px; height: 812px; border-radius: 42px; overflow: hidden; position: relative;
+    box-shadow: 0 14px 40px rgba(24,28,56,.2), 0 0 0 1px rgba(24,28,56,.06); background: var(--bg); }
+
+  .pbar { height: 47px; display: flex; align-items: flex-end; justify-content: space-between;
+    padding: 0 22px 6px; font-size: 14px; font-weight: 600; position: relative; z-index: 30; }
+  .pbar .r { display: flex; align-items: center; gap: 5px; }
+  .sig { display: flex; align-items: flex-end; gap: 2px; }
+  .sig i { width: 3px; background: currentColor; border-radius: 1px; display: block; }
+  .sig i:nth-child(1) { height: 4px; } .sig i:nth-child(2) { height: 6px; }
+  .sig i:nth-child(3) { height: 8px; } .sig i:nth-child(4) { height: 10px; }
+  .batt { width: 24px; height: 12px; border: 1px solid currentColor; border-radius: 3.5px; position: relative; }
+  .batt::after { content: ''; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: 70%;
+    background: currentColor; border-radius: 1.5px; }
+  .wxcap { position: absolute; right: 11px; top: 55px; z-index: 31; width: 78px; height: 28px;
+    border-radius: 999px; display: flex; align-items: center; justify-content: space-around;
+    font-size: 13px; letter-spacing: 1px; }
+  .homebar { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 3px; background: rgba(0,0,0,.85); z-index: 40; }
+
+  /* ================= C · App Store 今日卡 ================= */
+  .ap { background: #F2F2F7; }
+  .ap .wxcap { background: rgba(255,255,255,.75); border: 1px solid rgba(0,0,0,.07); }
+  .ap-head { padding: 2px 20px 0; display: flex; align-items: flex-end; justify-content: space-between;
+    margin-right: 78px; }
+  .ap-h1 { font-size: 29px; font-weight: 700; letter-spacing: -.6px; line-height: 1.1; }
+  .ap-date { font-size: 12.5px; color: var(--gray); letter-spacing: -.05px; white-space: nowrap; }
+
+  /* 精选封面卡 */
+  .ap-hero { margin: 12px 20px 0; border-radius: 22px; padding: 15px 16px 15px; position: relative;
+    overflow: hidden; color: #fff;
+    background: linear-gradient(148deg, #5B54D6 0%, #7B5CE0 42%, #A960D8 100%);
+    box-shadow: 0 10px 24px rgba(94,86,214,.28); }
+  .ap-hero::after { content: ''; position: absolute; right: -40px; top: -50px; width: 168px; height: 168px;
+    border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,.28), rgba(255,255,255,0) 68%); }
+  .ap-kicker { font-size: 10.5px; letter-spacing: 1.2px; text-transform: uppercase; opacity: .82; font-weight: 600; }
+  .ap-htitle { font-size: 23px; font-weight: 700; letter-spacing: -.4px; margin-top: 6px; line-height: 1.25; }
+  .ap-hsub { font-size: 12.5px; opacity: .85; margin-top: 5px; }
+  .ap-hrow { display: flex; align-items: center; gap: 8px; margin-top: 13px; }
+  .ap-cta { background: #fff; color: #4F46C8; font-size: 12.5px; font-weight: 600;
+    padding: 7px 15px; border-radius: 999px; letter-spacing: -.1px; }
+  .ap-left { font-size: 11.5px; opacity: .92; background: rgba(255,255,255,.2); padding: 6px 10px;
+    border-radius: 999px; backdrop-filter: blur(4px); }
+
+  /* 平台卡片横排 */
+  .ap-plats { display: flex; gap: 9px; padding: 14px 20px 0; }
+  .ap-pc { flex: 1; background: #fff; border-radius: 16px; padding: 10px 11px 11px;
+    box-shadow: 0 2px 8px rgba(24,28,56,.055); }
+  .ap-pc .ic { width: 26px; height: 26px; border-radius: 8px; color: #fff; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; }
+  .ap-pc .n { font-size: 18px; font-weight: 700; margin-top: 7px; letter-spacing: -.5px;
+    font-variant-numeric: tabular-nums; }
+  .ap-pc .s { font-size: 10px; color: var(--gray); margin-top: 1px; }
+
+  /* 待办列表卡 */
+  .ap-sec { display: flex; align-items: center; justify-content: space-between; padding: 16px 22px 7px; }
+  .ap-sect { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+  .ap-secact { font-size: 12.5px; color: var(--blue); display: flex; align-items: center; gap: 3px; }
+  .ap-list { margin: 0 20px; background: #fff; border-radius: 18px; overflow: hidden;
+    box-shadow: 0 2px 10px rgba(24,28,56,.055); }
+  .ap-row { display: flex; align-items: flex-start; gap: 10px; padding: 11px 13px; position: relative; }
+  .ap-row + .ap-row::before { content: ''; position: absolute; left: 50px; right: 0; top: 0;
+    height: .5px; background: var(--sep); }
+  .ap-ic { width: 30px; height: 30px; border-radius: 8px; flex: 0 0 30px; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+  .ap-m { flex: 1; min-width: 0; }
+  .ap-tt { font-size: 15px; font-weight: 500; letter-spacing: -.25px; line-height: 1.3; }
+  .ap-tt .req { font-size: 9.5px; font-weight: 700; color: #B25000; background: rgba(255,149,0,.16);
+    padding: 1px 4px; border-radius: 4px; vertical-align: 1px; margin-left: 3px; }
+  .ap-mt { font-size: 11.5px; color: var(--gray); margin-top: 2px; letter-spacing: -.05px; }
+  .ap-w { font-size: 11.5px; text-align: right; padding-top: 2px; font-variant-numeric: tabular-nums;
+    color: var(--gray); flex: 0 0 auto; }
+  .ap-w b { display: block; font-size: 12px; font-weight: 600; color: #48484A; }
+  .ap-w.r b { color: var(--red); }
+  .ap-w.a b { color: #B25000; }
+  .ap-acts { display: flex; gap: 9px; padding: 10px 20px 0; }
+  .ap-act { flex: 1; background: #fff; border-radius: 13px; padding: 9px 12px; font-size: 12.5px;
+    font-weight: 600; color: var(--blue); display: flex; align-items: center; justify-content: center;
+    gap: 6px; letter-spacing: -.1px; box-shadow: 0 2px 8px rgba(24,28,56,.055); }
+  .ap-act.pri { background: var(--blue); color: #fff; box-shadow: 0 4px 14px rgba(0,122,255,.3); }
+
+  .ap-tools { display: flex; gap: 9px; padding: 12px 20px 0; }
+  .ap-tool { flex: 1; background: #fff; border-radius: 16px; padding: 9px 11px;
+    box-shadow: 0 2px 8px rgba(24,28,56,.055); display: flex; align-items: center; gap: 8px; }
+  .ap-tool .e { width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center;
+    justify-content: center; font-size: 13px; }
+  .ap-tool .t { font-size: 12.5px; font-weight: 600; letter-spacing: -.2px; }
+  .ap-tool .d { font-size: 10px; color: var(--gray); margin-top: 1px; }
+  .ap-note { text-align: center; font-size: 10.5px; color: #AEAEB2; padding: 6px 24px 0; line-height: 1.55; }
+
+  /* ================= D · 日历日视图 ================= */
+  .cal { background: #fff; }
+  .cal .wxcap { background: rgba(120,120,128,.1); border: 1px solid rgba(0,0,0,.04); }
+  .cal-head { padding: 4px 18px 0; }
+  .cal-h1 { font-size: 27px; font-weight: 700; letter-spacing: -.6px; }
+  .cal-h1 em { font-style: normal; color: var(--red); }
+  .cal-sub { font-size: 12.5px; color: var(--gray); margin-top: 3px; display: flex; align-items: center; gap: 6px; }
+  .cal-sub i { width: 4px; height: 4px; border-radius: 50%; background: var(--gray2); }
+  .cal-sync { margin-left: auto; width: 27px; height: 27px; border-radius: 50%;
+    background: rgba(0,122,255,.11); display: flex; align-items: center; justify-content: center;
+    font-size: 12.5px; color: var(--blue); margin-right: 84px; }
+
+  /* 一周条 */
+  .cal-week { display: flex; padding: 12px 12px 8px; border-bottom: .5px solid var(--sep); }
+  .cal-d { flex: 1; text-align: center; }
+  .cal-d .dw { font-size: 10.5px; color: var(--gray); letter-spacing: .2px; }
+  .cal-d .dn { font-size: 16px; font-weight: 500; margin-top: 4px; width: 30px; height: 30px;
+    line-height: 30px; border-radius: 50%; margin-left: auto; margin-right: auto;
+    font-variant-numeric: tabular-nums; }
+  .cal-d.on .dw { color: var(--red); font-weight: 600; }
+  .cal-d.on .dn { background: var(--red); color: #fff; font-weight: 600; }
+  .cal-d .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--gray2); margin: 4px auto 0; }
+  .cal-d .dot.none { background: transparent; }
+
+  /* 时间轴 */
+  .cal-tl { position: relative; padding: 10px 0 0 0; }
+  .cal-nowbar { position: relative; height: 1px; background: var(--red); margin: 1px 12px 7px 52px; z-index: 6; }
+  .cal-nowbar::before { content: ''; position: absolute; left: -3px; top: -2.5px; width: 6px; height: 6px;
+    border-radius: 50%; background: var(--red); }
+  .cal-nowbar span { position: absolute; right: 0; top: -7px; font-size: 9.5px; font-weight: 600;
+    color: #fff; background: var(--red); border-radius: 4px; padding: 1px 4px; }
+  .cal-ev { display: flex; position: relative; }
+  .cal-t { width: 52px; flex: 0 0 52px; font-size: 10px; color: var(--gray); text-align: right;
+    padding: 11px 8px 0 0; font-variant-numeric: tabular-nums; }
+  .cal-box { flex: 1; padding: 5px 12px 0 0; min-width: 0; }
+  .cal-e { border-radius: 8px; padding: 7px 9px; margin-bottom: 6px; position: relative; overflow: hidden; }
+  .cal-e::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+  .cal-e.cls { background: rgba(88,86,214,.09); }
+  .cal-e.cls::before { background: var(--indigo); }
+  .cal-e.task { background: rgba(175,82,222,.08); }
+  .cal-e.task::before { background: var(--purple); }
+  .cal-e.hot { background: rgba(255,59,48,.075); }
+  .cal-e.hot::before { background: var(--red); }
+  .cal-e.past { background: rgba(120,120,128,.08); }
+  .cal-e.past::before { background: var(--gray2); }
+  .cal-e.allday { background: rgba(120,120,128,.07); }
+  .cal-e.allday::before { background: #AEAEB2; }
+  .cal-et { font-size: 12.5px; font-weight: 600; letter-spacing: -.15px; line-height: 1.3; }
+  .cal-et.past { color: var(--gray); text-decoration: line-through; }
+  .cal-es { font-size: 10.5px; color: var(--gray); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .cal-es i { width: 4px; height: 4px; border-radius: 50%; }
+  .cal-eq { height: 2px; background: rgba(120,120,128,.2); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+  .cal-eq i { display: block; height: 100%; background: var(--purple); border-radius: 2px; }
+  .cal-float { position: absolute; left: 14px; right: 14px; bottom: 22px; z-index: 12;
+    border-radius: 15px; padding: 11px 14px; display: flex; align-items: center; gap: 10px;
+    background: rgba(252,252,253,.86); backdrop-filter: blur(22px) saturate(180%);
+    box-shadow: 0 8px 26px rgba(24,28,56,.16), 0 0 0 .5px rgba(0,0,0,.05); }
+  .cal-fn { flex: 1; font-size: 12px; color: #3C3C43; letter-spacing: -.15px; }
+  .cal-fn b { font-size: 15px; font-weight: 700; letter-spacing: -.4px; }
+  .cal-fn .r { color: var(--red); font-weight: 600; }
+  .cal-fb { font-size: 12px; color: #fff; background: #1C1C1E; padding: 7px 13px; border-radius: 999px;
+    font-weight: 500; letter-spacing: -.1px; }
+
+  /* ================= E · 锁屏小组件 + 通知堆叠 ================= */
+  .lck { background: #EFEAF6; color: #17171B; }
+  .lck .wxcap { background: rgba(255,255,255,.55); border: 1px solid rgba(255,255,255,.6); }
+  .lck-bg { position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(60% 34% at 78% 6%, rgba(175,82,222,.34), transparent 62%),
+      radial-gradient(56% 30% at 12% 20%, rgba(0,122,255,.22), transparent 66%),
+      radial-gradient(70% 40% at 50% 92%, rgba(255,149,0,.18), transparent 70%),
+      linear-gradient(175deg, #EDE7F7 0%, #F1ECF4 46%, #F7EFE9 100%); }
+  .lck-bg::after { content: ''; position: absolute; inset: 0;
+    background: radial-gradient(80% 60% at 50% 40%, rgba(255,255,255,.5), transparent 72%); }
+  .lck-body { position: relative; z-index: 2; }
+
+  .lck-time { text-align: center; padding-top: 2px; }
+  .lck-clock { font-size: 74px; font-weight: 200; letter-spacing: -3px; line-height: 1;
+    font-variant-numeric: tabular-nums; color: #1C1C1E; }
+  .lck-day { font-size: 13px; color: #3C3C43; margin-top: 2px; letter-spacing: .1px; font-weight: 500; }
+
+  /* 锁屏小组件行 */
+  .lck-wg { display: flex; gap: 8px; padding: 16px 16px 0; }
+  .lck-w { flex: 1; border-radius: 15px; padding: 9px 11px;
+    background: rgba(255,255,255,.42); backdrop-filter: blur(16px) saturate(160%);
+    box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 8px rgba(24,28,56,.08);
+    display: flex; align-items: center; gap: 8px; }
+  .lck-w .v { font-size: 21px; font-weight: 700; letter-spacing: -.7px; line-height: 1;
+    font-variant-numeric: tabular-nums; }
+  .lck-w .l { font-size: 9.5px; color: #4A4A52; margin-top: 3px; letter-spacing: .1px; }
+  .lck-w .ring { width: 34px; height: 34px; position: relative; flex: 0 0 34px; margin-left: auto; }
+  .lck-w .ring .pc { position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: center; font-size: 9.5px; font-weight: 700; }
+
+  /* 通知堆叠 */
+  .lck-stack { padding: 14px 14px 0; }
+  .lck-note { background: rgba(255,255,255,.62); backdrop-filter: blur(20px) saturate(170%);
+    border-radius: 18px; padding: 11px 12px; margin-bottom: 7px;
+    box-shadow: 0 2px 12px rgba(24,28,56,.09), 0 0 0 .5px rgba(255,255,255,.7) inset; }
+  .lck-note.hot { background: rgba(255,246,246,.74); box-shadow: 0 2px 14px rgba(255,59,48,.14),
+    0 0 0 .5px rgba(255,255,255,.7) inset; }
+  .lck-nh { display: flex; align-items: center; gap: 7px; }
+  .lck-app { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex: 0 0 22px;
+    background: linear-gradient(150deg, #5B54D6, #A960D8); }
+  .lck-nh .nm { font-size: 11px; font-weight: 600; color: #3C3C43; letter-spacing: -.05px; }
+  .lck-nh .tm { font-size: 10.5px; color: #6D6D75; margin-left: auto; }
+  .lck-nt { font-size: 13.5px; font-weight: 600; letter-spacing: -.25px; margin-top: 6px; line-height: 1.3; }
+  .lck-nb { font-size: 11.5px; color: #4C4C54; margin-top: 2px; letter-spacing: -.05px; display: flex;
+    align-items: center; gap: 5px; }
+  .lck-nb i { width: 4px; height: 4px; border-radius: 50%; }
+  .lck-nb .warn { color: var(--red); font-weight: 600; }
+  .lck-fold { text-align: center; font-size: 11px; color: #5A5A62; padding: 3px 0 8px; letter-spacing: -.05px; }
+
+  .lck-bottom { display: flex; align-items: center; justify-content: space-between; padding: 8px 44px 0; }
+  .lck-c { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,.44);
+    backdrop-filter: blur(14px); box-shadow: 0 2px 10px rgba(24,28,56,.1);
+    display: flex; align-items: center; justify-content: center; font-size: 17px; color: #3C3C43; }
+  .lck-c.pri { background: linear-gradient(150deg, #5B54D6, #8B5CF6); color: #fff;
+    box-shadow: 0 6px 18px rgba(94,86,214,.36); }
+
+  /* 底部说明 */
+  .tail { max-width: 1250px; margin: 26px auto 0; background: #fff; border-radius: 18px;
+    padding: 18px 20px; box-shadow: 0 2px 10px rgba(24,28,56,.07); }
+  .tail h2 { font-size: 15px; letter-spacing: -.2px; }
+  .tail p { font-size: 12.5px; color: #6E7180; line-height: 1.8; margin-top: 7px; }
+  .tail p b { color: #1C1C1E; }
+  .tail .row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .tail .chipx { font-size: 11.5px; color: #48484A; background: #F2F2F7; border-radius: 8px;
+    padding: 5px 9px; letter-spacing: -.05px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>再来三个 iOS 方向 <a href="preview-home-ios.html" style="font-weight:400;margin-left:8px">← 上一版两个（分组列表 / 磁贴）</a></h1>
+  <p>这次不重复上一版的分组列表和磁贴，挑的是 iOS 上最有辨识度、也最容易被认出来的三个系统界面：<b>App Store 的今日大卡</b>、<b>日历的日视图</b>、<b>锁屏小组件 + 通知堆叠</b>。<br>
+     数据仍是同一份：12 项待办 / 3 项过期 / 5 项本周 / 完成率 63% / 学习通 8、希冀 3、U校园 1 / 今天两节课。长按菜单和新建 sheet 沿用上一版画过的 iOS 组件，不再重复画；三屏的筛选各按自己的范式来 —— C 用「全部 ⌄」下拉，D 用一周日期条，E 是通知流（平台筛选得另加一行 chip，是这三屏里唯一需要补的地方）。</p>
+</div>
+
+<div class="rail">
+
+  <!-- ================= C · App Store ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#5B54D6"></i>C · App Store 今日卡</div>
+    <div class="phone ap">
+      <div class="pbar">
+        <span>9:44</span>
+        <span class="r"><span class="sig"><i></i><i></i><i></i><i></i></span>
+          <span style="font-size:11px;font-weight:600">5G</span><span class="batt"></span></span>
+      </div>
+      <div class="wxcap">••• ⊙</div>
+
+      <div class="ap-head">
+        <div class="ap-h1">今天</div>
+        <div class="ap-date">10月28日 周三</div>
+      </div>
+
+      <!-- 精选卡：最急那一件，做成 App Store 的 Today 封面 -->
+      <div class="ap-hero">
+        <div class="ap-kicker">还剩 14 小时 · 未提交</div>
+        <div class="ap-htitle">集合的概念</div>
+        <div class="ap-hsub">希冀 · 离散数学 · 练习 · 未提交</div>
+        <div class="ap-hrow">
+          <div class="ap-cta">去完成</div>
+          <div class="ap-left">今晚 23:59</div>
+        </div>
+      </div>
+
+      <div class="ap-plats">
+        <div class="ap-pc">
+          <div class="ic" style="background:#34C759">学</div>
+          <div class="n">8</div><div class="s">学习通</div>
+        </div>
+        <div class="ap-pc">
+          <div class="ic" style="background:#5856D6">希</div>
+          <div class="n">3</div><div class="s">希冀 · 直连</div>
+        </div>
+        <div class="ap-pc">
+          <div class="ic" style="background:#FF9500">U</div>
+          <div class="n">1</div><div class="s">U校园</div>
+        </div>
+      </div>
+
+      <div class="ap-sec">
+        <span class="ap-sect">待办 12</span>
+        <span class="ap-secact">全部 ⌄</span>
+      </div>
+      <div class="ap-list">
+        <div class="ap-row">
+          <div class="ap-ic" style="background:#5856D6">希</div>
+          <div class="ap-m">
+            <div class="ap-tt">实验二 循环程序设计</div>
+            <div class="ap-mt">汇编语言 · 实验 · 未提交</div>
+          </div>
+          <div class="ap-w a"><b>明天</b>18:00</div>
+        </div>
+        <div class="ap-row">
+          <div class="ap-ic" style="background:#34C759">学</div>
+          <div class="ap-m">
+            <div class="ap-tt">第三章 单元测验<span class="req">必做</span></div>
+            <div class="ap-mt">大学英语 · 测验 · 限时 30 分钟</div>
+          </div>
+          <div class="ap-w"><b>10-30</b>23:59</div>
+        </div>
+        <div class="ap-row">
+          <div class="ap-ic" style="background:#34C759">学</div>
+          <div class="ap-m">
+            <div class="ap-tt">图的应用</div>
+            <div class="ap-mt">数据结构 · 视频 2/5 · 已看 40%</div>
+          </div>
+          <div class="ap-w"><b>11-02</b>23:59</div>
+        </div>
+        <div class="ap-row">
+          <div class="ap-ic" style="background:#FF9500">U</div>
+          <div class="ap-m">
+            <div class="ap-tt" style="color:#8E8E93;text-decoration:line-through">期中论文提纲</div>
+            <div class="ap-mt">软件工程 · 已过期 2 天</div>
+          </div>
+          <div class="ap-w r"><b>过期</b>2 天</div>
+        </div>
+      </div>
+
+      <div class="ap-acts">
+        <div class="ap-act"><span>⟳</span>同步全部课程</div>
+        <div class="ap-act pri"><span>＋</span>新任务</div>
+      </div>
+
+      <div class="ap-tools">
+        <div class="ap-tool">
+          <div class="e" style="background:#F1F1F4">📝</div>
+          <div><div class="t">记事本</div><div class="d">4 条</div></div>
+        </div>
+        <div class="ap-tool">
+          <div class="e" style="background:#FFECE9">⏱</div>
+          <div><div class="t">专注</div><div class="d">🍅3 · 86 分钟</div></div>
+        </div>
+      </div>
+      <div class="ap-note">今天 08:00 高等数学 · 10:00 软件工程导论 · 本周共 6 节</div>
+      <div class="homebar"></div>
+    </div>
+  </section>
+
+  <!-- ================= D · 日历日视图 ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#FF3B30"></i>D · 日历日视图</div>
+    <div class="phone cal">
+      <div class="pbar">
+        <span>9:44</span>
+        <span class="r"><span class="sig"><i></i><i></i><i></i><i></i></span>
+          <span style="font-size:11px;font-weight:600">5G</span><span class="batt"></span></span>
+      </div>
+      <div class="wxcap">••• ⊙</div>
+
+      <div class="cal-head">
+        <div class="cal-h1">10月28日 <em>周三</em></div>
+        <div class="cal-sub">12 项待办<i></i><span style="color:#FF3B30;font-weight:600">3 项已过期</span><i></i>完成率 63%<span class="cal-sync">⟳</span></div>
+      </div>
+
+      <div class="cal-week">
+        <div class="cal-d"><div class="dw">一</div><div class="dn">26</div><div class="dot"></div></div>
+        <div class="cal-d"><div class="dw">二</div><div class="dn">27</div><div class="dot"></div></div>
+        <div class="cal-d on"><div class="dw">三</div><div class="dn">28</div><div class="dot"></div></div>
+        <div class="cal-d"><div class="dw">四</div><div class="dn">29</div><div class="dot none"></div></div>
+        <div class="cal-d"><div class="dw">五</div><div class="dn">30</div><div class="dot"></div></div>
+        <div class="cal-d"><div class="dw">六</div><div class="dn">31</div><div class="dot none"></div></div>
+        <div class="cal-d"><div class="dw">日</div><div class="dn">1</div><div class="dot"></div></div>
+      </div>
+
+      <div class="cal-tl">
+        
+        <div class="cal-ev">
+          <div class="cal-t">全天</div>
+          <div class="cal-box">
+            <div class="cal-e allday">
+              <div class="cal-et">第 3 章 习题</div>
+              <div class="cal-es"><i style="background:#34C759"></i>学习通 · 线性代数 · 无期限</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-ev">
+          <div class="cal-t">08:00</div>
+          <div class="cal-box">
+            <div class="cal-e cls">
+              <div class="cal-et">高等数学</div>
+              <div class="cal-es">1-2 节 · 教二 305 · 09:40 下课</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-nowbar"><span>9:44</span></div>
+
+        <div class="cal-ev">
+          <div class="cal-t">10:00</div>
+          <div class="cal-box">
+            <div class="cal-e cls" style="background:rgba(120,120,128,.06)">
+              <div class="cal-et" style="color:#8E8E93">软件工程导论</div>
+              <div class="cal-es">3-4 节 · 教三 201</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-ev">
+          <div class="cal-t">18:00</div>
+          <div class="cal-box">
+            <div class="cal-e task">
+              <div class="cal-et">实验二 循环程序设计</div>
+              <div class="cal-es"><i style="background:#5856D6"></i>希冀 · 汇编语言 · 明天 18:00 截止</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cal-ev">
+          <div class="cal-t">23:59</div>
+          <div class="cal-box">
+            <div class="cal-e hot">
+              <div class="cal-et">集合的概念</div>
+              <div class="cal-es"><i style="background:#5856D6"></i>希冀 · 离散数学 · 练习 · 未提交</div>
+            </div>
+            <div class="cal-e task">
+              <div class="cal-et">图的应用</div>
+              <div class="cal-es"><i style="background:#34C759"></i>学习通 · 数据结构 · 11-02</div>
+              <div class="cal-eq"><i style="width:40%"></i></div>
+            </div>
+            <div class="cal-e past">
+              <div class="cal-et past">期中论文提纲</div>
+              <div class="cal-es"><i style="background:#FF9500"></i>U校园 · 软件工程 · 过期 2 天</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cal-float">
+        <div class="cal-fn"><b>今天 12 项</b> · <span class="r">3 项过期</span> · 完成率 63%</div>
+        <div class="cal-fb">＋ 新任务</div>
+      </div>
+      <div class="homebar"></div>
+    </div>
+  </section>
+
+  <!-- ================= E · 锁屏 / 通知堆叠 ================= -->
+  <section class="col">
+    <div class="badge"><i style="background:#AF52DE"></i>E · 锁屏小组件 + 通知堆叠</div>
+    <div class="phone lck">
+      <div class="lck-bg"></div>
+      <div class="pbar">
+        <span>9:44</span>
+        <span class="r"><span class="sig"><i></i><i></i><i></i><i></i></span>
+          <span style="font-size:11px;font-weight:600">5G</span><span class="batt"></span></span>
+      </div>
+      <div class="wxcap">••• ⊙</div>
+
+      <div class="lck-body">
+        <div class="lck-time">
+          <div class="lck-clock">9:44</div>
+          <div class="lck-day">10月28日 星期三</div>
+        </div>
+
+        <div class="lck-wg">
+          <div class="lck-w">
+            <div>
+              <div class="v">12</div>
+              <div class="l">项待完成</div>
+            </div>
+            <div class="ring">
+              <svg width="34" height="34" viewBox="0 0 34 34">
+                <circle cx="17" cy="17" r="14" fill="none" stroke="rgba(120,120,128,.2)" stroke-width="3.5"></circle>
+                <circle cx="17" cy="17" r="14" fill="none" stroke="#34C759" stroke-width="3.5"
+                        stroke-linecap="round" stroke-dasharray="87.96" stroke-dashoffset="32.5"
+                        transform="rotate(-90 17 17)"></circle>
+              </svg>
+              <div class="pc">63%</div>
+            </div>
+          </div>
+          <div class="lck-w">
+            <div>
+              <div class="v" style="color:#FF3B30">3</div>
+              <div class="l">项已过期</div>
+            </div>
+            <div style="margin-left:auto;text-align:right">
+              <div class="v" style="font-size:15px">5</div>
+              <div class="l">7 天内</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 通知堆叠：每条任务一副通知的样子 -->
+        <div class="lck-stack">
+          <div class="lck-note hot">
+            <div class="lck-nh">
+              <div class="lck-app">希</div>
+              <div class="nm">郑好有你</div>
+              <div class="tm">现在</div>
+            </div>
+            <div class="lck-nt">集合的概念 · 今晚 23:59 截止</div>
+            <div class="lck-nb"><span class="warn">还剩 14 小时</span><i style="background:#C7C7CC"></i>希冀 · 离散数学 · 练习</div>
+          </div>
+
+          <div class="lck-note">
+            <div class="lck-nh">
+              <div class="lck-app" style="background:linear-gradient(150deg,#34C759,#1FA97C)">学</div>
+              <div class="nm">郑好有你</div>
+              <div class="tm">8:00</div>
+            </div>
+            <div class="lck-nt">今天有 2 节课，第一节 8:00 开始</div>
+            <div class="lck-nb">高等数学 · 教二 305<i style="background:#C7C7CC"></i>本周共 6 节</div>
+          </div>
+
+          <div class="lck-note">
+            <div class="lck-nh">
+              <div class="lck-app">希</div>
+              <div class="nm">郑好有你</div>
+              <div class="tm">昨天</div>
+            </div>
+            <div class="lck-nt">实验二 循环程序设计 明天 18:00 截止</div>
+            <div class="lck-nb">希冀 · 汇编语言 · 实验 · 未提交</div>
+          </div>
+
+          <div class="lck-note">
+            <div class="lck-nh">
+              <div class="lck-app" style="background:linear-gradient(150deg,#FF9500,#F2701B)">U</div>
+              <div class="nm">郑好有你</div>
+              <div class="tm">昨天</div>
+            </div>
+            <div class="lck-nt">期中论文提纲 已过期</div>
+            <div class="lck-nb"><span class="warn">已过期 2 天</span><i style="background:#C7C7CC"></i>U校园 · 软件工程</div>
+          </div>
+
+          <div class="lck-fold">还有 8 条通知 · 全部展开 ›</div>
+        </div>
+
+        <div class="lck-bottom">
+          <div class="lck-c">⟳</div>
+          <div class="lck-c pri">＋</div>
+          <div class="lck-c">⏱</div>
+        </div>
+      </div>
+
+      <div class="homebar"></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="tail">
+  <h2>三个方向的性格，和各自的代价</h2>
+  <p><b>C · App Store 今日卡</b>：只把「最急的那一件」放大成封面，其余退成列表。适合你现在「一项作业压着没交」的真实状态 —— 打开就知道先去干哪件。代价是封面卡固定吃掉 180px，而且平台数量只好缩成三个小格子。<br>
+     <b>D · 日历日视图</b>：课程和截止时刻排在同一条时间轴上，左边是几点、右边是干什么，红色那条是「现在」。跟你已有的课表页共用一套心智，切换不违和。代价是没有列表视图的「分组」，过期项只能挂在 23:59 那条下面，一屏只能到 4 条。<br>
+     <b>E · 锁屏小组件 + 通知堆叠</b>：把任务当通知看，一天推几条就几条，最贴合你「做完一项同步一次」的用法 —— 每同步到新东西就像来了一条通知。代价是重发消息的时间感（每条通知得有时间戳），列表密度比前两个低。</p>
+  <div class="row">
+    <span class="chipx">同一套 iOS 基础：系统色板 · 0.5px hairline · 圆角 16/22</span>
+    <span class="chipx">字重 700 标题 + tabular-nums 数字</span>
+    <span class="chipx">毛玻璃 backdrop-filter</span>
+    <span class="chipx">长按菜单 / 新建 sheet 沿用上一版</span>
+    <span class="chipx">未加 tabBar</span>
+  </div>
+</div>
+
+</body>
+</html>

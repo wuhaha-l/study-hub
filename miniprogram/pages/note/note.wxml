@@ -1,0 +1,72 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+
+  <!-- ===== 顶部 ===== -->
+  <view class="head" style="padding-top:{{statusBarHeight}}px;">
+    <view class="nav" style="height:{{navBarHeight}}px;">
+      <view class="nav-back" bindtap="goBack" hover-class="hov">
+        <text class="nav-back-ico">‹</text>
+      </view>
+      <text class="nav-state">{{stateText}}</text>
+      <view class="nav-done" bindtap="goBack" hover-class="hov">完成</view>
+    </view>
+  </view>
+
+  <!-- ===== 编辑区 ===== -->
+  <view class="paper paper-{{color}}">
+    <input
+      class="ipt-title"
+      value="{{title}}"
+      bindinput="onTitle"
+      placeholder="标题"
+      placeholder-class="ph-title"
+      maxlength="60"
+      cursor-spacing="24"
+    />
+    <view class="paper-line"></view>
+    <textarea
+      class="ipt-body"
+      value="{{body}}"
+      bindinput="onBody"
+      placeholder="记点什么…"
+      placeholder-class="ph-body"
+      maxlength="-1"
+      cursor-spacing="24"
+      show-confirm-bar="{{false}}"
+      disable-default-padding="{{true}}"
+    />
+  </view>
+
+  <!-- ===== 底部工具栏 ===== -->
+  <view class="toolbar">
+    <view class="tool" bindtap="togglePalette" hover-class="hov">
+      <text class="tool-ico">🎨</text>
+      <text class="tool-txt">底色</text>
+    </view>
+    <view class="tool" bindtap="onTogglePin" hover-class="hov">
+      <text class="tool-ico">{{pinned ? '📌' : '📍'}}</text>
+      <text class="tool-txt">{{pinned ? '已置顶' : '置顶'}}</text>
+    </view>
+    <view class="tool" bindtap="onCopy" hover-class="hov">
+      <text class="tool-ico">⧉</text>
+      <text class="tool-txt">复制</text>
+    </view>
+    <view class="tool" bindtap="onDelete" hover-class="hov">
+      <text class="tool-ico">🗑</text>
+      <text class="tool-txt is-danger">删除</text>
+    </view>
+    <text class="tool-chars">{{chars}} 字</text>
+  </view>
+
+  <!-- 颜色选择 -->
+  <view class="palette" wx:if="{{palette}}">
+    <view
+      class="pal sw-{{item.key}} {{color === item.key ? 'is-on' : ''}}"
+      wx:for="{{colors}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="onPickColor"
+    >
+      <text class="pal-check" wx:if="{{color === item.key}}">✓</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>希冀验证码行 · 改版对照</title>
+<style>
+  :root {
+    --bg: #F4F5F9;
+    --card: #FFFFFF;
+    --card-2: #F6F7FA;
+    --text: #16161D;
+    --text-2: #6E7180;
+    --text-3: #A0A3B1;
+    --line: #EEF0F4;
+    --brand: #4C45D6;
+    --shadow: 0 6px 20px rgba(24, 28, 56, .06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #ECEDF3;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+    padding: 28px 20px 48px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 17px; text-align: center; margin-bottom: 4px; }
+  .lead { text-align: center; font-size: 12px; color: #6E7180; margin-bottom: 24px; }
+  .stage { display: flex; gap: 26px; justify-content: center; align-items: flex-start; flex-wrap: wrap; }
+  .col { width: 375px; }
+  .cap { margin: 10px 0 0; font-size: 12px; color: #6E7180; text-align: center; }
+  .cap b { color: #C0392B; }
+
+  .phone { width: 375px; background: var(--bg); border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(24,28,56,.12); padding-bottom: 18px; }
+
+  .intra {
+    margin: 14px 16px 0;
+    padding: 16px;
+    background: var(--card);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+  }
+  .intra-head { display: flex; align-items: center; gap: 7px; }
+  .intra-title { font-size: 15px; font-weight: 700; }
+  .intra-badge { font-size: 9.5px; color: #B4761A; background: #FDF3E2; padding: 2px 6px; border-radius: 4px; }
+
+  /* ===== 表单行（照 accounts.wxss 的 .field / .field.column） ===== */
+  .field {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 0; border-bottom: 1px solid var(--line);
+  }
+  .field.column { flex-direction: column; align-items: flex-start; gap: 7px; }
+  .field-label { font-size: 13px; color: var(--text-2); width: 95px; flex-shrink: 0; }
+  .field-input { flex: 1; font-size: 14px; color: var(--text); text-align: right; border: 0; background: transparent; outline: none; }
+  .field.column .field-input { width: 100%; }
+  .ph { color: var(--text-3); }
+
+  /* ===== 改版后的验证码行 ===== */
+  .edu-cap-head { display: flex; align-items: center; gap: 7px; width: 100%; }
+  .edu-cap-head .field-label { width: auto; flex-shrink: 0; }
+  .edu-cap-tip { margin-left: auto; flex-shrink: 0; font-size: 10.5px; color: var(--brand); }
+
+  .edu-cap-row { display: flex; align-items: stretch; gap: 8px; width: 100%; height: 44px; }
+
+  .edu-cap-input-wrap {
+    flex: 1; min-width: 0;
+    display: flex; align-items: center; gap: 5px;
+    padding: 0 11px;
+    border-radius: 7px;
+    background: var(--card-2);
+    border: 1px solid var(--line);
+  }
+  .edu-cap-input {
+    flex: 1; min-width: 0; height: 44px;
+    font-size: 16px; letter-spacing: 4px; text-align: left;
+    color: var(--text); border: 0; background: transparent; outline: none;
+  }
+  .edu-cap-input::placeholder { color: var(--text-3); letter-spacing: 0; font-size: 13px; }
+  .edu-cap-count { flex-shrink: 0; font-size: 11px; color: var(--text-3); }
+
+  .edu-cap-box {
+    width: 100px; flex-shrink: 0;
+    border-radius: 7px;
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  .edu-cap-img { width: 100%; height: 100%; object-fit: contain; }
+  .edu-cap-txt { font-size: 10.5px; color: var(--text-3); }
+
+  /* ===== 改版前的样子（复刻旧 CSS） ===== */
+  .old-cap-row { display: flex; align-items: center; gap: 8px; width: 100%; }
+  .old-cap-row .field-input { flex: 1; width: auto; min-width: 0; }
+  .old-cap-box {
+    width: 95px; height: 42px; border-radius: 7px; background: var(--card-2);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden;
+  }
+</style>
+</head>
+<body>
+  <h1>希冀 · 验证码这一行</h1>
+  <div class="lead">左边是改版后（输入框有自己的底色和边框、内容左对齐），右边是改版前</div>
+
+  <div class="stage">
+    <div class="col">
+      <div class="phone">
+        <div class="intra">
+          <div class="intra-head"><span class="intra-title">希冀 · 校园内网直连</span><span class="intra-badge">需校园网</span></div>
+
+          <div class="field column">
+            <div class="field-label">学号</div>
+            <input class="field-input" value="202515020339" readonly>
+          </div>
+
+          <div class="field column">
+            <div class="edu-cap-head">
+              <div class="field-label">验证码</div>
+              <div class="edu-cap-tip">看不清？点右边图片换一张</div>
+            </div>
+            <div class="edu-cap-row">
+              <div class="edu-cap-input-wrap">
+                <input class="edu-cap-input" value="7h2k" readonly>
+                <span class="edu-cap-count">4/6</span>
+              </div>
+              <div class="edu-cap-box" style="width:147px">
+                <img class="edu-cap-img" alt="captcha" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23EEECFA'/><g font-family='Courier New' font-size='30' font-weight='700' fill='%234C45D6'><text x='14' y='40' transform='rotate(-6 14 40)'>7</text><text x='50' y='40' transform='rotate(5 50 40)'>h</text><text x='86' y='40' transform='rotate(-3 86 40)'>2</text><text x='122' y='40' transform='rotate(6 122 40)'>k</text></g><path d='M4 44 L196 20' stroke='%23A0A3B1' stroke-width='1.4'/><path d='M8 16 L190 48' stroke='%23C9CBD8' stroke-width='1.2'/></svg>">
+              </div>
+            </div>
+          </div>
+
+          <div class="field column">
+            <div class="edu-cap-head">
+              <div class="field-label">验证码</div>
+              <div class="edu-cap-tip">点右边方框取一张</div>
+            </div>
+            <div class="edu-cap-row">
+              <div class="edu-cap-input-wrap">
+                <input class="edu-cap-input" placeholder="输入图中字符" readonly>
+              </div>
+              <div class="edu-cap-box">
+                <span class="edu-cap-txt">点击取图</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">改版后：已填 4 位 / 未取图两种状态</div>
+    </div>
+
+    <div class="col">
+      <div class="phone">
+        <div class="intra">
+          <div class="intra-head"><span class="intra-title">希冀 · 校园内网直连</span><span class="intra-badge">需校园网</span></div>
+
+          <div class="field column">
+            <div class="field-label">学号</div>
+            <input class="field-input" value="202515020339" readonly>
+          </div>
+
+          <div class="field column">
+            <div class="field-label">验证码</div>
+            <div class="old-cap-row">
+              <input class="field-input" value="7h2k" readonly>
+              <div class="old-cap-box">
+                <img class="edu-cap-img" alt="captcha" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='60'><rect width='200' height='60' fill='%23EEECFA'/><g font-family='Courier New' font-size='30' font-weight='700' fill='%234C45D6'><text x='14' y='40' transform='rotate(-6 14 40)'>7</text><text x='50' y='40' transform='rotate(5 50 40)'>h</text><text x='86' y='40' transform='rotate(-3 86 40)'>2</text><text x='122' y='40' transform='rotate(6 122 40)'>k</text></g></svg>">
+              </div>
+            </div>
+          </div>
+
+          <div class="field column">
+            <div class="field-label">验证码</div>
+            <div class="old-cap-row">
+              <input class="field-input" placeholder="看图填" readonly>
+              <div class="old-cap-box"><span class="edu-cap-txt">点这里取验证码</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="cap">改版前：<b>输入内容右对齐贴在图片边上、没有底色边框</b>，看着像没地方输入</div>
+    </div>
+  </div>
+</body>
+</html>

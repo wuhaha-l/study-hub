@@ -1,0 +1,209 @@
+/* 全局样式 */
+page {
+  /* 主题变量（浅色）。深色在 .theme-dark 里整组替换，页面根节点挂类即可 */
+  --bg: #F4F5F9;
+  --card: #FFFFFF;
+  --card-2: #F6F7FA;
+  --text: #16161D;
+  --text-2: #6E7180;
+  --text-3: #A0A3B1;
+  --line: #EEF0F4;
+  --brand: #4C45D6;
+  --brand-2: #6C63E8;
+  --brand-soft: #EDECFC;
+  --danger: #D6453B;
+  --ok: #15803D;
+  --ok-bg: #E7F7EE;
+  --warn: #B45309;
+  --err-bg: #FDE9EF;
+  --shadow: 0 4rpx 20rpx rgba(24, 28, 56, 0.05);
+  --ghost-bg: #F2F3F8;
+  --ghost-fg: #41445A;
+  --mask: rgba(15, 17, 26, 0.45);
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 深色模式：utils/theme.js 负责把类挂到每个页面的根节点上 */
+.theme-dark {
+  --bg: #101116;
+  --card: #1C1E28;
+  --card-2: #262938;
+  --text: #EDEFF7;
+  --text-2: #9CA1B5;
+  --text-3: #6A6F85;
+  --line: #2B2E3E;
+  --brand: #8B85F2;
+  --brand-2: #7D75F0;
+  --brand-soft: #2A2A45;
+  --danger: #E5695F;
+  --ok: #4ADE80;
+  --ok-bg: #17332A;
+  --warn: #F0B45C;
+  --err-bg: #3D2426;
+  --shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.4);
+  --ghost-bg: #262938;
+  --ghost-fg: #C6CADB;
+  --mask: rgba(0, 0, 0, 0.62);
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+view, text, scroll-view, input, textarea, button {
+  box-sizing: border-box;
+}
+
+/* ===== 卡片 ===== */
+.card {
+  background: var(--card);
+  border-radius: 28rpx;
+  box-shadow: var(--shadow);
+}
+
+.card-pad {
+  padding: 32rpx;
+}
+
+/* ===== 文本 ===== */
+.t-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2rpx;
+}
+
+.t-sub {
+  font-size: 26rpx;
+  color: var(--text-2);
+}
+
+.t-hint {
+  font-size: 24rpx;
+  color: var(--text-3);
+}
+
+.t-num {
+  font-family: 'DIN Alternate', 'Helvetica Neue', sans-serif;
+  font-weight: 700;
+  letter-spacing: -1rpx;
+}
+
+/* ===== 平台色标 ===== */
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.p-chaoxing { background: #E8453C; }
+.p-educoder { background: #2B7FFF; }
+.p-unipus   { background: #11B981; }
+
+.tag-chaoxing { background: #FDEEED; color: #C93A32; }
+.tag-educoder { background: #E9F1FF; color: #1E63CC; }
+.tag-unipus   { background: #E6F8F1; color: #0B8E63; }
+.tag-zhihuishu { background: #F1E9FB; color: #7C3AED; }
+.tag-icourse163 { background: #E4F2FE; color: #0369A1; }
+.tag-yuketang  { background: #FEF3E2; color: #B45309; }
+.tag-custom    { background: #F1F5F9; color: #64748B; }
+
+.theme-dark .tag-chaoxing { background: #3D2422; color: #F0A29B; }
+.theme-dark .tag-educoder { background: #1E2C44; color: #93BEF7; }
+.theme-dark .tag-unipus   { background: #17332A; color: #85DDB8; }
+.theme-dark .tag-zhihuishu { background: #2F2444; color: #C8ADF8; }
+.theme-dark .tag-icourse163 { background: #1E3348; color: #8CC2F5; }
+.theme-dark .tag-yuketang  { background: #3A2E1C; color: #F0C583; }
+.theme-dark .tag-custom    { background: #262938; color: #A9B0C2; }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 36rpx;
+  padding: 0 14rpx;
+  border-radius: 10rpx;
+  font-size: 20rpx;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+/* ===== 分隔线 ===== */
+.hr {
+  height: 1rpx;
+  background: var(--line);
+  transform: scaleY(0.5);
+}
+
+/* ===== 按钮 ===== */
+.btn-primary {
+  height: 92rpx;
+  line-height: 92rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+  color: #FFFFFF;
+  font-size: 30rpx;
+  font-weight: 600;
+  text-align: center;
+  border: none;
+  padding: 0;
+}
+
+.btn-primary::after { border: none; }
+
+.btn-primary.is-disabled {
+  background: #D8DAE5;
+  color: #FFFFFF;
+}
+
+.theme-dark .btn-primary.is-disabled {
+  background: #3A3D4C;
+  color: #8A8EA0;
+}
+
+.btn-ghost {
+  height: 92rpx;
+  line-height: 92rpx;
+  border-radius: 24rpx;
+  background: var(--ghost-bg);
+  color: var(--ghost-fg);
+  font-size: 30rpx;
+  font-weight: 500;
+  text-align: center;
+  border: none;
+  padding: 0;
+}
+
+.btn-ghost::after { border: none; }
+
+/* ===== 空状态 ===== */
+.empty {
+  padding: 100rpx 40rpx;
+  text-align: center;
+}
+
+.empty-emoji {
+  font-size: 72rpx;
+  line-height: 1;
+  margin-bottom: 24rpx;
+  opacity: 0.85;
+}
+
+.empty-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12rpx;
+}
+
+.empty-desc {
+  font-size: 26rpx;
+  color: var(--text-3);
+  line-height: 1.6;
+}

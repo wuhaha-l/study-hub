@@ -1,0 +1,329 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+
+  <!-- ===== 顶部 ===== -->
+  <view class="head" style="padding-top:{{statusBarHeight}}px;">
+    <view class="nav" style="height:{{navBarHeight}}px;">
+      <view class="nav-back" bindtap="goBack" hover-class="hov">
+        <text class="nav-back-ico">‹</text>
+      </view>
+      <text class="nav-title">专注</text>
+      <view class="nav-set" bindtap="openSet" hover-class="hov">
+        <text class="nav-set-ico">⚙</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- ===== 今日统计 ===== -->
+  <view class="stat-card">
+    <view class="stat">
+      <text class="stat-num">{{stats.today}}<text class="stat-unit">/{{stats.goal}}</text></text>
+      <text class="stat-label">今日番茄</text>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat">
+      <text class="stat-num">{{stats.todayMin}}</text>
+      <text class="stat-label">专注分钟</text>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat">
+      <text class="stat-num">{{stats.todayRest}}</text>
+      <text class="stat-label">休息分钟</text>
+    </view>
+    <view class="stat-line"></view>
+    <view class="stat">
+      <text class="stat-num">{{stats.streak}}</text>
+      <text class="stat-label">连续天数</text>
+    </view>
+    <view class="goal-bar">
+      <view class="goal-fill" style="width:{{stats.goalPct}}%"></view>
+    </view>
+  </view>
+
+  <!-- ===== 计时器 ===== -->
+  <view class="timer-card">
+    <!-- 准备状态时，按住这个圈转就能调时长（顺时针加，一圈 59 分钟）。
+         touchmove 用 catch：转表盘时页面不能跟着滚，不然圆心会跑、角度就算歪了 -->
+    <view
+      class="ring-wrap"
+      bindtouchstart="onRingStart"
+      catchtouchmove="onRingMove"
+      bindtouchend="onRingEnd"
+      bindtouchcancel="onRingEnd"
+    >
+      <canvas type="2d" id="ring" class="ring-canvas"></canvas>
+      <view class="ring-inner">
+        <text class="ring-mode {{running ? (mode === 'break' ? 'is-break' : 'is-focus') : ''}}">{{modeText}}</text>
+        <text class="ring-time">{{timeText}}</text>
+        <text class="ring-task" wx:if="{{mode === 'break'}}">休息一下，待会儿接着来</text>
+        <text class="ring-task" wx:elif="{{taskTitle}}">{{taskTitle}}</text>
+        <text class="ring-task" wx:else>没选任务，也能直接开始</text>
+      </view>
+    </view>
+    <text class="ring-drag" wx:if="{{!hasRun}}">按住圆环转 · 一圈 59 分钟</text>
+
+    <view class="ctrl">
+      <button class="ctrl-main {{running ? 'is-running' : ''}}" bindtap="onMain" disabled="{{busy}}">
+        {{mainText}}
+      </button>
+      <button class="ctrl-sub" bindtap="onSecondary" wx:if="{{hasRun}}">{{secondaryText}}</button>
+    </view>
+
+    <!-- 没开始的时候：快速选时长 + 自定义 -->
+    <view class="quick" wx:if="{{!hasRun}}">
+      <view
+        class="quick-chip {{item === pickedMin ? 'is-on' : ''}}"
+        wx:for="{{quickList}}"
+        wx:key="*this"
+        data-min="{{item}}"
+        bindtap="onPickMin"
+      >{{item}}</view>
+      <view
+        class="quick-chip quick-more {{pickedCustom ? 'is-on' : ''}}"
+        data-from="timer"
+        data-k="{{mode}}"
+        bindtap="openCustom"
+      >
+        <text wx:if="{{pickedCustom}}">{{pickedMin}} 分</text>
+        <text wx:else>自定义</text>
+      </view>
+    </view>
+    <text class="timer-hint" wx:if="{{!hasRun}}">{{mode === 'break' ? '点「开始休息」计时，休息时长也计入统计' : '选好待办后点「开始专注」，完成后自动记一个番茄'}}</text>
+  </view>
+
+  <!-- ===== 学习 / 休息时长统计（日 / 周 / 月 / 年） ===== -->
+  <view class="learn-card">
+    <view class="learn-head">
+      <view class="learn-head-top">
+        <text class="learn-title">{{learn.title}}</text>
+        <view class="learn-kind">
+          <text
+            class="learn-kind-item {{learn.metric === item.k ? 'is-on' : ''}}"
+            wx:for="{{learn.kinds}}"
+            wx:key="k"
+            data-k="{{item.k}}"
+            bindtap="onMetric"
+          >{{item.t}}</text>
+        </view>
+      </view>
+      <text class="learn-total">累计 {{learn.totalTxt}} · {{learn.totalSub}}</text>
+    </view>
+
+    <view class="learn-grid">
+      <view class="learn-tile" wx:for="{{learn.tiles}}" wx:key="label">
+        <text class="learn-tile-label">{{item.label}}</text>
+        <view class="learn-tile-val">
+          <block wx:for="{{item.parts}}" wx:for-item="p" wx:key="k">
+            <text class="lt-num">{{p.n}}</text>
+            <text class="lt-unit">{{p.u}}</text>
+          </block>
+        </view>
+        <text class="learn-tile-sub">{{item.sub}}</text>
+      </view>
+    </view>
+
+    <view class="learn-tabs">
+      <view
+        class="learn-tab {{learn.mode === item.k ? 'is-on' : ''}}"
+        wx:for="{{learn.tabs}}"
+        wx:key="k"
+        data-k="{{item.k}}"
+        bindtap="onChartMode"
+      >{{item.t}}</view>
+    </view>
+
+    <view class="bars">
+      <view class="bar-col" wx:for="{{learn.bars}}" wx:key="from">
+        <text class="bar-val">{{item.txt}}</text>
+        <view class="bar-track">
+          <view class="bar-fill {{item.isNow ? 'is-now' : ''}}" style="height:{{item.pct}}%"></view>
+        </view>
+      </view>
+    </view>
+    <view class="bar-labs">
+      <text class="bar-lab {{item.isNow ? 'is-now' : ''}}" wx:for="{{learn.bars}}" wx:key="from">{{item.label}}</text>
+    </view>
+
+    <!-- 生活时长：按待办标题里的关键词再分一层（健身、跑步、做饭…） -->
+    <view class="kw" wx:if="{{learn.metric === 'life' && learn.kws.length}}">
+      <text class="kw-head">按待办关键词 · 跟上面这张图同一段</text>
+      <view class="kw-row" wx:for="{{learn.kws}}" wx:key="kw">
+        <view class="kw-top">
+          <text class="kw-name">{{item.kw}}</text>
+          <text class="kw-val">{{item.txt}}</text>
+        </view>
+        <view class="kw-track">
+          <view class="kw-fill" style="width:{{item.pct}}%"></view>
+        </view>
+        <text class="kw-sub">{{item.sub}}</text>
+      </view>
+    </view>
+
+    <text class="learn-foot">{{learn.foot}}</text>
+  </view>
+
+  <!-- ===== 今日待办 ===== -->
+  <view class="todo-card">
+    <view class="todo-head">
+      <view class="todo-head-left">
+        <text class="todo-title">今日待办</text>
+        <text class="todo-count" wx:if="{{undone > 0}}">{{undone}} 项未完成</text>
+      </view>
+      <view class="todo-add-btn" bindtap="toggleAdd" hover-class="hov">
+        <text class="todo-add-ico">{{addShow ? '✕' : '＋'}}</text>
+      </view>
+    </view>
+
+    <view class="add-box" wx:if="{{addShow}}">
+      <view class="add-row">
+        <input
+          class="add-ipt"
+          value="{{addTitle}}"
+          bindinput="onAddInput"
+          bindconfirm="onAddTask"
+          placeholder="要专注做什么？比如：复习高数第三章"
+          placeholder-class="ph"
+          confirm-type="done"
+          focus="{{addShow}}"
+          cursor-spacing="20"
+        />
+        <view class="add-ok" bindtap="onAddTask">添加</view>
+      </view>
+      <view class="add-tags">
+        <text class="add-tag-tip">标签</text>
+        <view
+          class="add-tag {{addTag === item.k ? 'is-on' : ''}} tag-{{item.k}}"
+          wx:for="{{addTags}}"
+          wx:key="k"
+          data-k="{{item.k}}"
+          bindtap="onAddTag"
+        >{{item.t}}</view>
+        <text class="add-tag-hint" wx:if="{{!addTag}}">必选</text>
+      </view>
+    </view>
+
+    <view class="todo-empty" wx:if="{{!tasks.length}}">
+      <text class="todo-empty-txt">还没有待办。加一条，专注的时候就知道在为什么努力。</text>
+    </view>
+
+    <view
+      class="todo"
+      wx:for="{{tasks}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      bindtap="onPickTask"
+      bindlongpress="onTaskLong"
+      hover-class="todo-hover"
+    >
+      <view class="todo-check {{item.done ? 'is-done' : ''}} {{item.id === taskId ? 'is-picked' : ''}}" data-id="{{item.id}}" catchtap="onToggleDone">
+        <text class="todo-check-ico" wx:if="{{item.done}}">✓</text>
+      </view>
+      <view class="todo-main">
+        <text class="todo-name {{item.done ? 'is-done' : ''}}">{{item.title}}</text>
+        <view class="todo-meta">
+          <text
+            class="tag-pill tag-{{item.tag}}"
+            data-id="{{item.id}}"
+            catchtap="onTaskTag"
+          >{{item.tagText}}</text>
+          <text class="todo-pomo" wx:if="{{item.pomos > 0}}">🍅 {{item.pomos}}</text>
+          <text class="todo-tag" wx:if="{{item.id === taskId}}">正在专注</text>
+        </view>
+      </view>
+      <text class="todo-go">▶</text>
+    </view>
+
+    <view class="todo-tip" wx:if="{{tasks.length}}">点圆圈打勾 · 点整行开始专注 · 点标签换分类 · 长按删除</view>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- ===== 设置 ===== -->
+  <view class="mask" wx:if="{{setShow}}" bindtap="closeSet"></view>
+  <view class="sheet" wx:if="{{setShow}}" catchtap="noop">
+    <view class="sheet-bar"></view>
+    <view class="sheet-title">专注设置</view>
+
+    <view class="set-row">
+      <text class="set-label">专注时长</text>
+      <view class="stepper">
+        <view class="step-btn" data-k="focus" data-d="-5" bindtap="onStep">－</view>
+        <view class="step-val is-tap" data-from="set" data-k="focus" bindtap="openCustom">{{settings.focus}} 分钟</view>
+        <view class="step-btn" data-k="focus" data-d="5" bindtap="onStep">＋</view>
+      </view>
+    </view>
+
+    <view class="set-row">
+      <text class="set-label">休息时长</text>
+      <view class="stepper">
+        <view class="step-btn" data-k="break" data-d="-1" bindtap="onStep">－</view>
+        <view class="step-val is-tap" data-from="set" data-k="break" bindtap="openCustom">{{settings.break}} 分钟</view>
+        <view class="step-btn" data-k="break" data-d="1" bindtap="onStep">＋</view>
+      </view>
+    </view>
+
+    <view class="set-row">
+      <text class="set-label">每日目标</text>
+      <view class="stepper">
+        <view class="step-btn" data-k="goal" data-d="-1" bindtap="onStep">－</view>
+        <text class="step-val">{{settings.goal}} 个番茄</text>
+        <view class="step-btn" data-k="goal" data-d="1" bindtap="onStep">＋</view>
+      </view>
+    </view>
+
+    <view class="set-row">
+      <text class="set-label">专注完自动休息</text>
+      <switch class="set-switch" checked="{{settings.autoNext}}" color="#6366F1" bindchange="onAutoNext" />
+    </view>
+
+    <view class="sheet-done" bindtap="closeSet">完成</view>
+  </view>
+
+  <!-- ===== 自定义时长 ===== -->
+  <view class="mask mask-top" wx:if="{{customShow}}" bindtap="closeCustom"></view>
+  <view class="sheet sheet-top" wx:if="{{customShow}}" catchtap="noop">
+    <view class="sheet-bar"></view>
+    <view class="sheet-title">自定义时长</view>
+
+    <view class="cus-kind">
+      <view
+        class="cus-kind-item {{customKind === item.k ? 'is-on' : ''}}"
+        wx:for="{{customKinds}}"
+        wx:key="k"
+        data-k="{{item.k}}"
+        bindtap="onCustomKind"
+      >{{item.t}}时长</view>
+    </view>
+
+    <view class="cus-input-row">
+      <input
+        class="cus-input"
+        type="number"
+        value="{{customText}}"
+        bindinput="onCustomInput"
+        bindconfirm="onCustomOk"
+        confirm-type="done"
+        cursor-spacing="24"
+        placeholder="分钟"
+        placeholder-class="ph"
+      />
+      <text class="cus-unit">分钟</text>
+    </view>
+
+    <view class="cus-presets">
+      <view
+        class="cus-preset {{customText == item ? 'is-on' : ''}}"
+        wx:for="{{customPresets}}"
+        wx:key="*this"
+        data-min="{{item}}"
+        bindtap="onCustomPreset"
+      >{{item}}</view>
+    </view>
+
+    <text class="cus-hint">{{customHint}}</text>
+
+    <view class="cus-btns">
+      <view class="cus-cancel" bindtap="closeCustom">取消</view>
+      <view class="cus-ok" bindtap="onCustomOk">{{customFrom === 'timer' ? '按这个时长开始' : '保存'}}</view>
+    </view>
+  </view>
+</view>

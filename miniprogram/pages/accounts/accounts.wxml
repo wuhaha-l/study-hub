@@ -1,0 +1,364 @@
+<view class="page {{theme === 'dark' ? 'theme-dark' : ''}}">
+
+  <!-- 访客：这页全是学校平台，不给进 -->
+  <block wx:if="{{blocked}}">
+    <view class="head">
+      <text class="head-title">访客用不了这里</text>
+      <text class="head-desc">这里的每一项（学习通、希冀、U校园）都要学校账号。访客身份没有学号，也就不该有这些入口。</text>
+    </view>
+
+    <view class="guest-block">
+      <text class="guest-block-emoji">👤</text>
+      <text class="guest-block-title">当前是访客身份</text>
+      <text class="guest-block-body">记事本、番茄钟、手动加课表、手动建待办都能照常用，这些都在首页和课表页。想用平台绑定和任务同步，换成学校账号登录。</text>
+      <view class="guest-block-btn" bindtap="switchToSchool">换成学校账号登录</view>
+    </view>
+
+    <view class="foot-note">
+      <text>访客的记事本、专注记录都在本机，换身份不会清掉。</text>
+    </view>
+    <view class="safe-bottom"></view>
+  </block>
+
+  <block wx:else>
+  <view class="head">
+    <text class="head-title">登录设置</text>
+    <text class="head-desc">在这里登录/绑定各个学习平台。绑定后，小程序会替你登录并汇总所有未完成的任务点、作业与考试。</text>
+  </view>
+
+  <!-- ===== 需要重新登录：逐个点名，点一条就摊开它自己的登录表单 ===== -->
+  <view class="relogin" wx:if="{{reloginItems.length}}">
+    <view class="relogin-head">
+      <text class="relogin-ico">🔑</text>
+      <text class="relogin-title">{{reloginItems.length}} 个平台需要重新登录</text>
+      <text class="relogin-all" wx:if="{{reloginItems.length > 1}}" catchtap="reloginFirst">从第一个开始</text>
+    </view>
+    <text class="relogin-sub">现在抓不到新任务，同步时会跳过它，页面上的任务停在上次的样子。</text>
+
+    <view
+      class="relogin-row"
+      wx:for="{{reloginItems}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="reloginOne"
+      hover-class="row-hover"
+    >
+      <view class="dot" style="background:{{item.color}}"></view>
+      <view class="relogin-row-body">
+        <view class="relogin-row-line">
+          <text class="relogin-name">{{item.name}}</text>
+          <text class="relogin-reason">{{item.reasonText}}</text>
+        </view>
+        <text class="relogin-detail" wx:if="{{item.detail}}">{{item.detail}}</text>
+      </view>
+      <text class="relogin-btn">{{item.action}} ›</text>
+    </view>
+  </view>
+
+  <view class="warn">
+    <text class="warn-ico">🔒</text>
+    <view class="warn-body">
+      <text class="warn-title">关于账号安全</text>
+      <text class="warn-text">密码经加密后只保存在你自己的云数据库里，按 OpenID 隔离，仅用于模拟登录抓取数据。如果你不放心，强烈建议用 Cookie 模式——它不涉及密码，只在 Cookie 有效期内可用。</text>
+    </view>
+  </view>
+
+  <view class="plat" wx:for="{{platforms}}" wx:key="key">
+    <view class="plat-top" data-key="{{item.key}}" bindtap="toggleEdit" hover-class="row-hover">
+      <view class="dot" style="background:{{item.color}}"></view>
+      <view class="plat-info">
+        <text class="plat-name">{{item.name}}</text>
+        <text class="plat-desc">{{item.desc}}</text>
+      </view>
+      <text class="state-badge {{item.bound ? 'on' : ''}}">{{item.bound ? '已绑定' : '未绑定'}}</text>
+      <text class="chev {{editing === item.key ? 'up' : ''}}">›</text>
+    </view>
+
+    <!-- 已绑定概要 -->
+    <view class="bound" wx:if="{{item.bound && editing !== item.key}}">
+      <view class="bound-row">
+        <text class="bound-user">{{item.username || '已绑定'}}</text>
+        <text class="bound-mode">{{item.modeText}}</text>
+      </view>
+      <text class="bound-status {{item.needLogin ? 'bad' : ''}}">{{item.statusText}}</text>
+
+      <!-- 旧模式账号（本地代理 / 内网直连）：云端没有凭据，同步会直接跳过它 -->
+      <view class="legacy" wx:if="{{item.legacy}}">
+        <text class="legacy-title">云端不会同步它</text>
+        <text class="legacy-body">这个账号是「{{item.modeText}}」方式绑的，云端拿不到可用的登录凭据，点同步时会被直接跳过，数据就停在上次抓取的时间。重新绑一次就变成云端抓取{{item.key === 'chaoxing' ? '（学习通可以直接扫码，最快）' : ''}}。</text>
+        <text class="legacy-btn" data-key="{{item.key}}" catchtap="toggleEdit">重新绑成云端模式</text>
+      </view>
+      <view class="bound-ops">
+        <text class="op warn" wx:if="{{item.needLogin}}" data-key="{{item.key}}" catchtap="reloginOne">{{item.reloginAction}}</text>
+        <text class="op" data-key="{{item.key}}" catchtap="reSync">立即同步</text>
+        <text class="op" wx:if="{{item.key === 'chaoxing'}}" catchtap="selfTest">网络自检</text>
+        <text class="op" wx:if="{{item.key === 'chaoxing'}}" catchtap="cxDiag">状态诊断</text>
+        <text class="op" data-key="{{item.key}}" catchtap="toggleEdit">修改</text>
+        <text class="op danger" data-id="{{item.accountId}}" data-key="{{item.key}}" data-name="{{item.name}}" catchtap="removeAccount">解绑</text>
+      </view>
+    </view>
+
+    <!-- 编辑表单 -->
+    <view class="form" wx:if="{{editing === item.key}}">
+      <!-- 上次为什么没登上，就写在表单顶上：填的时候不用回头翻弹窗 -->
+      <view class="form-relogin" wx:if="{{item.needLogin}}">
+        <text class="form-relogin-ico">🔑</text>
+        <text class="form-relogin-txt">{{item.reloginCode === 'legacy' ? '这是「' + item.modeText + '」方式绑的账号，重绑一次才会变成云端抓取' : '上次没登上：' + item.reloginReason}}</text>
+      </view>
+      <view class="seg">
+        <view class="seg-item {{form.mode === 'password' ? 'on' : ''}}" data-mode="password" bindtap="switchMode">账号密码</view>
+        <view class="seg-item {{form.mode === 'qr' ? 'on' : ''}}" wx:if="{{item.key === 'chaoxing'}}" data-mode="qr" bindtap="switchMode">扫码登录</view>
+        <view class="seg-item {{form.mode === 'cookie' ? 'on' : ''}}" data-mode="cookie" bindtap="switchMode">Cookie</view>
+      </view>
+
+      <block wx:if="{{form.mode === 'password'}}">
+        <view class="field">
+          <text class="field-label">{{hintOf[item.key].userLabel}}</text>
+          <input
+            class="field-input"
+            data-field="username"
+            value="{{form.username}}"
+            bindinput="onInput"
+            placeholder="请输入"
+            placeholder-class="ph"
+          />
+        </view>
+        <view class="field">
+          <text class="field-label">密码</text>
+          <input
+            class="field-input"
+            password
+            data-field="password"
+            value="{{form.password}}"
+            bindinput="onInput"
+            placeholder="请输入登录密码"
+            placeholder-class="ph"
+          />
+        </view>
+        <view class="edu-jump" wx:if="{{hintOf[item.key].intraHint}}" bindtap="gotoEdu" hover-class="row-hover">
+          <text class="edu-jump-t">学校把希冀装在内网（地址像 10.67.4.14）？</text>
+          <text class="edu-jump-b">那这里的账号密码模式一定登不上——云函数连不到内网地址。点这一条跳到「希冀 · 校园内网直连」，用学号 + 希冀密码 + 图片验证码登录，会话只存这台手机 →</text>
+        </view>
+
+        <text class="form-tip">部分平台开启了滑块或短信二次验证，这种情况请改用扫码或 Cookie 模式。</text>
+      </block>
+
+      <block wx:elif="{{form.mode === 'qr'}}">
+        <view class="qr-wrap">
+          <view class="qr-box">
+            <image wx:if="{{qrImage}}" class="qr-img" src="{{qrImage}}" mode="aspectFit" />
+            <view class="qr-veil" wx:if="{{qrState === 'loading'}}">
+              <text class="qr-veil-text">正在获取二维码…</text>
+            </view>
+            <view class="qr-veil" wx:if="{{qrState === 'expired' || qrState === 'error'}}">
+              <text class="qr-veil-text bad">二维码已失效</text>
+            </view>
+          </view>
+
+          <text class="qr-state {{qrState === 'scanned' ? 'active' : ''}}">{{qrMessage}}</text>
+
+          <text class="qr-hint">用手机「学习通」App 扫一扫上方二维码，并在手机上点「确认登录」。二维码 4 分钟内有效，过期点下面刷新即可。</text>
+
+          <button class="btn-ghost qr-refresh" bindtap="startQr" loading="{{qrState === 'loading'}}" disabled="{{qrState === 'loading'}}">刷新二维码</button>
+        </view>
+      </block>
+
+      <block wx:else>
+        <view class="field column">
+          <text class="field-label">Cookie</text>
+          <textarea
+            class="field-textarea"
+            data-field="cookie"
+            value="{{form.cookie}}"
+            bindinput="onInput"
+            placeholder="直接粘贴即可，下面三种格式都能自动识别"
+            placeholder-class="ph"
+            maxlength="-1"
+            auto-height
+          />
+        </view>
+        <text class="form-tip">三种粘法都认：① 浏览器控制台执行 copy(document.cookie) 的结果；② 开发者工具 → 应用程序 → Cookies 表格（全选复制）；③ 「复制为 cURL」得到的整条命令。</text>
+        <text class="form-link" bindtap="copyHint">复制获取方法</text>
+      </block>
+
+      <view class="form-actions">
+        <button class="btn-ghost" data-key="{{item.key}}" bindtap="toggleEdit">取消</button>
+        <button class="btn-primary" wx:if="{{form.mode !== 'qr'}}" bindtap="save" disabled="{{saving}}">保存并同步</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 校园内网直连：云函数访问不到私有地址，只能由小程序自己抓 -->
+
+  <view class="intra fold" id="edu-card">
+    <view class="fold-head" bindtap="toggleEdu" hover-class="fold-hover">
+      <view class="fold-main">
+        <view class="fold-title-row">
+          <text class="fold-ico">🏫</text>
+          <text class="fold-title">希冀 · 校园内网直连</text>
+          <text class="intra-badge">需校园网</text>
+        </view>
+        <text class="fold-sum" wx:if="{{!eduOpen}}">学号 + 希冀密码 + 图片验证码，手机直连内网抓任务（云函数进不去内网）</text>
+      </view>
+      <view class="fold-right">
+        <text class="fold-state {{edu.logged ? 'is-on' : ''}}">{{edu.logged ? '已登录' : '未登录'}}</text>
+        <text class="fold-chev {{eduOpen ? 'up' : ''}}">›</text>
+      </view>
+    </view>
+
+    <view class="fold-body" wx:if="{{eduOpen}}">
+    <text class="intra-desc">学校的希冀部署在内网，云函数访问不到，所以由小程序直连，抓完再把任务推送到云端。登录就用你的学号和希冀密码，再加上图片验证码——不用再去浏览器里翻 Cookie。请先连上校园网；手机端若提示「微信拦了这个地址」，点右上角「···」→「开发调试」打开调试模式即可。注意：希冀的「在线作业」列表服务端不返回「已提交/未提交」状态，抓下来一律算未完成，做完的在首页长按该任务点「标记为已完成」即可，和学习通一样归到「已完成」。</text>
+
+    <!-- 用一个 form 把四个输入框和「登录」按钮包起来：点登录时 e.detail.value 里带的是
+         input 原生值，不依赖 bindinput 事件有没有被派发（真机上就栽在这一点上） -->
+    <form bindsubmit="eduLogin">
+
+    <view class="field column">
+      <text class="field-label">平台地址</text>
+      <input class="field-input" name="base" value="{{edu.base}}" bindinput="eduInBase" bindblur="eduInBase" placeholder="http://10.67.4.14" placeholder-class="ph" />
+    </view>
+
+    <view class="field column">
+      <text class="field-label">学号</text>
+      <input class="field-input" name="stid" value="{{edu.stid}}" bindinput="eduInStid" bindblur="eduInStid" type="number" placeholder="202515020339" placeholder-class="ph" />
+    </view>
+
+    <view class="field column">
+      <text class="field-label">希冀密码</text>
+      <input class="field-input" name="password" value="{{edu.password}}" bindinput="eduInPwd" bindblur="eduInPwd" password placeholder="登录希冀用的那个密码" placeholder-class="ph" />
+    </view>
+
+    <view class="field column">
+      <view class="edu-cap-head">
+        <text class="field-label">验证码</text>
+        <text class="edu-cap-tip" bindtap="eduCaptcha">{{eduCaptcha ? '看不清？点右边图片换一张' : '点右边方框取一张'}}</text>
+      </view>
+      <view class="edu-cap-row">
+        <view class="edu-cap-input-wrap">
+          <input
+            class="edu-cap-input"
+            name="code"
+            value="{{edu.code}}"
+            bindinput="eduInCode"
+            bindblur="eduInCode"
+            bindconfirm="eduInCode"
+            maxlength="6"
+            placeholder="输入图中字符"
+            placeholder-class="ph"
+            confirm-type="done"
+          />
+          <text class="edu-cap-count" wx:if="{{eduCodeLen}}">{{eduCodeLen}}/6</text>
+        </view>
+        <view class="edu-cap-box" style="{{eduCapW ? 'width:' + eduCapW + 'rpx' : ''}}" bindtap="eduCaptcha" hover-class="row-hover">
+          <image class="edu-cap-img" wx:if="{{eduCaptcha}}" src="{{eduCaptcha}}" mode="aspectFit" />
+          <text class="edu-cap-txt" wx:else>{{eduBusy ? '加载中…' : '点击取图'}}</text>
+        </view>
+      </view>
+    </view>
+
+    <text class="intra-tip">学号密码和会话都只存在这台手机上，不会上传云端。{{edu.lastSyncText}}<text wx:if="{{edu.build}}" class="edu-build">直连模块 {{edu.build}}</text></text>
+
+    <text class="form-link dbg-link" bindtap="eduShowDebugGuide">连不上内网？看「开发调试」在哪开</text>
+
+    <view class="edu-state">
+      <text class="edu-state-txt">{{edu.stateText}}</text>
+      <text class="form-link" wx:if="{{edu.logged}}" bindtap="eduLogout">退出登录</text>
+    </view>
+
+    <view class="edu-actions">
+      <button class="btn-ghost" bindtap="eduSave" disabled="{{eduBusy}}">仅保存</button>
+      <button class="btn-ghost" bindtap="eduProbe" disabled="{{eduBusy}}">连通性探测</button>
+      <button class="btn-primary" form-type="submit" bindtouchstart="eduLoginTouch" bindtap="eduLoginTap" disabled="{{eduBusy}}">登录</button>
+      <button class="btn-primary" bindtap="eduSync" disabled="{{eduBusy}}">直连同步</button>
+    </view>
+
+    </form>
+
+    <view class="intra-result" wx:if="{{eduResult}}">
+      <text class="intra-result-title">探测结果</text>
+      <text class="intra-result-body">{{eduResult}}</text>
+      <text class="form-link" bindtap="eduCopy">复制结果</text>
+    </view>
+    </view>
+  </view>
+
+  <!-- 课表导入：统一身份认证（APP 通道），手机上一步到位 -->
+
+  <view class="intra fold">
+    <view class="fold-head" bindtap="toggleJw" hover-class="fold-hover">
+      <view class="fold-main">
+        <view class="fold-title-row">
+          <text class="fold-ico">📅</text>
+          <text class="fold-title">课表导入</text>
+          <text class="intra-badge">手机直接用</text>
+        </view>
+        <text class="fold-sum" wx:if="{{!jwOpen}}">{{jwLogged ? '云端已登录' + (jwName ? '（' + jwName + '）' : '') + '，可重新导入' : '统一认证登录 + 短信验证码，课表自动写进「课表」页'}}</text>
+      </view>
+      <view class="fold-right">
+        <text class="fold-state {{jwLogged ? 'is-on' : ''}}">{{jwLogged ? '已登录' : '未登录'}}</text>
+        <text class="fold-chev {{jwOpen ? 'up' : ''}}">›</text>
+      </view>
+    </view>
+
+    <view class="fold-body" wx:if="{{jwOpen}}">
+    <text class="intra-desc">统一认证要短信二次验证：填学号密码点「登录并导入课表」，验证码会发到你手机，填进来就完成（之后约一个月云端免密，同一设备也不再收短信）。抓到的课表直接写进「课表」页，开学日期和单双周一起校准好。</text>
+
+    <view class="jw-account" wx:if="{{jwLogged}}">
+      <text class="jw-account-txt">云端已登录{{jwName ? '：' + jwName : ''}}</text>
+      <text class="form-link" bindtap="jwCasLogout">清除</text>
+    </view>
+
+    <view class="field column">
+      <text class="field-label">学校</text>
+      <picker mode="selector" range="{{schoolNames}}" value="{{schoolIndex}}" bindchange="onSchoolChange">
+        <view class="pick-row">
+          <text class="pick-txt">{{schoolNames[schoolIndex]}}</text>
+          <text class="pick-arrow">▾</text>
+        </view>
+      </picker>
+    </view>
+
+    <view class="field column">
+      <text class="field-label">学号</text>
+      <input class="field-input" value="{{jwUser}}" bindinput="onJwUser" placeholder="202515020339" placeholder-class="ph" />
+    </view>
+
+    <view class="field column">
+      <text class="field-label">统一身份认证密码</text>
+      <input class="field-input" password value="{{jwPass}}" bindinput="onJwPass" placeholder="和登门户那个密码一样" placeholder-class="ph" />
+    </view>
+
+    <!-- 统一认证的短信二次验证：验证码在用户手机上，填进来云端接着走 -->
+    <view class="field column" wx:if="{{jwMfaShow}}">
+      <text class="field-label">短信验证码{{jwPhone ? '（' + jwPhone + '）' : ''}}</text>
+      <input class="field-input" type="number" value="{{jwMfaCode}}" bindinput="onJwMfaCode" placeholder="填手机上收到的验证码" placeholder-class="ph" />
+      <view class="intra-actions">
+        <button class="btn-ghost" bindtap="jwMfaResend" disabled="{{jwBusy}}">重发验证码</button>
+        <button class="btn-primary" bindtap="jwMfaVerify" disabled="{{jwBusy}}">验证并导入</button>
+      </view>
+    </view>
+
+    <text class="intra-tip">{{jwState || jwTip}}</text>
+
+    <view class="intra-actions">
+      <button class="btn-ghost" bindtap="jwSaveCred">仅保存</button>
+      <button class="btn-primary" bindtap="jwLoginImport" disabled="{{jwBusy}}">{{jwBusy ? '处理中…' : '登录并导入课表'}}</button>
+    </view>
+
+    <view class="intra-result" wx:if="{{jwResult}}">
+      <text class="intra-result-title">结果</text>
+      <text class="intra-result-body">{{jwResult}}</text>
+      <text class="form-link" bindtap="jwCopyResult">复制结果</text>
+    </view>
+
+    <text class="intra-tip">提示：验证码发到你手机后 10 分钟内有效；通过一次约一个月内免密，同一设备不再收短信。反复收不到验证码时，去学校 App 里确认绑定了安全手机。</text>
+    </view>
+  </view>
+
+  <view class="foot-note">
+    <text>抓取逻辑基于各平台网页端接口，平台改版后可能短暂失效。失效时重新绑一次 Cookie 通常就能恢复。</text>
+  </view>
+
+  <view class="safe-bottom"></view>
+  </block>
+</view>

@@ -1,0 +1,141 @@
+.page {
+  min-height: 100vh;
+  padding: 32rpx;
+}
+
+.main-card {
+  padding: 36rpx 32rpx;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.course {
+  font-size: 23rpx;
+  color: var(--text-3);
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.title {
+  font-size: 38rpx;
+  font-weight: 600;
+  line-height: 1.42;
+  color: var(--text);
+  letter-spacing: -0.4rpx;
+  margin-bottom: 36rpx;
+}
+
+.meta {
+  background: var(--card-2);
+  border-radius: 20rpx;
+  padding: 8rpx 24rpx;
+  margin-bottom: 28rpx;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+
+.meta-item:last-child {
+  border-bottom: none;
+}
+
+.meta-label {
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+
+.meta-value {
+  font-size: 25rpx;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.meta-value.ok {
+  color: var(--ok);
+}
+
+.progress {
+  margin-bottom: 28rpx;
+}
+
+.prog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14rpx;
+}
+
+.prog-label {
+  font-size: 24rpx;
+  color: var(--text-2);
+}
+
+.prog-val {
+  font-size: 24rpx;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.prog-bar {
+  height: 12rpx;
+  background: var(--ghost-bg);
+  border-radius: 6rpx;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  border-radius: 6rpx;
+  background: linear-gradient(90deg, #6366F1, #8B5CF6);
+  transition: width 0.4s ease;
+}
+
+.countdown {
+  text-align: center;
+  padding: 24rpx 0 8rpx;
+}
+
+.cd-text {
+  display: inline-block;
+  font-size: 26rpx;
+  font-weight: 600;
+  padding: 10rpx 28rpx;
+  border-radius: 24rpx;
+}
+
+.dl-expired { color: var(--danger); background: var(--err-bg); }
+.dl-urgent  { color: #C2410C; background: #FFF1E6; }
+.dl-soon    { color: #1E63CC; background: #EAF2FF; }
+.dl-normal  { color: var(--text-2); background: var(--ghost-bg); }
+.dl-none    { color: var(--text-3); background: var(--card-2); }
+
+.theme-dark .dl-urgent { color: #F0A26B; background: #38260F; }
+.theme-dark .dl-soon { color: #8CC2F5; background: #1E2C44; }
+
+.actions {
+  margin-top: 40rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.tip {
+  margin-top: 32rpx;
+  font-size: 22rpx;
+  color: var(--text-3);
+  line-height: 1.7;
+  text-align: center;
+  padding: 0 20rpx;
+}
