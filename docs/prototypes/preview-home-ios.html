@@ -282,18 +282,6 @@
   .t-btn.p { background: var(--blue); color: #fff; box-shadow: 0 4px 14px rgba(0,122,255,.32); }
   .t-note { font-size: 10.5px; color: var(--gray); line-height: 1.55; padding: 9px 20px 26px; text-align: center; }
 
-  /* 功能对照表 */
-  .feat { max-width: 1600px; margin: 34px auto 0; background: #fff; border-radius: 18px; padding: 20px 22px 22px;
-    box-shadow: 0 2px 10px rgba(24,28,56,.07); }
-  .feat h2 { font-size: 16px; letter-spacing: -.3px; }
-  .feat p { font-size: 12.5px; color: #6E7180; margin-top: 6px; line-height: 1.7; }
-  table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 12.5px; }
-  th, td { text-align: left; padding: 8px 10px; border-bottom: .5px solid #EDEEF3; vertical-align: top; }
-  th { font-size: 11.5px; color: #8A8F9E; font-weight: 600; letter-spacing: .3px; }
-  td:first-child { color: #1C1C1E; font-weight: 500; width: 190px; }
-  td .ok { color: #15803D; font-weight: 600; }
-  .feat .tip { margin-top: 14px; font-size: 12px; color: #6E7180; background: #F7F8FB; border-radius: 10px;
-    padding: 10px 12px; line-height: 1.7; }
 </style>
 </head>
 <body>
@@ -697,32 +685,6 @@
     </div>
   </section>
 
-</div>
-
-<div class="feat">
-  <h2>功能对照：一个都没少</h2>
-  <p>下面这些是现在首页上真实存在的交互，两套设计都留了位置。左侧是功能，右侧是它在两个方案里落在哪儿。</p>
-  <table>
-    <tr><th>功能</th><th>方案一（分组列表）</th><th>方案二（磁贴）</th></tr>
-    <tr><td>待完成 / 过期 / 7 天内 / 完成率</td><td>顶部概览卡：大数字 + 三个胶囊 + 完成率环</td><td>2×2 磁贴里的两块（待完成、完成率环）</td></tr>
-    <tr><td>平台三卡（数量 / 绑定状态 / 失效）</td><td>「平台」分组三行，右侧数量 + chevron，失效行红字</td><td>顶栏下方三个胶囊，未绑定置灰</td></tr>
-    <tr><td>同步全部课程和任务（含转圈 / 分阶段文案）</td><td>大标题右侧 ⟳ 圆按钮（转圈）</td><td>顶栏 ⟳ + 下拉刷新，同款分阶段文案走顶部小 toast</td></tr>
-    <tr><td>主题切换 / 登录设置</td><td>🌙 在标题右侧；⚙ 收进「账号与登录设置」行（iOS 习惯把设置放列表里，也给右上胶囊让位）</td><td>顶栏 🌙；账号入口同样落在列表底部的账号行</td></tr>
-    <tr><td>今日课程（含「正在上」、地点、本周节数、无课文案）</td><td>「今天 · 周二」分组，行内时间片 + 课名 + 地点，「在课表中查看」蓝字入口</td><td>首屏底部课程行（下一屏置顶），点进课表</td></tr>
-    <tr><td>平台筛选（全部 + 3 个平台，带数量）</td><td>iOS 分段控件，四段</td><td>胶囊 chip 行，选中反白</td></tr>
-    <tr><td>学期筛选（本学期 / 全部学期 + 说明）</td><td>「待办」标题右侧「新学期 ⌄」菜单</td><td>chip 行首段「新学期 ⌄」</td></tr>
-    <tr><td>课程筛选</td><td>同级「课程 ⌄」菜单</td><td>chip 行第二段「课程 ⌄」</td></tr>
-    <tr><td>7 类分组（过期 / 今天 / 一周内 / 更晚 / 章节 / 不用做 / 已完成）+ 折叠</td><td>按分组顺序下排，「已完成 / 不用做」收成两行可展开</td><td>卡片流按分组排，「已完成 · 不用做」合成一张折叠条</td></tr>
-    <tr><td>任务行信息（平台、课程、必做/选做、往期学期、类型、进度、截止分级、已完成态）</td><td>标题 + 灰色副标题（平台 · 课程 · 类型 · 进度），角标贴在标题后，右侧截止</td><td>卡头一行放平台/课程/截止，标题加粗，底部一行放类型 + 进度条</td></tr>
-    <tr><td>长按菜单（完成 / 恢复 / 详情 / 复制链接 / 删除）</td><td>iOS 上下文菜单（毛玻璃 + 取消）</td><td>同款 contextMenu，从卡片浮出</td></tr>
-    <tr><td>新建任务（标题 / 课程 / 日期 / 时间 / 提醒 4 档 + 自定义 / 额度说明）</td><td>「＋」进 sheet，同方案二样式</td><td>底部 sheet，分组表单 + 双按钮</td></tr>
-    <tr><td>每日提醒卡（开启 / 续订）</td><td>「每日提醒」行，右侧「开启」蓝字</td><td>卡片 + 开关</td></tr>
-    <tr><td>记事本 / 专注（条数、番茄数、分钟、进行中）</td><td>「工具」分组两行，副标题显示今日数据</td><td>2×2 磁贴各占一格</td></tr>
-    <tr><td>错误提示 / 同步警告 / 云函数版本过旧</td><td>列表顶部一条黄色 inline 提示行</td><td>顶部毛玻璃提示条，可点开</td></tr>
-    <tr><td>加载骨架 / 未绑定引导 / 全空态</td><td>分组列表骨架条；引导卡改成分组 + 蓝色按钮</td><td>磁贴占位块；空态卡居中</td></tr>
-    <tr><td>页脚（上次同步 / 服务版本 / 长按提示）+ 退出登录</td><td>页脚小字 + 账号分组末尾的红色「退出登录」行</td><td>页脚小字 + 底部「退出登录」红字</td></tr>
-  </table>
-  <div class="tip">两点说明：<b>①</b> 方案一保留了「大标题」这个 iOS 特征，所以顶部比现在高 40px 左右，任务会晚半屏出现；如果你更在意首屏能看几条任务，方案二更划算。<b>②</b> 两套都<b>没有</b>加底部 tab bar —— 你现在 8 个页面是靠导航跳转的，凭空加个 tab 会改信息架构，那个要单独定。</div>
 </div>
 
 </body>
